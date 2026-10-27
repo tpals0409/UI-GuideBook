@@ -164,22 +164,37 @@ html:has(.dt[open]){overflow:hidden}
 .tpanel h3{margin:0;font-size:17px;font-weight:700}
 .tp-note{margin:0;font-size:13px;line-height:1.6;color:var(--ui-muted)}
 .tp-h{margin:6px 0 0;font-size:13px;font-weight:700;color:var(--ui-text)}
-.font-list{display:grid;grid-template-columns:1fr 1fr;gap:6px;max-height:252px;overflow-y:auto;padding:2px}
-.font-list button{display:flex;flex-direction:column;gap:2px}
-.font-list .fn{font-size:14px;line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.font-list .fm{display:flex;justify-content:space-between;gap:6px;font-size:12px;color:var(--ui-muted)}
-.font-list .fm em{font-style:normal;font-family:"Gmarket Sans",sans-serif;font-size:11px}
+.chips{display:flex;flex:none}
+.chips i{width:16px;height:16px;border-radius:50%;box-shadow:0 0 0 1.5px var(--ui-surface),0 0 0 2.5px var(--ui-line)}
+.chips i+i{margin-left:-4px}
+.dd{position:relative}
+.dd-btn{all:unset;box-sizing:border-box;width:100%;display:flex;align-items:center;gap:10px;min-height:46px;padding:8px 10px 8px 12px;border:1px solid var(--ui-line);border-radius:10px;background:var(--ui-surface);color:var(--ui-text);cursor:pointer;font-size:14px}
+.dd-btn:hover{border-color:color-mix(in srgb,var(--ui-text) 40%,var(--ui-line))}
+.dd-btn[aria-expanded=true]{border-color:var(--ui-text)}
+.dd-btn:focus-visible{outline:2px solid var(--ui-text);outline-offset:2px}
+.dd-btn .dd-cur{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dd-btn em{font-style:normal;font-size:12px;color:var(--ui-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dd-caret{margin-left:auto;flex:none;display:grid;color:var(--ui-muted)}
+.dd-btn[aria-expanded=true] .dd-caret{transform:rotate(180deg)}
+.dd-pop{margin-top:6px;background:var(--ui-surface);border:1px solid var(--ui-line);border-radius:12px;box-shadow:0 6px 18px rgb(0 0 0/.08);padding:6px;display:flex;flex-direction:column;gap:6px}
+.dd-list{max-height:264px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
+.dd-row{display:flex;align-items:center;gap:2px}
+.dd-opt{all:unset;box-sizing:border-box;flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;padding:8px 10px;border-radius:8px;cursor:pointer;color:var(--ui-text);font-size:14px}
+.dd-opt .fn{line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dd-opt .fm{display:flex;justify-content:space-between;gap:6px;font-size:12px;color:var(--ui-muted)}
+.dd-opt .fm em,.dd-btn em{font-family:"Gmarket Sans",sans-serif}
+.dd-opt .fm em{font-style:normal;font-size:11px}
+.pal-opt{flex-direction:row;align-items:center;gap:10px}
+.pal-opt .tag{margin-left:auto;font-size:11px;color:var(--ui-muted);border:1px solid var(--ui-line);border-radius:5px;padding:0 5px}
+.dd-opt:hover,.dd-opt:focus{background:var(--ui-soft)}
+.dd-opt:focus-visible{outline:2px solid var(--ui-text);outline-offset:-2px}
+.dd-opt[aria-selected=true]{background:var(--ui-soft);box-shadow:inset 3px 0 0 var(--ui-text)}
+.dd-del{all:unset;flex:none;width:36px;height:36px;border-radius:8px;display:grid;place-items:center;color:var(--ui-muted);cursor:pointer}
+.dd-del:hover{background:var(--ui-soft);color:var(--danger)}
+.dd-del:focus-visible{outline:2px solid var(--ui-text);outline-offset:-2px;color:var(--danger)}
+.dt-theme-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:10px}
 .font-q{height:36px;border:1px solid var(--ui-line);border-radius:10px;padding:0 12px;font:inherit;font-size:13px;background:var(--ui-surface);color:var(--ui-text)}
 .font-q:focus{outline:none;border-color:var(--ui-text)}
-.pal-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}
-.font-list button,.pal{all:unset;box-sizing:border-box;cursor:pointer;border:1px solid var(--ui-line);border-radius:10px;padding:9px 11px;font-size:14px;line-height:1.35;background:var(--ui-surface);color:var(--ui-text)}
-.pal{display:flex;align-items:center;gap:10px}
-.pal .chips{display:flex;flex:none}
-.pal .chips i{width:16px;height:16px;border-radius:50%;box-shadow:0 0 0 1.5px var(--ui-surface),0 0 0 2.5px var(--ui-line)}
-.pal .chips i+i{margin-left:-4px}
-.font-list button:hover,.pal:hover{border-color:color-mix(in srgb,var(--ui-text) 40%,var(--ui-line))}
-.font-list button[aria-pressed=true],.pal[aria-pressed=true]{border-color:var(--ui-text);box-shadow:inset 0 0 0 1px var(--ui-text)}
-.font-list button:focus-visible,.pal:focus-visible,.tp-reset:focus-visible{outline:2px solid var(--ui-text);outline-offset:2px}
 .ai-pal{display:flex;gap:6px;margin-top:2px}
 .ai-pal input{flex:1;min-width:0;height:40px;border:1px solid var(--ui-line);border-radius:10px;padding:0 12px;font:inherit;font-size:14px;background:var(--ui-surface);color:var(--ui-text)}
 .ai-pal input:focus{outline:none;border-color:var(--ui-text)}
@@ -190,7 +205,6 @@ html:has(.dt[open]){overflow:hidden}
 .tp-reset{all:unset;align-self:flex-start;cursor:pointer;font-size:13px;color:var(--ui-muted);text-decoration:underline;text-underline-offset:3px}
 .dt-theme{display:flex;flex-direction:column;gap:8px}
 .dt-theme h3{font-size:13px;margin:0;color:var(--ui-muted);font-weight:700}
-.dt-theme .font-list{grid-template-columns:repeat(auto-fill,minmax(170px,1fr));max-height:220px}
 @media (max-width:900px){.tpanel{right:16px}.theme-btn{padding:0;width:44px;justify-content:center}.theme-btn .lbl{display:none}}
 
 /* 데모 공통 */
@@ -272,8 +286,8 @@ html:has(.dt[open]){overflow:hidden}
     <div class="tpanel" id="tpanel" role="dialog" aria-label="예시 테마" hidden>
       <h3>예시 테마</h3>
       <p class="tp-note">모든 용어 예시의 글꼴과 색을 바꿔요. 글꼴은 무료·오픈소스 글꼴만 있어요(이름에 마우스를 올리면 라이선스가 보여요). 용어 하나만 바꾸려면 그 용어를 열고 "이 용어만 바꾸기"를 쓰세요. 새로고침하면 처음으로 돌아가요.</p>
-      <p class="tp-h">글꼴</p><input class="font-q" type="search" aria-label="글꼴 검색" placeholder="글꼴 검색 (예: 명조, 손글씨, Pretendard)"><div class="font-list"></div>
-      <p class="tp-h">색</p><div class="pal-list"></div>
+      <p class="tp-h">글꼴</p><div class="dd" data-kind="font" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><input class="font-q" type="search" aria-label="글꼴 검색" placeholder="글꼴 검색 (예: 명조, 손글씨, Pretendard)"><div class="dd-list" role="listbox" aria-label="글꼴"></div></div></div>
+      <p class="tp-h">색</p><div class="dd" data-kind="pal" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><div class="dd-list" role="listbox" aria-label="색 팔레트"></div></div></div>
       <form class="ai-pal"><input aria-label="원하는 느낌" maxlength="100" placeholder="원하는 느낌 (예: 따뜻한 카페)"><button type="submit">✦ AI로 만들기</button></form>
       <p class="tp-msg" aria-live="polite"></p>
       <button class="tp-reset" type="button">처음으로 되돌리기</button>
@@ -290,7 +304,7 @@ html:has(.dt[open]){overflow:hidden}
   <div class="dt-body">
     <p class="desc"></p>
     <div><p class="dt-demo-l">직접 해 보기</p><div class="demo dt-demo"></div></div>
-    <section class="dt-theme"><h3>이 용어만 바꾸기</h3><p class="tp-h">글꼴</p><input class="font-q" type="search" aria-label="글꼴 검색" placeholder="글꼴 검색"><div class="font-list"></div><p class="tp-h">색</p><div class="pal-list"></div></section>
+    <section class="dt-theme"><h3>이 용어만 바꾸기</h3><div class="dt-theme-row"><div><p class="tp-h">글꼴</p><div class="dd" data-kind="font" data-scope="term"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><input class="font-q" type="search" aria-label="글꼴 검색" placeholder="글꼴 검색 (예: 명조, 손글씨, Pretendard)"><div class="dd-list" role="listbox" aria-label="글꼴"></div></div></div></div><div><p class="tp-h">색</p><div class="dd" data-kind="pal" data-scope="term"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><div class="dd-list" role="listbox" aria-label="색 팔레트"></div></div></div></div></div></section>
     <section class="dt-how"><h3>동작 방식</h3><ol></ol></section>
     <p class="diff"></p>
   </div>
@@ -1772,7 +1786,7 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
     pal('mono','모노',['#141414','#ffffff','#e8e8e8','#ffffff','#f3f3f3','#141414','#616161','#dadada']),
   ];
   const DEFAULT={font:'gmarket-sans',pal:'cobalt'};
-  const theme={...DEFAULT},per={},aiPals=[];
+  const theme={...DEFAULT},per={},aiPals=[];let aiSeq=0;
   const pals=()=>[...PALS,...aiPals];
   const loadedFonts=new Set();
   const addCss=href=>document.head.insertAdjacentHTML('beforeend',`<link rel="stylesheet" href="${href}">`);
@@ -1796,36 +1810,80 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
     for(const[id,o]of Object.entries(per)){const d=decl(o.font,o.pal);if(d)t+=`#${CSS.escape(id)} .demo,.dt-demo[data-for="${id}"]{${d}}`}
     themeCss.textContent=t;
   };
-  const fontBtns=(follow,cur)=>(follow?`<button type="button" data-font="" data-n="전체 설정 따르기" aria-pressed="${!cur}"><span class="fn">전체 설정 따르기</span></button>`:'')+FONTS.map(f=>`<button type="button" data-font="${f.id}" data-n="${esc((f.name+' '+f.family+' '+(CAT_KO[f.category]||'')).toLowerCase())}" aria-pressed="${cur===f.id}" title="${esc(f.license||'')}" style="font-family:${esc(stack(f))}"><span class="fn">${esc(f.name)}</span><span class="fm"><span>가나다라 Aa</span><em>${CAT_KO[f.category]||''}</em></span></button>`).join('');
-  const filterFonts=box=>{const q=$('.font-q',box).value.trim().toLowerCase();$$('.font-list button',box).forEach(b=>b.hidden=!!q&&!b.dataset.n.includes(q))};
-  const palBtns=(follow,cur)=>(follow?`<button type="button" class="pal" data-pal="" aria-pressed="${!cur}">전체 설정 따르기</button>`:'')+pals().map(p=>`<button type="button" class="pal" data-pal="${p.id}" aria-pressed="${cur===p.id}"><span class="chips" aria-hidden="true"><i style="background:${p.primary}"></i><i style="background:${p.primarySoft}"></i><i style="background:${p.text}"></i></span>${esc(p.name)}</button>`).join('');
+  // ── 드롭다운: 버튼을 누르면 목록이 펼쳐져요. 글꼴은 검색할 수 있고, AI로 만든 팔레트는 지울 수 있어요 ──
+  // 같은 부품을 패널(전체 설정)과 모달(이 용어만)에서 같이 써요. data-scope로 어느 상태를 읽고 쓸지 정해요.
+  const FOLLOW='전체 설정 따르기';
+  const chips=p=>`<span class="chips" aria-hidden="true"><i style="background:${p.primary}"></i><i style="background:${p.primarySoft}"></i><i style="background:${p.text}"></i></span>`;
+  const fontOpt=(f,sel)=>`<div class="dd-row"><button type="button" class="dd-opt" role="option" data-v="${f.id}" aria-selected="${sel}" data-n="${esc((f.name+' '+f.family+' '+(CAT_KO[f.category]||'')).toLowerCase())}" title="${esc(f.license||'')}" style="font-family:${esc(stack(f))}"><span class="fn">${esc(f.name)}</span><span class="fm"><span>가나다라 Aa</span><em>${CAT_KO[f.category]||''}</em></span></button></div>`;
+  const palOpt=(p,sel)=>`<div class="dd-row"><button type="button" class="dd-opt pal-opt" role="option" data-v="${p.id}" aria-selected="${sel}">${chips(p)}<span>${esc(p.name)}</span>${p.ai?'<span class="tag">AI</span>':''}</button>${p.ai?`<button type="button" class="dd-del" data-del="${p.id}" aria-label="${esc(p.name)} 팔레트 삭제" title="삭제">${ic('trash',15)}</button>`:''}</div>`;
+  const getV=(kind,scope)=>scope==='global'?theme[kind]:(per[cur]||{})[kind];
+  const setV=(kind,scope,v)=>{if(scope==='global'){theme[kind]=v;return}const o=per[cur]||(per[cur]={});o[kind]=v||undefined;if(!o.font&&!o.pal)delete per[cur]};
+  const label=(kind,v,follow)=>{
+    if(follow&&!v){const g=kind==='font'?FONTS.find(f=>f.id===theme.font):pals().find(p=>p.id===theme.pal);return `<span class="dd-cur">${FOLLOW}</span><em>${esc(g?.name||'')}</em>`}
+    if(kind==='font'){const f=FONTS.find(x=>x.id===v)||FONTS[0];return `<span class="dd-cur" style="font-family:${esc(stack(f))}">${esc(f.name)}</span><em>${CAT_KO[f.category]||''}</em>`}
+    const p=pals().find(x=>x.id===v)||PALS[0];return `${chips(p)}<span class="dd-cur">${esc(p.name)}</span>`;
+  };
+  const filterDD=dd=>{const q=($('.font-q',dd)?.value||'').trim().toLowerCase();$$('.dd-row',dd).forEach(r=>{r.hidden=!!q&&!($('.dd-opt',r).dataset.n||'').includes(q)})};
+  const drawDD=dd=>{
+    const{kind,scope}=dd.dataset,follow=scope==='term',v=getV(kind,scope);
+    $('.dd-btn',dd).innerHTML=label(kind,v,follow)+`<span class="dd-caret" aria-hidden="true">${ic('chev-d',16)}</span>`;
+    const head=follow?`<div class="dd-row"><button type="button" class="dd-opt" role="option" data-v="" data-n="${FOLLOW}" aria-selected="${!v}"><span class="fn">${FOLLOW}</span></button></div>`:'';
+    $('.dd-list',dd).innerHTML=head+(kind==='font'?FONTS.map(f=>fontOpt(f,v===f.id)):pals().map(p=>palOpt(p,v===p.id))).join('');
+    filterDD(dd);
+  };
+  const DDS=()=>$$('.dd');
+  const drawAll=()=>DDS().forEach(dd=>{if(dd.dataset.scope==='global'||cur)drawDD(dd)});
+  const setDD=(dd,o)=>{
+    $('.dd-pop',dd).hidden=!o;$('.dd-btn',dd).setAttribute('aria-expanded',o);
+    if(!o)return;
+    loadAllFonts();DDS().forEach(x=>x!==dd&&setDD(x,false));
+    const fq=$('.font-q',dd);
+    if(fq){fq.value='';filterDD(dd);fq.focus()}else($('.dd-opt[aria-selected=true]',dd)||$('.dd-opt',dd))?.focus();
+  };
+  const removePal=id=>{
+    const i=aiPals.findIndex(p=>p.id===id);if(i<0)return;
+    const[p]=aiPals.splice(i,1);
+    if(theme.pal===id)theme.pal=DEFAULT.pal; // 지운 팔레트를 쓰던 곳은 기본값·전체 설정으로 돌아가요
+    for(const[k,o]of Object.entries(per))if(o.pal===id){o.pal=undefined;if(!o.font)delete per[k]}
+    applyTheme();drawAll();aiMsg.textContent=`"${p.name}" 팔레트를 지웠어요.`;
+  };
+  document.addEventListener('click',e=>{
+    const path=e.composedPath(),dd=e.target.closest?.('.dd');
+    DDS().forEach(x=>{if(!path.includes(x))setDD(x,false)});
+    if(!dd)return;
+    if(e.target.closest('.dd-btn'))return setDD(dd,$('.dd-pop',dd).hidden);
+    const del=e.target.closest('.dd-del');
+    if(del)return removePal(del.dataset.del);
+    const opt=e.target.closest('.dd-opt');
+    if(opt){setV(dd.dataset.kind,dd.dataset.scope,opt.dataset.v);applyTheme();drawAll();setDD(dd,false);$('.dd-btn',dd).focus()}
+  });
+  document.addEventListener('input',e=>{if(e.target.matches?.('.font-q'))filterDD(e.target.closest('.dd'))});
+  // 키보드: ↓·↑로 열고 옮겨 다니고, Esc로 닫아요 (패널·모달은 열린 채로)
+  document.addEventListener('keydown',e=>{
+    const dd=e.target.closest?.('.dd');if(!dd)return;
+    const pop=$('.dd-pop',dd);
+    if(e.key==='Escape'&&!pop.hidden){e.preventDefault();e.stopPropagation();setDD(dd,false);$('.dd-btn',dd).focus();return}
+    if(e.key!=='ArrowDown'&&e.key!=='ArrowUp')return;
+    e.preventDefault();
+    if(pop.hidden)return setDD(dd,true);
+    const os=$$('.dd-row:not([hidden]) .dd-opt',dd),i=os.indexOf(document.activeElement);
+    (os[e.key==='ArrowDown'?Math.min(os.length-1,i+1):Math.max(0,i-1)]||os[0])?.focus();
+  },true);
 
   const tBtn=$('#theme-btn'),tPanel=$('#tpanel'),tSec=$('.dt-theme',dlg);
-  const drawPanel=()=>{$('.font-list',tPanel).innerHTML=fontBtns(false,theme.font);$('.pal-list',tPanel).innerHTML=palBtns(false,theme.pal);filterFonts(tPanel)};
-  function drawTerm(){if(!cur)return;const o=per[cur]||{};loadAllFonts();$('.font-list',tSec).innerHTML=fontBtns(true,o.font);$('.pal-list',tSec).innerHTML=palBtns(true,o.pal);filterFonts(tSec)}
-  const setPanel=o=>{tPanel.hidden=!o;tBtn.setAttribute('aria-expanded',o);if(o){loadAllFonts();drawPanel()}};
-  [tPanel,tSec].forEach(box=>$('.font-q',box).addEventListener('input',()=>filterFonts(box)));
+  function drawTerm(){if(cur)$$('.dd',tSec).forEach(drawDD)}
+  const setPanel=o=>{tPanel.hidden=!o;tBtn.setAttribute('aria-expanded',o);if(o)drawAll();else DDS().forEach(x=>setDD(x,false))};
   if(location.protocol.startsWith('http'))fetch('/fonts.json').then(r=>r.ok?r.json():[]).then(list=>{
     for(const f of list)if(!FONTS.some(x=>x.family===f.family))FONTS.splice(FONTS.length-1,0,f); // '시스템 기본'은 맨 뒤에
-    if(!tPanel.hidden){loadAllFonts();drawPanel()}
+    drawAll();
   }).catch(()=>{});
   tBtn.onclick=e=>{e.stopPropagation();setPanel(tPanel.hidden)};
   document.addEventListener('click',e=>{const path=e.composedPath();if(!tPanel.hidden&&!path.includes(tPanel)&&!path.includes(tBtn))setPanel(false)});
   addEventListener('keydown',e=>{if(e.key==='Escape'&&!tPanel.hidden){setPanel(false);tBtn.focus()}});
   tPanel.addEventListener('click',e=>{
-    const f=e.target.closest('[data-font]'),p=e.target.closest('[data-pal]'),reset=e.target.closest('.tp-reset');
-    if(f)theme.font=f.dataset.font;
-    if(p)theme.pal=p.dataset.pal;
-    if(reset){Object.assign(theme,DEFAULT);for(const k in per)delete per[k];$('.tp-msg',tPanel).textContent='';}
-    if(f||p||reset){applyTheme();drawPanel()}
-  });
-  tSec.addEventListener('click',e=>{
-    const f=e.target.closest('[data-font]'),p=e.target.closest('[data-pal]');if(!f&&!p)return;
-    const o=per[cur]||(per[cur]={});
-    if(f)o.font=f.dataset.font||undefined;
-    if(p)o.pal=p.dataset.pal||undefined;
-    if(!o.font&&!o.pal)delete per[cur];
-    applyTheme();drawTerm();
+    if(!e.target.closest('.tp-reset'))return;
+    Object.assign(theme,DEFAULT);for(const k in per)delete per[k];
+    aiMsg.textContent='처음 설정으로 되돌렸어요. AI로 만든 팔레트는 목록에 남아 있어요.';applyTheme();drawAll();
   });
   // AI 팔레트: 원하는 느낌을 쓰면 Worker가 Claude로 만들고 명도 대비를 맞춰서 돌려줘요
   const aiForm=$('.ai-pal',tPanel),aiMsg=$('.tp-msg',tPanel);
@@ -1839,8 +1897,8 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
       const res=await fetch(AI_ENDPOINT.replace(/\/$/,'')+'/palette',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({prompt:q})});
       const data=await res.json().catch(()=>({}));
       if(!res.ok)throw new Error(data.error||'팔레트를 만들지 못했어요.');
-      const p={...data.palette,id:'ai-'+(aiPals.length+1)};
-      aiPals.push(p);theme.pal=p.id;applyTheme();drawPanel();drawTerm();inp.value='';
+      const p={...data.palette,id:'ai-'+(++aiSeq),ai:true};
+      aiPals.push(p);theme.pal=p.id;applyTheme();drawAll();inp.value='';
       aiMsg.textContent=`"${p.name}" 팔레트를 적용했어요.`+(data.adjusted?.length?' 글자가 잘 보이도록 일부 색을 보정했어요.':'');
     }catch(err){aiMsg.textContent=err instanceof TypeError?'AI 서버에 연결하지 못했어요.':err.message}
     finally{btn.disabled=false}
