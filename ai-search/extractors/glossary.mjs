@@ -21,7 +21,7 @@ export default function extractGlossary({ source, file, root }) {
     matchMedia: () => ({ matches: false }),
     addEventListener: noop, removeEventListener: noop, requestAnimationFrame: noop,
     localStorage: { getItem: () => null, setItem: noop },
-    location: { hash: '' }, navigator: {},
+    location: { hash: '', protocol: 'file:', hostname: '' }, navigator: {},
     document: { documentElement: { dataset: {}, classList: { add: noop, remove: noop } }, querySelector: () => null, querySelectorAll: () => [] },
   });
   for (const code of scripts) vm.runInContext(code, ctx);
