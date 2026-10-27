@@ -40,7 +40,9 @@
 |---|---|
 | UI 용어 추가·수정 | `UI/ui-glossary.html`의 `add(...)`, `HOW` 데이터를 고쳐요 |
 | 체크리스트·문서 추가 | 알맞은 폴더에 `.md` 파일을 넣어요 |
-| 사이트·AI 검색에 반영 | `ai-search`에서 `npm run deploy`(사이트) → `npm run ingest`(검색 색인) |
+| 사이트·AI 검색에 반영 | `main`에 푸시하면 GitHub Actions가 자동으로 배포하고 검색 색인을 갱신해요 (바뀐 문서만) |
+
+자동 배포는 [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)에 있어요. PR에서는 빌드와 배포 점검만 하고, Actions 탭에서 수동으로 실행할 수도 있어요. 필요한 GitHub Secrets: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `ADMIN_TOKEN`.
 
 ## 비밀값
 

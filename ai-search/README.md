@@ -7,7 +7,9 @@
 - `dev-reference-ai-search.tpals0409dev.workers.dev`: 자료 업로드(`/ingest`, `/stats`)만 받아요(`ADMIN_TOKEN` 필요). 페이지와 검색은 404예요.
 - 로컬 파일로 연 html에서는 AI 버튼이 숨겨져요.
 
-`npm run deploy`는 `scripts/build-site.mjs`로 html과 `.md` 문서를 `public/`에 모은 뒤 배포해요. 문서를 고쳤다면 `npm run deploy`(사이트 반영)와 `npm run ingest`(검색 반영)를 둘 다 실행해요.
+`main`에 푸시하면 GitHub Actions(`.github/workflows/deploy.yml`)가 배포와 검색 색인 갱신을 자동으로 해요. 로컬에서 직접 하려면 `npm run deploy`(사이트 반영)와 `npm run ingest`(검색 반영)를 실행해요. `npm run deploy`는 `scripts/build-site.mjs`로 html과 `.md` 문서를 `public/`에 모은 뒤 배포해요.
+
+GitHub Actions의 `CLOUDFLARE_API_TOKEN` 권한: Account — Workers Scripts Edit, Account Settings Read, D1 Read, Vectorize Read, Workers AI Read / Zone(leo0409.work) — Workers Routes Edit, Zone Read, DNS Read.
 
 ---
 
