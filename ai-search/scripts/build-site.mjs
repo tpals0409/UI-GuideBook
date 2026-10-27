@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import sources from '../sources.config.mjs';
 import { walk } from '../extractors/markdown.mjs';
 import { buildFontList } from './fonts.mjs';
+import { buildCompanyList } from './companies.mjs';
 
 const configDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const root = path.join(configDir, '..'); // 개발 체크리스트 폴더
@@ -35,4 +36,7 @@ fs.writeFileSync(path.join(out, 'docs.json'), JSON.stringify(docs));
 // 예시 테마의 글꼴 목록 (무료·오픈소스 글꼴)
 const fonts = await buildFontList();
 fs.writeFileSync(path.join(out, 'fonts.json'), JSON.stringify(fonts));
-console.log(`public/에 ${files.length}개 파일, 문서 목록(${docs.length}개), 글꼴 목록(${fonts.length}개)을 만들었어요`);
+// 예시 테마의 회사 팔레트 (oh-my-design). 받아오지 못해도 배포는 계속해요
+const companies = await buildCompanyList().catch(err => { console.warn(`회사 팔레트를 받지 못했어요: ${err.message}`); return []; });
+fs.writeFileSync(path.join(out, 'companies.json'), JSON.stringify(companies));
+console.log(`public/에 ${files.length}개 파일, 문서 목록(${docs.length}개), 글꼴 목록(${fonts.length}개), 회사 팔레트(${companies.length}개)를 만들었어요`);
