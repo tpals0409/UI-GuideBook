@@ -1,0 +1,16 @@
+[
+  { "name": "Gmarket Sans", "family": "Gmarket Sans", "category": "Sans Serif", "license": "무료(상업 이용 가능)", "css": "https://cdn.jsdelivr.net/gh/fonts-archive/GmarketSans/GmarketSans.css" },
+  { "name": "Pretendard", "family": "Pretendard", "category": "Sans Serif", "license": "OFL", "css": "https://cdn.jsdelivr.net/gh/fonts-archive/Pretendard/Pretendard.css" },
+  { "name": "SUIT", "family": "SUIT", "category": "Sans Serif", "license": "OFL", "css": "https://cdn.jsdelivr.net/gh/fonts-archive/SUIT/SUIT.css" },
+  { "name": "Wanted Sans", "family": "Wanted Sans Variable", "category": "Sans Serif", "license": "OFL", "css": "https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split/WantedSansVariable.min.css" },
+  { "name": "Spoqa Han Sans Neo", "family": "Spoqa Han Sans Neo", "category": "Sans Serif", "license": "OFL", "css": "https://cdn.jsdelivr.net/gh/fonts-archive/SpoqaHanSansNeo/SpoqaHanSansNeo.css" },
+  { "name": "LINE Seed KR", "family": "LINE Seed KR", "category": "Sans Serif", "license": "OFL", "css": "https://cdn.jsdelivr.net/gh/fonts-archive/LINESeedKR/LINESeedKR.css" },
+  { "name": "나눔스퀘어 네오", "family": "Nanum Square Neo", "category": "Sans Serif", "license": "OFL", "css": "https://cdn.jsdelivr.net/gh/fonts-archive/NanumSquareNeo/NanumSquareNeo.css" },
+  { "name": "나눔스퀘어", "family": "Nanum Square", "category": "Sans Serif", "license": "OFL", "css": "https://cdn.jsdelivr.net/gh/fonts-archive/NanumSquare/NanumSquare.css" },
+  { "name": "Freesentation", "family": "Freesentation", "category": "Sans Serif", "license": "OFL", "css": "https://cdn.jsdelivr.net/gh/fonts-archive/Freesentation/Freesentation.css" },
+  { "name": "Paperlogy", "family": "Paperlogy", "category": "Sans Serif", "license": "OFL", "css": "https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/Paperlogy.css" },
+  { "name": "마루부리", "family": "Maru Buri", "category": "Serif", "license": "OFL", "css": "https://cdn.jsdelivr.net/gh/fonts-archive/MaruBuri/MaruBuri.css" },
+  { "name": "리디바탕", "family": "RIDI Batang", "category": "Serif", "license": "OFL", "css": "https://cdn.jsdelivr.net/gh/fonts-archive/RIDIBatang/RIDIBatang.css" },
+  { "name": "Galmuri11", "family": "Galmuri11", "category": "Display", "license": "OFL", "css": "https://cdn.jsdelivr.net/gh/fonts-archive/Galmuri11/Galmuri11.css" },
+  { "name": "D2Coding", "family": "D2Coding", "category": "Monospace", "license": "OFL", "css": "https://cdn.jsdelivr.net/gh/fonts-archive/D2Coding/D2Coding.css" }
+]

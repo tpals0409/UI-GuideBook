@@ -5,6 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sources from '../sources.config.mjs';
 import { walk } from '../extractors/markdown.mjs';
+import { buildFontList } from './fonts.mjs';
 
 const configDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const root = path.join(configDir, '..'); // 개발 체크리스트 폴더
@@ -31,4 +32,7 @@ for (const f of files) {
 // 사이드바의 "문서" 목록. 폴더에 .md를 추가하면 다음 배포 때 자동으로 나타나요.
 docs.sort((a, b) => a.url.localeCompare(b.url));
 fs.writeFileSync(path.join(out, 'docs.json'), JSON.stringify(docs));
-console.log(`public/에 ${files.length}개 파일과 문서 목록(${docs.length}개)을 만들었어요`);
+// 예시 테마의 글꼴 목록 (무료·오픈소스 글꼴)
+const fonts = await buildFontList();
+fs.writeFileSync(path.join(out, 'fonts.json'), JSON.stringify(fonts));
+console.log(`public/에 ${files.length}개 파일, 문서 목록(${docs.length}개), 글꼴 목록(${fonts.length}개)을 만들었어요`);

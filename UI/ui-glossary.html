@@ -164,7 +164,13 @@ html:has(.dt[open]){overflow:hidden}
 .tpanel h3{margin:0;font-size:17px;font-weight:700}
 .tp-note{margin:0;font-size:13px;line-height:1.6;color:var(--ui-muted)}
 .tp-h{margin:6px 0 0;font-size:13px;font-weight:700;color:var(--ui-text)}
-.font-list{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.font-list{display:grid;grid-template-columns:1fr 1fr;gap:6px;max-height:252px;overflow-y:auto;padding:2px}
+.font-list button{display:flex;flex-direction:column;gap:2px}
+.font-list .fn{font-size:14px;line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.font-list .fm{display:flex;justify-content:space-between;gap:6px;font-size:12px;color:var(--ui-muted)}
+.font-list .fm em{font-style:normal;font-family:"Gmarket Sans",sans-serif;font-size:11px}
+.font-q{height:36px;border:1px solid var(--ui-line);border-radius:10px;padding:0 12px;font:inherit;font-size:13px;background:var(--ui-surface);color:var(--ui-text)}
+.font-q:focus{outline:none;border-color:var(--ui-text)}
 .pal-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}
 .font-list button,.pal{all:unset;box-sizing:border-box;cursor:pointer;border:1px solid var(--ui-line);border-radius:10px;padding:9px 11px;font-size:14px;line-height:1.35;background:var(--ui-surface);color:var(--ui-text)}
 .pal{display:flex;align-items:center;gap:10px}
@@ -184,7 +190,7 @@ html:has(.dt[open]){overflow:hidden}
 .tp-reset{all:unset;align-self:flex-start;cursor:pointer;font-size:13px;color:var(--ui-muted);text-decoration:underline;text-underline-offset:3px}
 .dt-theme{display:flex;flex-direction:column;gap:8px}
 .dt-theme h3{font-size:13px;margin:0;color:var(--ui-muted);font-weight:700}
-.dt-theme .font-list{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.dt-theme .font-list{grid-template-columns:repeat(auto-fill,minmax(170px,1fr));max-height:220px}
 @media (max-width:900px){.tpanel{right:16px}.theme-btn{padding:0;width:44px;justify-content:center}.theme-btn .lbl{display:none}}
 
 /* 데모 공통 */
@@ -265,8 +271,8 @@ html:has(.dt[open]){overflow:hidden}
     <button class="tool-btn theme-btn" id="theme-btn" aria-label="예시 테마" aria-expanded="false" aria-controls="tpanel"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.9 1.6-1.6 0-.9-.9-1.5-.9-2.4 0-.9.7-1.6 1.6-1.6H16a5 5 0 0 0 5-5C21 6.6 17 3 12 3z"/><path d="M7.5 11h.01M10 7.5h.01M14.5 7.5h.01"/></svg><span class="lbl">테마</span></button>
     <div class="tpanel" id="tpanel" role="dialog" aria-label="예시 테마" hidden>
       <h3>예시 테마</h3>
-      <p class="tp-note">모든 용어 예시의 글꼴과 색을 바꿔요. 용어 하나만 바꾸려면 그 용어를 열고 "이 용어만 바꾸기"를 쓰세요. 새로고침하면 처음으로 돌아가요.</p>
-      <p class="tp-h">글꼴</p><div class="font-list"></div>
+      <p class="tp-note">모든 용어 예시의 글꼴과 색을 바꿔요. 글꼴은 무료·오픈소스 글꼴만 있어요(이름에 마우스를 올리면 라이선스가 보여요). 용어 하나만 바꾸려면 그 용어를 열고 "이 용어만 바꾸기"를 쓰세요. 새로고침하면 처음으로 돌아가요.</p>
+      <p class="tp-h">글꼴</p><input class="font-q" type="search" aria-label="글꼴 검색" placeholder="글꼴 검색 (예: 명조, 손글씨, Pretendard)"><div class="font-list"></div>
       <p class="tp-h">색</p><div class="pal-list"></div>
       <form class="ai-pal"><input aria-label="원하는 느낌" maxlength="100" placeholder="원하는 느낌 (예: 따뜻한 카페)"><button type="submit">✦ AI로 만들기</button></form>
       <p class="tp-msg" aria-live="polite"></p>
@@ -284,7 +290,7 @@ html:has(.dt[open]){overflow:hidden}
   <div class="dt-body">
     <p class="desc"></p>
     <div><p class="dt-demo-l">직접 해 보기</p><div class="demo dt-demo"></div></div>
-    <section class="dt-theme"><h3>이 용어만 바꾸기</h3><p class="tp-h">글꼴</p><div class="font-list"></div><p class="tp-h">색</p><div class="pal-list"></div></section>
+    <section class="dt-theme"><h3>이 용어만 바꾸기</h3><p class="tp-h">글꼴</p><input class="font-q" type="search" aria-label="글꼴 검색" placeholder="글꼴 검색"><div class="font-list"></div><p class="tp-h">색</p><div class="pal-list"></div></section>
     <section class="dt-how"><h3>동작 방식</h3><ol></ol></section>
     <p class="diff"></p>
   </div>
@@ -1748,14 +1754,13 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
 
   // ───── 예시 테마: 용어 예시의 글꼴과 색을 바꿔요 (저장하지 않아요) ─────
   // 전체 설정은 모든 .demo에, 용어별 설정은 그 용어 타일과 모달 예시에만 CSS 변수로 덮어써요. 서비스 화면은 --ui-* 변수라 영향이 없어요.
+  // 글꼴 목록: 페이지에 내장된 2개 + 사이트에서 열면 배포 때 만든 fonts.json(무료·오픈소스 52개)을 더해요
   const FONTS=[
-    {id:'gmarket',name:'Gmarket Sans',css:'"Gmarket Sans",sans-serif'},
-    {id:'pretendard',name:'Pretendard',css:'"Pretendard Variable",Pretendard,sans-serif',href:'https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css'},
-    {id:'noto',name:'Noto Sans KR',css:'"Noto Sans KR",sans-serif',href:'https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap'},
-    {id:'plex',name:'IBM Plex Sans KR',css:'"IBM Plex Sans KR",sans-serif',href:'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;700&display=swap'},
-    {id:'myeongjo',name:'나눔명조',css:'"Nanum Myeongjo",serif',href:'https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700&display=swap'},
-    {id:'system',name:'시스템 기본',css:'-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif'},
+    {id:'gmarket-sans',name:'Gmarket Sans',family:'Gmarket Sans',category:'Sans Serif',license:'무료(상업 이용 가능)'}, // 위 @font-face로 이미 불러와요
+    {id:'system',name:'시스템 기본',stack:'-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif',category:'Sans Serif',license:'기기 내장'},
   ];
+  const CAT_KO={'Sans Serif':'고딕','Serif':'명조','Display':'장식','Handwriting':'손글씨','Monospace':'고정폭'};
+  const stack=f=>f.stack||`"${f.family}",${f.category==='Serif'?'serif':f.category==='Monospace'?'monospace':'sans-serif'}`;
   const ROLES={primary:'--primary',onPrimary:'--on-primary',primarySoft:'--primary-soft',surface:'--surface',surface2:'--surface-2',text:'--text',muted:'--muted',border:'--border'};
   const pal=(id,name,v)=>({id,name,...Object.fromEntries(Object.keys(ROLES).map((r,i)=>[r,v[i]]))});
   const PALS=[
@@ -1766,14 +1771,22 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
     pal('ocean','오션',['#0a6f8c','#ffffff','#d6eef5','#fafdfe','#ecf6f8','#10262e','#4a666f','#cde3e9']),
     pal('mono','모노',['#141414','#ffffff','#e8e8e8','#ffffff','#f3f3f3','#141414','#616161','#dadada']),
   ];
-  const DEFAULT={font:'gmarket',pal:'cobalt'};
+  const DEFAULT={font:'gmarket-sans',pal:'cobalt'};
   const theme={...DEFAULT},per={},aiPals=[];
   const pals=()=>[...PALS,...aiPals];
   const loadedFonts=new Set();
-  const loadFont=id=>{const f=FONTS.find(x=>x.id===id);if(f?.href&&!loadedFonts.has(id)){loadedFonts.add(id);document.head.insertAdjacentHTML('beforeend',`<link rel="stylesheet" href="${f.href}">`)}};
+  const addCss=href=>document.head.insertAdjacentHTML('beforeend',`<link rel="stylesheet" href="${href}">`);
+  const loadFont=id=>{const f=FONTS.find(x=>x.id===id);if(f?.css&&!loadedFonts.has(id)){loadedFonts.add(id);addCss(f.css)}};
+  const loadAllFonts=()=>{
+    const todo=FONTS.filter(f=>f.css&&!loadedFonts.has(f.id));if(!todo.length)return;
+    const g=todo.filter(f=>f.css.startsWith('https://fonts.googleapis.com/'));
+    if(g.length)addCss('https://fonts.googleapis.com/css2?'+g.map(f=>'family='+f.css.match(/family=([^&]+)/)[1]).join('&')+'&display=swap');
+    todo.filter(f=>!g.includes(f)).forEach(f=>addCss(f.css));
+    todo.forEach(f=>loadedFonts.add(f.id));
+  };
   const decl=(fontId,palId)=>{
     let d='';const f=FONTS.find(x=>x.id===fontId),p=pals().find(x=>x.id===palId);
-    if(f){loadFont(f.id);d+=`--demo-font:${f.css};`}
+    if(f){loadFont(f.id);d+=`--demo-font:${stack(f)};`}
     if(p)for(const[r,v]of Object.entries(ROLES))d+=`${v}:${p[r]};`;
     return d;
   };
@@ -1783,13 +1796,19 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
     for(const[id,o]of Object.entries(per)){const d=decl(o.font,o.pal);if(d)t+=`#${CSS.escape(id)} .demo,.dt-demo[data-for="${id}"]{${d}}`}
     themeCss.textContent=t;
   };
-  const fontBtns=(follow,cur)=>(follow?`<button type="button" data-font="" aria-pressed="${!cur}">전체 설정 따르기</button>`:'')+FONTS.map(f=>`<button type="button" data-font="${f.id}" aria-pressed="${cur===f.id}" style="font-family:${esc(f.css)}">${f.name}</button>`).join('');
+  const fontBtns=(follow,cur)=>(follow?`<button type="button" data-font="" data-n="전체 설정 따르기" aria-pressed="${!cur}"><span class="fn">전체 설정 따르기</span></button>`:'')+FONTS.map(f=>`<button type="button" data-font="${f.id}" data-n="${esc((f.name+' '+f.family+' '+(CAT_KO[f.category]||'')).toLowerCase())}" aria-pressed="${cur===f.id}" title="${esc(f.license||'')}" style="font-family:${esc(stack(f))}"><span class="fn">${esc(f.name)}</span><span class="fm"><span>가나다라 Aa</span><em>${CAT_KO[f.category]||''}</em></span></button>`).join('');
+  const filterFonts=box=>{const q=$('.font-q',box).value.trim().toLowerCase();$$('.font-list button',box).forEach(b=>b.hidden=!!q&&!b.dataset.n.includes(q))};
   const palBtns=(follow,cur)=>(follow?`<button type="button" class="pal" data-pal="" aria-pressed="${!cur}">전체 설정 따르기</button>`:'')+pals().map(p=>`<button type="button" class="pal" data-pal="${p.id}" aria-pressed="${cur===p.id}"><span class="chips" aria-hidden="true"><i style="background:${p.primary}"></i><i style="background:${p.primarySoft}"></i><i style="background:${p.text}"></i></span>${esc(p.name)}</button>`).join('');
 
   const tBtn=$('#theme-btn'),tPanel=$('#tpanel'),tSec=$('.dt-theme',dlg);
-  const drawPanel=()=>{$('.font-list',tPanel).innerHTML=fontBtns(false,theme.font);$('.pal-list',tPanel).innerHTML=palBtns(false,theme.pal)};
-  function drawTerm(){if(!cur)return;const o=per[cur]||{};FONTS.forEach(f=>loadFont(f.id));$('.font-list',tSec).innerHTML=fontBtns(true,o.font);$('.pal-list',tSec).innerHTML=palBtns(true,o.pal)}
-  const setPanel=o=>{tPanel.hidden=!o;tBtn.setAttribute('aria-expanded',o);if(o){FONTS.forEach(f=>loadFont(f.id));drawPanel()}};
+  const drawPanel=()=>{$('.font-list',tPanel).innerHTML=fontBtns(false,theme.font);$('.pal-list',tPanel).innerHTML=palBtns(false,theme.pal);filterFonts(tPanel)};
+  function drawTerm(){if(!cur)return;const o=per[cur]||{};loadAllFonts();$('.font-list',tSec).innerHTML=fontBtns(true,o.font);$('.pal-list',tSec).innerHTML=palBtns(true,o.pal);filterFonts(tSec)}
+  const setPanel=o=>{tPanel.hidden=!o;tBtn.setAttribute('aria-expanded',o);if(o){loadAllFonts();drawPanel()}};
+  [tPanel,tSec].forEach(box=>$('.font-q',box).addEventListener('input',()=>filterFonts(box)));
+  if(location.protocol.startsWith('http'))fetch('/fonts.json').then(r=>r.ok?r.json():[]).then(list=>{
+    for(const f of list)if(!FONTS.some(x=>x.family===f.family))FONTS.splice(FONTS.length-1,0,f); // '시스템 기본'은 맨 뒤에
+    if(!tPanel.hidden){loadAllFonts();drawPanel()}
+  }).catch(()=>{});
   tBtn.onclick=e=>{e.stopPropagation();setPanel(tPanel.hidden)};
   document.addEventListener('click',e=>{const path=e.composedPath();if(!tPanel.hidden&&!path.includes(tPanel)&&!path.includes(tBtn))setPanel(false)});
   addEventListener('keydown',e=>{if(e.key==='Escape'&&!tPanel.hidden){setPanel(false);tBtn.focus()}});
