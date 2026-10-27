@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>모션 예시 · UI GuideBook</title>
+<title>모션 · UI GuideBook</title>
 <link rel="icon" href="icons/fav-32.png" sizes="32x32"><link rel="icon" href="icons/fav-64.png" sizes="64x64"><link rel="apple-touch-icon" href="icons/touch-180.png">
 <style>
 /* 용어 사전과 같은 모노톤 서비스 화면 */
@@ -61,10 +61,10 @@ pre{margin:0;white-space:pre-wrap;word-break:break-word;font:13px/1.65 ui-monosp
 <body>
 <header class="bar">
   <a class="back" href="ui-glossary.html" aria-label="용어 사전으로">←<span> 용어 사전</span></a>
-  <input class="search" id="q" type="search" autocomplete="off" spellcheck="false" placeholder="모션 예시 검색 (제목, 작성자, 프롬프트)" aria-label="모션 예시 검색">
+  <input class="search" id="q" type="search" autocomplete="off" spellcheck="false" placeholder="모션 검색 (제목, 작성자, 프롬프트)" aria-label="모션 검색">
 </header>
 <main>
-  <h1>모션 예시 <span class="n" id="count"></span></h1>
+  <h1>모션 <span class="n" id="count"></span></h1>
   <p class="lead">Claude로 만든 모션 영상과 그 영상을 만든 프롬프트예요. 마우스를 올리면 재생되고, 누르면 프롬프트를 복사할 수 있어요. 출처: prompt-motion.com, 영상과 프롬프트의 권리는 각 작성자에게 있어요.</p>
   <div class="chips" id="chips" role="group" aria-label="종류"></div>
   <div class="grid" id="grid"></div>
@@ -126,7 +126,7 @@ pre{margin:0;white-space:pre-wrap;word-break:break-word;font:13px/1.65 ui-monosp
   fetch('/motion.json').then(r=>r.ok?r.json():[]).then(list=>{
     all=list;drawChips();draw();
     if(location.hash)open(decodeURIComponent(location.hash.slice(1)));
-  }).catch(()=>{$('#empty').hidden=false;$('#empty').textContent='모션 예시를 불러오지 못했어요. 새로고침해 보세요.'});
+  }).catch(()=>{$('#empty').hidden=false;$('#empty').textContent='모션을 불러오지 못했어요. 새로고침해 보세요.'});
 })();
 </script>
 </body>
