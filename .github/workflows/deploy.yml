@@ -1,0 +1,49 @@
+# main에 푸시하면 사이트(ui.leo0409.work)를 배포하고 AI 검색 색인을 갱신해요.
+# PR에서는 빌드와 배포 점검(dry run)만 해요.
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# 배포가 겹치지 않게 하나씩 실행해요
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ai-search
+    env:
+      CF_SEND_TELEMETRY: "false"
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ai-search/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      # html과 .md 문서를 public/에 모은 뒤 Worker를 빌드해요
+      - run: npm run build
+      - run: npx cf deploy --prebuilt --mode production --dry-run
+
+      - name: 배포
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        run: npx cf deploy --prebuilt --mode production
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: AI 검색 색인 갱신 (바뀐 문서만)
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        run: npm run ingest
+        env:
+          AI_SEARCH_URL: https://dev-reference-ai-search.tpals0409dev.workers.dev
+          ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
