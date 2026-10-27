@@ -1614,7 +1614,7 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
     el.innerHTML=t.demo;
     try{t.init?.(el)}catch(err){console.error(t.id,err)}
   }),{rootMargin:'400px'});
-  $$('.demo').forEach(d=>io.observe(d));
+  $$('.demo[data-demo]').forEach(d=>io.observe(d)); // 모달의 예시 영역은 open()이 직접 그려요
 
   let cat='all';
   const catCount=c=>TERMS.filter(t=>t.cat===c).length;
