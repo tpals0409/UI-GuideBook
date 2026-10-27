@@ -1,0 +1,22 @@
+{
+  "name": "dev-reference-ai-search",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "cf dev",
+    "deploy": "node scripts/build-site.mjs && cf deploy",
+    "types": "cf workers types",
+    "typecheck": "cf workers types && tsc",
+    "ingest": "node scripts/ingest.mjs",
+    "build": "node scripts/build-site.mjs && cf build"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "^2.0.0-beta.v.5",
+    "cf": "^0.15.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.5"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.3.0"
+  }
+}
