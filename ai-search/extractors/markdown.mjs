@@ -17,7 +17,8 @@ export function* walk(dir, exclude) {
 export default function extractMarkdown({ source, file: dir, root, exclude = [] }) {
   const docs = [];
   for (const file of walk(dir, exclude)) {
-    const rel = path.relative(root, file).split(path.sep).join('/');
+    // macOS는 한글 파일 이름을 NFD로, Git·Linux는 NFC로 다뤄요. 어디서 돌려도 같은 id가 나오게 NFC로 맞춰요.
+    const rel = path.relative(root, file).split(path.sep).join('/').normalize('NFC');
     const lines = fs.readFileSync(file, 'utf8').split('\n');
     const h1 = (lines.find(l => l.startsWith('# ')) || `# ${path.basename(file, '.md')}`).slice(2).trim();
     let cur = { heading: '', body: [] };
