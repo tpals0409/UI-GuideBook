@@ -207,7 +207,14 @@ export default {
     // 페이지·검색은 Access로 잠긴 사이트 주소에서만 열어요. 다른 주소(workers.dev)는 관리용 경로만 받아요.
     if (hostname !== env.SITE_HOST && !isAdminPath) return new Response("Not found", { status: 404 });
     if (hostname === env.SITE_HOST && pathname === "/") return Response.redirect(new URL("/UI/ui-glossary.html", req.url).href, 302);
-    if (hostname === env.SITE_HOST && pathname !== "/search" && !isAdminPath) return env.ASSETS.fetch(req);
+    if (hostname === env.SITE_HOST && pathname !== "/search" && !isAdminPath) {
+      const res = await env.ASSETS.fetch(req);
+      if (!pathname.endsWith(".md") || !res.ok) return res;
+      // 마크다운 문서는 내려받지 않고 브라우저에서 바로 읽히게 텍스트로 보내요
+      const headers = new Headers(res.headers);
+      headers.set("Content-Type", "text/plain; charset=utf-8");
+      return new Response(res.body, { status: res.status, headers });
+    }
 
     const cors = corsHeaders(req, env);
     if (!cors) return Response.json({ error: "허용되지 않은 출처예요." }, { status: 403 });

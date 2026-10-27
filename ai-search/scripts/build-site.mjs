@@ -15,9 +15,18 @@ const files = sources.flatMap(s => {
   return s.extractor === 'markdown' ? [...walk(p, s.exclude ?? [])] : [p];
 });
 fs.rmSync(out, { recursive: true, force: true });
+const docs = [];
 for (const f of files) {
-  const dest = path.join(out, path.relative(root, f));
+  const rel = path.relative(root, f).split(path.sep).join('/').normalize('NFC');
+  const dest = path.join(out, rel);
   fs.mkdirSync(path.dirname(dest), { recursive: true });
   fs.copyFileSync(f, dest);
+  if (f.endsWith('.md')) {
+    const h1 = fs.readFileSync(f, 'utf8').split('\n').find(l => l.startsWith('# '));
+    docs.push({ title: h1 ? h1.slice(2).trim() : path.basename(f, '.md'), url: rel });
+  }
 }
-console.log(`public/에 ${files.length}개 파일을 복사했어요`);
+// 사이드바의 "문서" 목록. 폴더에 .md를 추가하면 다음 배포 때 자동으로 나타나요.
+docs.sort((a, b) => a.url.localeCompare(b.url));
+fs.writeFileSync(path.join(out, 'docs.json'), JSON.stringify(docs));
+console.log(`public/에 ${files.length}개 파일과 문서 목록(${docs.length}개)을 만들었어요`);
