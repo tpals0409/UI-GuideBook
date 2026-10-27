@@ -45,6 +45,8 @@ export async function buildMotionList() {
   const old = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : [];
   const xml = await (await fetch(`${SITE}/sitemap.xml`)).text();
   const slugs = [...xml.matchAll(/<loc>https:\/\/prompt-motion\.com\/([^/<]+)<\/loc>/g)].map(m => m[1]).filter(s => !NOT_ENTRY.has(s));
+  // 배포 서버(GitHub Actions)에서는 사이트가 봇 확인 화면을 줄 때가 있어요. 그때는 저장해 둔 목록을 그대로 써요
+  if (!slugs.length) throw new Error('사이트맵에서 글을 찾지 못했어요');
   const have = new Map(old.map(e => [e.slug, e]));
   const todo = slugs.filter(s => !have.has(s));
   // ponytail: 한 번에 4개씩, 순서대로. 글이 수천 개로 늘면 그때 속도를 다시 봐요
