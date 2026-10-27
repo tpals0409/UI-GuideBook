@@ -112,6 +112,83 @@ async function search(env: Env, q: string, source?: string) {
   };
 }
 
+// ───── AI 팔레트 ─────
+const PALETTE_ROLES = ["primary", "onPrimary", "primarySoft", "surface", "surface2", "text", "muted", "border"] as const;
+type Palette = { name: string } & Record<(typeof PALETTE_ROLES)[number], string>;
+
+const PALETTE_SYSTEM = `당신은 UI 예시 화면에 쓸 색 팔레트를 만들어요. 밝은 화면 기준이에요.
+역할:
+- primary: 버튼·스위치·선택 표시에 쓰는 강조색
+- onPrimary: primary 위에 올리는 글자색
+- primarySoft: primary를 아주 연하게 만든 배경 (연한 버튼, 선택된 칩)
+- surface: 카드·입력칸 배경 (아주 밝게)
+- surface2: surface보다 조금 어두운 보조 배경
+- text: 본문 글자색 (아주 어둡게)
+- muted: 보조 글자색
+- border: 테두리
+지켜야 할 대비: text와 muted는 surface 위에서, onPrimary는 primary 위에서, primary는 primarySoft 위에서 각각 4.5:1 이상.
+name은 팔레트 분위기를 담은 한국어 2~6글자.`;
+
+const hexRgb = (h: string) => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+const rgbHex = (c: number[]) => "#" + c.map(v => Math.round(Math.min(255, Math.max(0, v))).toString(16).padStart(2, "0")).join("");
+const luminance = (h: string) => {
+  const [r, g, b] = hexRgb(h).map(v => v / 255).map(v => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+};
+const contrast = (a: string, b: string) => {
+  const [x, y] = [luminance(a), luminance(b)];
+  return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
+};
+const mix = (a: string, b: string, t: number) => { const [x, y] = [hexRgb(a), hexRgb(b)]; return rgbHex(x.map((v, i) => v + (y[i] - v) * t)); };
+// fg를 bg와 min:1이 될 때까지 검정(또는 흰색) 쪽으로 조금씩 옮겨요
+function ensure(fg: string, bg: string, toward: string, min = 4.5) {
+  for (let t = 0; t <= 1 && contrast(fg, bg) < min; t += 0.05) fg = mix(fg, toward, t);
+  return fg;
+}
+
+async function makePalette(env: Env, prompt: string) {
+  const hex = { type: "string", pattern: "^#[0-9a-fA-F]{6}$" };
+  const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
+  const msg = await client.beta.messages.create({
+    model: CLAUDE_MODEL,
+    max_tokens: 1000,
+    betas: ["server-side-fallback-2026-07-01"],
+    fallbacks: "default",
+    output_config: {
+      effort: "low",
+      format: {
+        type: "json_schema",
+        schema: {
+          type: "object",
+          properties: { name: { type: "string" }, ...Object.fromEntries(PALETTE_ROLES.map(r => [r, hex])) },
+          required: ["name", ...PALETTE_ROLES],
+          additionalProperties: false,
+        },
+      },
+    },
+    system: PALETTE_SYSTEM,
+    messages: [{ role: "user", content: `원하는 느낌: ${prompt}` }],
+  });
+  if (msg.stop_reason === "refusal") return { error: "이 설명으로는 팔레트를 만들 수 없어요. 다른 말로 써 주세요.", status: 422 };
+  const block = msg.content.find(b => b.type === "text");
+  if (!block || block.type !== "text") throw new Error("응답에 텍스트가 없어요");
+  const p = JSON.parse(block.text) as Palette;
+  for (const r of PALETTE_ROLES) if (!/^#[0-9a-fA-F]{6}$/.test(p[r])) throw new Error(`잘못된 색: ${r}`);
+
+  // 모델이 대비를 못 맞춰도 글자가 보이게 Worker에서 보정해요
+  const before = { ...p };
+  const darkSurface = luminance(p.surface) < 0.4;
+  const ink = darkSurface ? "#ffffff" : "#000000";
+  p.text = ensure(p.text, p.surface, ink, 7); // 본문은 보조 글자보다 항상 진하게
+  p.muted = ensure(p.muted, p.surface, ink);
+  p.onPrimary = contrast("#ffffff", p.primary) >= contrast("#111111", p.primary) ? "#ffffff" : "#111111";
+  if (contrast(p.onPrimary, p.primary) < 4.5) p.primary = ensure(p.primary, p.onPrimary, p.onPrimary === "#ffffff" ? "#000000" : "#ffffff");
+  // 강조색 글자를 연한 배경 위에 쓰는 경우(연한 버튼 등). 강조색 자체가 밝아서 흰 배경에서도 4.5:1이 안 되면 맞출 수 없어 그대로 둬요
+  if (contrast(p.primary, darkSurface ? "#000000" : "#ffffff") >= 4.5) p.primarySoft = ensure(p.primarySoft, p.primary, darkSurface ? "#000000" : "#ffffff");
+  const adjusted = PALETTE_ROLES.filter(r => p[r].toLowerCase() !== before[r].toLowerCase());
+  return { palette: { name: p.name.slice(0, 12), ...Object.fromEntries(PALETTE_ROLES.map(r => [r, p[r].toLowerCase()])) }, adjusted };
+}
+
 // ───── 색인 (관리자 전용) ─────
 async function getMeta(env: Env, key: string) {
   return (await env.DB.prepare("SELECT value FROM meta WHERE key = ?").bind(key).first<{ value: string }>())?.value;
@@ -207,7 +284,7 @@ export default {
     // 페이지·검색은 Access로 잠긴 사이트 주소에서만 열어요. 다른 주소(workers.dev)는 관리용 경로만 받아요.
     if (hostname !== env.SITE_HOST && !isAdminPath) return new Response("Not found", { status: 404 });
     if (hostname === env.SITE_HOST && pathname === "/") return Response.redirect(new URL("/UI/ui-glossary.html", req.url).href, 302);
-    if (hostname === env.SITE_HOST && pathname !== "/search" && !isAdminPath) {
+    if (hostname === env.SITE_HOST && pathname !== "/search" && pathname !== "/palette" && !isAdminPath) {
       const res = await env.ASSETS.fetch(req);
       if (!pathname.endsWith(".md") || !res.ok) return res;
       // 마크다운 문서는 내려받지 않고 브라우저에서 바로 읽히게 텍스트로 보내요
@@ -230,6 +307,16 @@ export default {
         if (!q || q.length > MAX_QUESTION) return reply({ error: `질문은 1~${MAX_QUESTION}자로 입력해 주세요.` }, 400);
         const source = typeof body.source === "string" && body.source.length <= 64 ? body.source : undefined;
         return reply(await search(env, q, source));
+      }
+
+      if (pathname === "/palette" && req.method === "POST") {
+        const ip = req.headers.get("CF-Connecting-IP") ?? "unknown";
+        if (!(await env.RATE_LIMITER.limit({ key: ip })).success) return reply({ error: "잠시 후 다시 시도해 주세요. (1분에 10회까지)" }, 429);
+        const body = await req.json<{ prompt?: unknown }>().catch(() => ({} as { prompt?: unknown }));
+        const prompt = typeof body.prompt === "string" ? body.prompt.trim() : "";
+        if (!prompt || prompt.length > 100) return reply({ error: "원하는 느낌을 1~100자로 써 주세요." }, 400);
+        const r = await makePalette(env, prompt);
+        return "error" in r ? reply({ error: r.error }, r.status) : reply(r);
       }
 
       if (isAdminPath) {
