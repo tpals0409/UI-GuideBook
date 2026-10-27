@@ -7,8 +7,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="icons/fav-32.png">
 <link rel="icon" type="image/png" sizes="64x64" href="icons/fav-64.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icons/touch-180.png">
-<meta name="theme-color" content="#edf0f3" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0e131c" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#edf0f3">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -18,18 +17,6 @@
   --primary:#2e4fd8;--on-primary:#fff;--primary-soft:#e2e8fc;--danger:#cf2e21;--success:#12804a;--warn:#b26d00;
   --shadow:0 1px 2px rgb(16 24 40/.06),0 4px 12px rgb(16 24 40/.08);--hl:rgb(255 255 255/.9);--sd:rgb(16 24 40/.14);
   color-scheme:light;
-}
-@media (prefers-color-scheme:dark){:root:not([data-theme=light]){
-  --bg:#0e131c;--surface:#151b26;--surface-2:#1b2230;--stage:#111723;--grid:#2a3446;--tick:#4f5c72;--text:#e7ebf2;--muted:#98a2b4;--border:#273143;
-  --primary:#8da1ff;--on-primary:#0f1a4a;--primary-soft:#212c52;--danger:#ff7468;--success:#45d088;--warn:#f0b246;
-  --shadow:0 1px 2px rgb(0 0 0/.4),0 4px 14px rgb(0 0 0/.35);--hl:rgb(255 255 255/.06);--sd:rgb(0 0 0/.55);
-  color-scheme:dark;
-}}
-:root[data-theme=dark]{
-  --bg:#0e131c;--surface:#151b26;--surface-2:#1b2230;--stage:#111723;--grid:#2a3446;--tick:#4f5c72;--text:#e7ebf2;--muted:#98a2b4;--border:#273143;
-  --primary:#8da1ff;--on-primary:#0f1a4a;--primary-soft:#212c52;--danger:#ff7468;--success:#45d088;--warn:#f0b246;
-  --shadow:0 1px 2px rgb(0 0 0/.4),0 4px 14px rgb(0 0 0/.35);--hl:rgb(255 255 255/.06);--sd:rgb(0 0 0/.55);
-  color-scheme:dark;
 }
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -99,8 +86,6 @@ a.src:hover{text-decoration:underline}
 .src-APG{background:#e2ecfb;color:#1c4a8a}.src-MDN{background:#e8e9ed;color:#1b1d24}.src-M3{background:#ece4fa;color:#57298c}
 .src-HIG{background:#e4eaef;color:#2b3c48}.src-WCAG{background:#dcf2e4;color:#12603a}.src-DTCG{background:#fbecdb;color:#83460e}
 .src-idiom{background:transparent;color:var(--warn);border-color:color-mix(in srgb,var(--warn) 45%,transparent)}
-:root[data-theme=dark] .src:not(.src-idiom){filter:brightness(.82) saturate(1.15)}
-@media (prefers-color-scheme:dark){:root:not([data-theme=light]) .src:not(.src-idiom){filter:brightness(.82) saturate(1.15)}}
 .desc{margin:0;font-size:15px}
 .diff{margin:0;font-size:14px;color:var(--muted);border-top:1px solid var(--border);padding-top:12px}
 .diff b{color:var(--text);font-weight:600;margin-right:6px}
@@ -234,7 +219,6 @@ html:has(.dt[open]){overflow:hidden}
     <button class="tool-btn menu-btn" id="menu-btn" aria-label="분류 열기" aria-expanded="false" aria-controls="side"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
     <label class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M16.5 16.5L21 21M11 18a7 7 0 1 1 0-14 7 7 0 0 1 0 14z"/></svg><input id="q" type="search" placeholder="용어 검색 (한글·영문·별칭)" aria-label="용어 검색"><kbd>/</kbd></label>
     <button class="ai-btn" id="ai" hidden title="질문으로 찾기 (Enter)">✦<span class="ai-l"> AI에게 묻기</span></button>
-    <button class="tool-btn" id="theme" aria-label="테마 전환" title="테마 전환"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
   </header>
   <section class="ai-panel" id="ai-panel" aria-live="polite" hidden></section>
   <main id="app"></main>
@@ -302,14 +286,8 @@ function menuToggle(btn,menu){
   });
 }
 const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
-function toggleTheme(){
-  const r=document.documentElement,dark=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;
-  r.dataset.theme=dark?'light':'dark';
-  try{localStorage.setItem('ui-glossary-theme',r.dataset.theme)}catch{}
-}
 addEventListener('pointerdown',()=>document.documentElement.classList.add('mouse'),true);
 addEventListener('keydown',()=>document.documentElement.classList.remove('mouse'),true);
-try{const t=localStorage.getItem('ui-glossary-theme');if(t)document.documentElement.dataset.theme=t}catch{}
 </script>
 
 <!-- ───── 액션·입력 ───── -->
@@ -1424,8 +1402,8 @@ add('concept',[
 {id:'dark-mode',en:'Dark mode',ko:'다크 모드',aka:'Dark theme',src:'HIG:dark-mode MDN:Web/CSS/@media/prefers-color-scheme',
  desc:'어두운 배경에 밝은 글자를 쓰는 화면 테마예요. 기기 설정에 맞춰 자동으로 바뀌게 할 수 있어요(prefers-color-scheme).',
  diff:'완전한 검정(#000)보다 짙은 회색을 쓰고, 진한 색은 조금 밝게 바꿔야 눈이 덜 피로해요.',
- demo:`<div class="col full" style="align-items:center"><div class="dm-w"><div class="dm light"><b>Light</b><span>밝은 배경 · 어두운 글자</span><button class="btn sm">버튼</button></div><div class="dm dark"><b>Dark</b><span>짙은 회색 배경 · 밝은 글자</span><button class="btn sm">버튼</button></div></div><button class="btn sm outline th">이 페이지 테마 바꾸기</button></div>`,
- init(el){$('.th',el).onclick=toggleTheme}},
+ demo:`<div class="col full" style="align-items:center"><div class="dm-w"><div class="dm light"><b>Light</b><span>밝은 배경 · 어두운 글자</span><button class="btn sm">버튼</button></div><div class="dm dark"><b>Dark</b><span>짙은 회색 배경 · 밝은 글자</span><button class="btn sm">버튼</button></div></div></div>`,
+},
 {id:'focus-indicator',en:'Focus indicator',ko:'포커스 링',aka:'Focus ring · Focus visible',src:'WCAG:focus-visible MDN:Web/CSS/:focus-visible',
  desc:'키보드(Tab)로 이동할 때 지금 어느 요소에 있는지 보여주는 테두리예요. 마우스를 쓰기 어려운 사람에게 꼭 필요해요.',
  diff:'테두리를 없애지 말고, :focus-visible을 써서 키보드로 이동할 때만 보이게 해요. 이 페이지도 그렇게 만들었어요.',
@@ -1593,7 +1571,7 @@ grain:['동작은 없고 표면에 질감을 더해요','SVG 노이즈를 overla
 'type-scale':['역할(Display~Label)에 맞는 단계를 골라 써요','단계마다 크기·굵기·줄 간격이 세트로 정해져 있어요','임의 크기 대신 토큰 이름으로 지정해요'],
 'design-tokens':['주 색상을 바꾸면 → 버튼·배지·카드 색이 한 번에 바뀌어요','모서리 값을 바꾸면 → 세 요소의 둥글기가 함께 바뀌어요','아래 코드에 바뀐 토큰 값이 그대로 보여요'],
 'color-roles':['각 칸은 역할 배경색과 그 위 글자색(On-)의 짝이에요','테마를 바꾸면 → 역할은 그대로, 값만 바뀌어요','컴포넌트는 색상값이 아니라 역할 이름을 참조해요'],
-'dark-mode':['OS 설정을 prefers-color-scheme으로 자동 감지해요','버튼 클릭 → 이 페이지 전체 테마가 바뀌어요','토큰(색 역할) 값만 바뀌고 컴포넌트는 그대로예요'],
+'dark-mode':['OS 설정을 prefers-color-scheme으로 자동 감지해요','라이트·다크 두 벌의 색 값을 준비해 두고, 설정에 따라 바꿔 끼워요','토큰(색 역할) 값만 바뀌고 컴포넌트는 그대로예요'],
 'focus-indicator':['Tab → 다음 요소로 이동하며 테두리가 보여요','마우스로 클릭할 때는 링이 보이지 않아요 (:focus-visible)','outline: none 버튼은 포커스가 있어도 보이지 않아요'],
 'interaction-states':['Hover: 밝아짐 / Focus: 바깥 링 / Pressed: 눌려서 작아짐','Disabled: 흐려지고 반응이 없어요','Loading: 스피너를 보여주고 중복 입력을 막아요'],
 contrast:['글자색·배경색을 바꾸면 → 대비 비율이 바로 계산돼요','4.5 이상이면 AA, 3 이상이면 큰 글자 AA, 7 이상이면 AAA 통과','통과하지 못한 기준은 빨간 배지로 표시돼요'],
@@ -1674,7 +1652,6 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
   });
   $('#q').addEventListener('input',filter);
   addEventListener('keydown',e=>{if(e.key==='/'&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)){e.preventDefault();$('#q').focus()}});
-  $('#theme').addEventListener('click',toggleTheme);
   filter();
 
   // 상세 모달: 카드를 누르면 같은 데모를 크게 다시 그리고 동작 방식을 보여줘요
