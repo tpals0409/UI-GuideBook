@@ -91,6 +91,38 @@ main{padding:4px 28px 64px;max-width:1480px;width:100%}
 .cap p{margin:0;font-size:13.5px;line-height:1.55;color:var(--ui-muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .empty-msg{margin:0;padding:80px 28px;color:var(--ui-muted)}
 footer{padding:0 28px 40px;font-size:12.5px;color:var(--ui-muted);max-width:76ch}
+/* 모션: prompt-motion의 모션 영상과 프롬프트 (사이드바 "참고 → 모션") */
+body[data-view=motion] :is(#app,#empty,.mainc>footer,#ai,#ai-panel){display:none!important}
+.docs a[aria-current=page]{background:var(--ui-surface);font-weight:600;box-shadow:inset 0 0 0 1px var(--ui-line)}
+.mo{padding:4px 28px 64px;max-width:1480px}
+.mo-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px}
+.mo-chips button{border:1px solid var(--ui-line);background:var(--ui-surface);color:var(--ui-text);font:inherit;border-radius:999px;padding:6px 12px;font-size:13px;cursor:pointer}
+.mo-chips button[aria-pressed=true]{background:var(--ui-accent);border-color:var(--ui-accent);color:var(--ui-on-accent)}
+.mo-chips .n{opacity:.6;margin-left:4px;font-size:12px}
+.mo-card{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;background:var(--ui-surface);border:1px solid var(--ui-line);border-radius:14px;overflow:hidden}
+.mo-card:hover{border-color:color-mix(in srgb,var(--ui-text) 35%,var(--ui-line))}
+.mo-card:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}
+.mo-th{position:relative;aspect-ratio:16/9;background:var(--ui-soft)}
+.mo-th img,.mo-th video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.mo-meta{padding:12px 14px 14px}
+.mo-meta b{display:block;font-size:15px;line-height:1.4}
+.mo-meta small{display:block;margin-top:4px;color:var(--ui-muted);font-size:12.5px}
+.mo-tag{font-size:11px;font-weight:700;padding:2px 7px;border-radius:999px;background:var(--ui-soft);margin-right:6px}
+.mo-dlg{width:min(1080px,calc(100vw - 32px));max-height:calc(100vh - 32px);padding:0;border:0;border-radius:18px;background:var(--ui-surface);color:var(--ui-text);overflow:hidden;box-shadow:0 24px 80px rgb(0 0 0/.35)}
+.mo-dlg::backdrop{background:rgb(10 14 24/.55)}
+.mo-dt{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);max-height:calc(100vh - 32px)}
+.mo-dt video{width:100%;height:100%;max-height:calc(100vh - 32px);background:#000;object-fit:contain;display:block}
+.mo-side{display:flex;flex-direction:column;gap:12px;padding:20px;overflow-y:auto;min-height:0}
+.mo-side h2{margin:0;font-size:20px;line-height:1.35;padding-right:36px}
+.mo-by{margin:0;font-size:13px;color:var(--ui-muted)}
+.mo-by a{color:inherit}
+.mo-side dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0;font-size:13px}
+.mo-side dt{color:var(--ui-muted)}.mo-side dd{margin:0}
+.mo-side pre{margin:0;white-space:pre-wrap;word-break:break-word;font:13px/1.65 ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--ui-surface-2);border:1px solid var(--ui-line);border-radius:10px;padding:12px;max-height:46vh;overflow-y:auto}
+.mo-act{align-self:flex-start;border:0;border-radius:10px;background:var(--ui-accent);color:var(--ui-on-accent);font:inherit;padding:9px 14px;font-size:14px;cursor:pointer}
+.mo-x{position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:50%;border:0;background:rgb(255 255 255/.9);cursor:pointer;display:grid;place-items:center;z-index:1}
+@media (max-width:760px){.mo{padding:4px 16px 48px}.mo-dt{grid-template-columns:1fr}.mo-dt video{max-height:40vh}}
+@media (prefers-reduced-motion:reduce){.mo-th video{display:none}}
 html.mouse :focus{outline:none!important}
 
 .aka{font-size:13px;color:var(--ui-muted)}
@@ -286,7 +318,7 @@ html:has(.dt[open]){overflow:hidden}
   <div class="brand"><b>UI GuideBook</b><p>화면을 이루는 부품을 직접 눌러 보며 이름을 찾는 용어 사전이에요.</p></div>
   <nav aria-label="분류"><p class="nav-h">분류</p><div class="cats" id="cats"></div></nav>
   <nav class="docs" id="docs" aria-label="문서" hidden><p class="nav-h">문서</p><div id="docs-list"></div></nav>
-  <nav class="docs" aria-label="참고"><p class="nav-h">참고</p><a href="motion.html">모션</a></nav>
+  <nav class="docs" aria-label="참고"><p class="nav-h">참고</p><a href="#motion" id="mo-link">모션</a></nav>
   <div class="legend">
     <p>출처 표시</p>
     <span class="src src-APG">WAI-ARIA APG</span><span class="src src-MDN">MDN</span><span class="src src-M3">Material 3</span><span class="src src-HIG">Apple HIG</span><span class="src src-WCAG">WCAG 2.2</span><span class="src src-idiom">관용어</span>
@@ -313,10 +345,17 @@ html:has(.dt[open]){overflow:hidden}
   </header>
   <section class="ai-panel" id="ai-panel" aria-live="polite" hidden></section>
   <main id="app"></main>
+  <section class="mo" id="mo" hidden aria-labelledby="mo-h">
+    <div class="cat-head"><h2 id="mo-h">모션 <span class="n" id="mo-count"></span></h2><p>Claude로 만든 모션 영상과 그 영상을 만든 프롬프트예요. 마우스를 올리면 재생되고, 누르면 프롬프트를 복사할 수 있어요. 출처는 prompt-motion.com이고, 영상과 프롬프트의 권리는 각 작성자에게 있어요.</p></div>
+    <div class="mo-chips" id="mo-chips" role="group" aria-label="종류"></div>
+    <div class="grid" id="mo-grid"></div>
+    <p class="empty-msg" id="mo-empty" hidden>맞는 예시가 없어요. 다른 종류를 고르거나 검색어를 바꿔 보세요.</p>
+  </section>
   <p class="empty-msg" id="empty" hidden>검색 결과가 없어요.</p>
   <footer>이름은 WAI-ARIA APG → HTML·CSS 표준(MDN) → Material Design 3 → Apple HIG 순서로 따랐어요. 출처마다 이름이 다르면 나머지는 "별칭"에 적었어요.</footer>
 </div>
 </div>
+<dialog class="mo-dlg" id="mo-dlg" aria-labelledby="mo-title"><button class="mo-x" id="mo-x" aria-label="닫기"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div class="mo-dt"><video id="mo-v" controls loop playsinline></video><div class="mo-side" id="mo-side"></div></div></dialog>
 <dialog class="dt" id="detail" aria-labelledby="dt-title">
   <div class="dt-head"><div><h2 id="dt-title"></h2><div class="aka"></div><div class="srcs"></div></div><button type="button" class="dt-prompt" title="이 부품을 만들어 달라는 AI용 프롬프트를 복사해요">프롬프트 복사</button><button class="icon-btn dt-x" aria-label="닫기"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
   <div class="dt-body">
@@ -1792,9 +1831,69 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
   };
   $('#cats').addEventListener('click',e=>{
     const b=e.target.closest('button');if(!b)return;cat=b.dataset.cat;
-    $$('#cats button').forEach(x=>x.setAttribute('aria-pressed',x===b));filter();scrollTo({top:0});setNav(false);
+    $$('#cats button').forEach(x=>x.setAttribute('aria-pressed',x===b));setView('terms');filter();scrollTo({top:0});setNav(false);
   });
-  $('#q').addEventListener('input',filter);
+  $('#q').addEventListener('input',()=>document.body.dataset.view==='motion'?drawMo():filter());
+
+  // ───── 모션: 배포 때 만든 motion.json(prompt-motion 영상·프롬프트)을 이 페이지 안에서 보여줘요 ─────
+  // 주소: #motion(목록), #motion/<글 id>(영상 열기). 영상은 복사하지 않고 원래 주소로 재생해요
+  const MO_TAG={'product-ui':'화면 UI','phone':'휴대폰','charts':'차트','diagrams':'다이어그램','kinetic-type':'키네틱 타이포','shapes':'도형','particles':'파티클','characters':'캐릭터','photos':'사진','music':'음악','code':'코드'};
+  const moTag=t=>MO_TAG[t]||t;
+  let mo=null,moSel='all';const qPh=$('#q').placeholder;
+  const moLoad=()=>mo?Promise.resolve(mo):fetch('/motion.json').then(r=>r.ok?r.json():[]).catch(()=>[]).then(l=>mo=l);
+  const moKind=e=>e.install?'스킬':'프롬프트';
+  const drawMo=()=>{
+    if(!mo)return;
+    const q=$('#q').value.trim().toLowerCase();
+    const list=mo.filter(e=>(moSel==='all'||(moSel==='skill'?e.install:e.tags.includes(moSel)))&&(!q||[e.title,e.author,e.handle,e.prompt,e.skill,...e.tags.map(moTag)].join(' ').toLowerCase().includes(q)));
+    $('#mo-grid').innerHTML=list.map(e=>`<button class="mo-card" data-s="${esc(e.slug)}" aria-label="${esc(e.title)} 자세히 보기"><div class="mo-th"><img src="${esc(e.poster)}" alt="" loading="lazy"></div><div class="mo-meta"><b>${esc(e.title)}</b><small><span class="mo-tag">${moKind(e)}</span>@${esc(e.handle||e.author)} · ${e.tags.map(moTag).join(', ')}</small></div></button>`).join('');
+    $('#mo-count').textContent=list.length;$('#mo-empty').hidden=list.length>0;
+    const n={};mo.forEach(e=>e.tags.forEach(t=>n[t]=(n[t]||0)+1));
+    $('#mo-chips').innerHTML=[['all','전체',mo.length],...Object.entries(n).sort((a,b)=>b[1]-a[1]).map(([t,c])=>[t,moTag(t),c]),['skill','스킬',mo.filter(e=>e.install).length]]
+      .map(([v,l,c])=>`<button data-t="${v}" aria-pressed="${v===moSel}">${esc(l)}<span class="n">${c}</span></button>`).join('');
+  };
+  function setView(v){
+    const m=v==='motion';
+    document.body.dataset.view=m?'motion':'terms';$('#mo').hidden=!m;
+    $('#mo-link').toggleAttribute('aria-current',m);if(m)$('#mo-link').setAttribute('aria-current','page');
+    if(m)$$('#cats button').forEach(x=>{x.setAttribute('aria-pressed',false);x.classList.remove('here')});
+    $('#q').placeholder=m?'모션 검색 (제목, 작성자, 프롬프트)':qPh;
+    if(m)moLoad().then(drawMo);else if(location.hash.startsWith('#motion'))history.replaceState(null,'',location.pathname);
+  }
+  $('#mo-link').onclick=e=>{e.preventDefault();$('#q').value='';setView('motion');history.replaceState(null,'','#motion');scrollTo({top:0});setNav(false)};
+  $('#mo-chips').onclick=e=>{const b=e.target.closest('button');if(!b)return;moSel=b.dataset.t;drawMo()};
+  // 타일: 마우스를 올렸을 때만 재생 (용어 타일과 같은 규칙)
+  const moCard=e=>e.target.closest?.('.mo-card');
+  const moPlay=c=>{if(reduced()||$('video',c))return;const e=mo.find(x=>x.slug===c.dataset.s);$('.mo-th',c).insertAdjacentHTML('beforeend',`<video src="${esc(e.video)}" muted loop playsinline autoplay></video>`)};
+  const moStop=c=>$('video',c)?.remove();
+  $('#mo-grid').addEventListener('mouseover',e=>{const c=moCard(e);if(c)moPlay(c)});
+  $('#mo-grid').addEventListener('mouseout',e=>{const c=moCard(e);if(c&&!c.contains(e.relatedTarget))moStop(c)});
+  $('#mo-grid').addEventListener('focusin',e=>{const c=moCard(e);if(c)moPlay(c)});
+  $('#mo-grid').addEventListener('focusout',e=>{const c=moCard(e);if(c)moStop(c)});
+  const moDlg=$('#mo-dlg'),moV=$('#mo-v');
+  const moOpen=slug=>{
+    const e=mo?.find(x=>x.slug===slug);if(!e)return;
+    moV.poster=e.poster;moV.src=e.video;
+    $('#mo-side').dataset.s=slug;
+    $('#mo-side').innerHTML=`<h2 id="mo-title">${esc(e.title)}</h2>
+      <p class="mo-by">@${esc(e.handle||'')} ${esc(e.author||'')}${e.post?` · <a href="${esc(e.post)}" target="_blank" rel="noopener">원문 글</a>`:''}</p>
+      <dl>${e.model?`<dt>모델</dt><dd>${esc(e.model)}</dd>`:''}${e.effort?`<dt>노력 수준</dt><dd>${esc(e.effort)}</dd>`:''}<dt>종류</dt><dd>${e.tags.map(moTag).join(', ')}</dd>${e.date?`<dt>올린 날</dt><dd>${esc(e.date)}</dd>`:''}</dl>
+      ${e.prompt?`<pre>${esc(e.prompt)}</pre><button class="mo-act" data-copy="prompt">프롬프트 복사</button>`:''}
+      ${e.install?`<p class="mo-by">${esc(e.skill||'')}</p><pre>${esc(e.install)}</pre><button class="mo-act" data-copy="install">설치 명령 복사</button>`:''}
+      <p class="mo-by">영상과 프롬프트의 권리는 작성자에게 있어요. 참고용으로만 써요.</p>`;
+    moDlg.showModal();moV.play().catch(()=>{});
+    history.replaceState(null,'','#motion/'+slug);
+  };
+  $('#mo-grid').addEventListener('click',e=>{const c=moCard(e);if(c)moOpen(c.dataset.s)});
+  $('#mo-side').addEventListener('click',async ev=>{
+    const b=ev.target.closest('[data-copy]');if(!b)return;
+    const e=mo.find(x=>x.slug===$('#mo-side').dataset.s),t=b.textContent;
+    try{await navigator.clipboard.writeText(e[b.dataset.copy]);b.textContent='복사했어요'}catch{b.textContent='복사하지 못했어요'}
+    setTimeout(()=>b.textContent=t,1400);
+  });
+  $('#mo-x').onclick=()=>moDlg.close();
+  moDlg.addEventListener('click',e=>{if(e.target===moDlg)moDlg.close()});
+  moDlg.addEventListener('close',()=>{moV.pause();moV.removeAttribute('src');moV.load();history.replaceState(null,'','#motion')});
   addEventListener('keydown',e=>{if(e.key==='/'&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)){e.preventDefault();$('#q').focus()}});
   filter();
 
@@ -1834,7 +1933,11 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
   dlg.addEventListener('close',()=>{if(dlg.open)return;dDemo.innerHTML='';history.replaceState(null,'',location.pathname);$('#'+cur)?.focus({preventScroll:true})});
 
   // 주소에 #용어가 있으면, 아래 초기화(테마 등)가 끝난 뒤 그 용어를 열어요
-  queueMicrotask(()=>{if(location.hash){const id=location.hash.slice(1);$("#"+id)?.scrollIntoView();open(id)}});
+  queueMicrotask(()=>{
+    const h=decodeURIComponent(location.hash.slice(1));if(!h)return;
+    if(h==='motion'||h.startsWith('motion/')){setView('motion');moLoad().then(()=>h.includes('/')&&moOpen(h.slice(7)));return}
+    $("#"+h)?.scrollIntoView();open(h);
+  });
 
   // ───── 예시 테마: 용어 예시의 글꼴과 색을 바꿔요 (저장하지 않아요) ─────
   // 고른 값은 모든 .demo(타일과 모달 예시)에 CSS 변수로 덮어써요. 서비스 화면은 --ui-* 변수라 영향이 없어요.
@@ -2073,7 +2176,7 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
       }finally{aiBtn.disabled=false}
     };
     aiBtn.onclick=ask;
-    $('#q').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing)ask()});
+    $('#q').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing&&document.body.dataset.view!=='motion')ask()});
     panel.addEventListener('click',e=>{
       if(e.target.closest('.ai-x')){panel.hidden=true;return}
       const url=e.target.closest('[data-url]')?.dataset.url;if(!url)return;

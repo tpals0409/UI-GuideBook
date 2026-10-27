@@ -1,4 +1,4 @@
-// 모션 예시 목록을 만들어요. build-site.mjs가 배포할 때 public/motion.json으로 써요.
+// 모션 목록을 만들어요. build-site.mjs가 배포할 때 public/motion.json으로 써요.
 // 출처: prompt-motion.com (Claude로 만든 모션 영상 갤러리). 영상과 프롬프트의 권리는 각 작성자에게 있어요.
 // 나만 보는 사이트(Cloudflare Access)에서 참고용으로만 써요. 영상은 복사하지 않고 원래 주소로 재생해요.
 // 받은 목록은 data/motion.json에 저장해 두고, 다음부터는 새로 생긴 글만 받아요 (사이트에 부담을 줄이려고).
