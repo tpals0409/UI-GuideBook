@@ -27,6 +27,28 @@ function colorsOf(md) {
   return { name: (fm.match(/^name:\s*['"]?(.+?)['"]?\s*$/m) || [])[1], c: out };
 }
 
+// 색 말고 모양: 모서리 둥글기(작게·중간·크게, 버튼)와 글꼴. 우리 글꼴 목록(무료)에 있는 글꼴만 써요
+const block = (fm, key) => (fm.split(new RegExp(`^${key}:\\s*$`, 'm'))[1] || '').split(/\n(?=\S)/)[0];
+const px = v => { const n = parseFloat(v); return /^\s*['"]?\d+(\.\d+)?px/.test(v) && n <= 40 ? n + 'px' : null; };
+export function styleOf(md, fonts) {
+  const fm = md.split(/^---$/m)[1] || '', r = {};
+  for (const m of block(fm, 'rounded').matchAll(/^ {2}([\w-]+):\s*(.+)$/gm)) r[m[1]] = m[2];
+  const radius = {
+    sm: px(r.sm || r.xs || r.badge || r.chip || ''),
+    md: px(r.md || r.control || r.input || r.button || ''),
+    lg: px(r.lg || r.card || r.xl || ''),
+  };
+  // 버튼: 컴포넌트 중 첫 버튼의 rounded. 999px 이상이나 full이면 알약 모양
+  const b = block(fm, 'components').match(/type: button\n(?: {4}.+\n)*? {4}rounded:\s*(.+)/);
+  if (b) radius.btn = /full|pill|999/.test(b[1]) || parseFloat(b[1]) >= 100 ? '999px' : px(b[1]);
+  for (const k in radius) if (!radius[k]) delete radius[k];
+  // 글꼴: fonts.roles와 typography의 fontFamily를 순서대로 보고, 목록에 있는 첫 글꼴
+  const fams = [...block(fm, 'fonts').matchAll(/^ {4}\w+:\s*(.+)$/gm), ...fm.matchAll(/fontFamily:\s*(.+)/g)]
+    .flatMap(m => m[1].split(',')).map(x => x.replace(/['"]/g, '').replace(/ Variable$/, '').trim());
+  const font = fams.map(f => fonts.find(x => x.family === f || x.name === f)).find(Boolean);
+  return { ...(Object.keys(radius).length && { radius }), ...(font && { font: font.id }) };
+}
+
 // 회사마다 이름이 달라서, 흔한 이름부터 차례로 찾아 우리 역할 8개에 맞춰요. 없는 값은 있는 값으로 섞어 만들어요.
 const pick = (c, ...ks) => ks.map(k => c[k]).find(Boolean);
 export function toPalette(id, name, c) {
@@ -50,7 +72,14 @@ export function toPalette(id, name, c) {
   };
 }
 
-export async function buildCompanyList() {
+// 한국어 이름: 사이트 한국어 목록 페이지의 구조화 데이터(JSON-LD)에서 id → 이름을 읽어요. 못 받으면 영문 이름을 써요
+async function koNames() {
+  const html = await (await fetch('https://oh-my-design.kr/ko/design-systems')).text();
+  return new Map([...html.matchAll(/"name":"([^"]+)","url":"https:\/\/oh-my-design\.kr\/ko\/design-systems\/([^"]+)"/g)].map(m => [m[2], m[1]]));
+}
+
+export async function buildCompanyList(fonts = []) {
+  const ko = await koNames().catch(() => new Map());
   const meta = await (await fetch('https://registry.npmjs.org/oh-my-design-cli/latest')).json();
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'omd-'));
   try {
@@ -63,11 +92,17 @@ export async function buildCompanyList() {
     for (const id of ok) {
       const f = path.join(pkg, 'web/references', id, 'DESIGN.md');
       if (!fs.existsSync(f)) continue;
-      const r = colorsOf(fs.readFileSync(f, 'utf8'));
-      const p = r && toPalette(id, r.name || id, r.c);
-      if (p) list.push(p);
+      const md = fs.readFileSync(f, 'utf8'), r = colorsOf(md);
+      const p = r && { ...toPalette(id, r.name || id, r.c), ...styleOf(md, fonts) };
+      if (!p?.primary) continue;
+      // "Classum (클라썸)"처럼 괄호 안에 한글 이름이 있으면 한글만 보여줘요
+      const k = ko.get(id) || p.name, m = k.match(/^(.+?) \(([^)]*[가-힣][^)]*)\)$/);
+      const name = m ? m[2] : k;
+      list.push(name !== p.name ? { ...p, name, en: p.name } : p);
     }
-    return list.sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+    // 한글 이름 → 영문 이름 → 그 밖(일본어·중국어) 순서로 보여줘요
+    const grp = n => (/[가-힣]/.test(n) ? 0 : /^[\x00-\x7f]+$/.test(n) ? 1 : 2);
+    return list.sort((a, b) => grp(a.name) - grp(b.name) || a.name.localeCompare(b.name, 'ko'));
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
