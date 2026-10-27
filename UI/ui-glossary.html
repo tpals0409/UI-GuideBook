@@ -1872,6 +1872,8 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
     if(f){loadFont(f.id);d+=`--demo-font:${stack(f)};`}
     if(p)for(const[r,v]of Object.entries(ROLES))d+=`${v}:${p[r]};`;
     for(const[k,v]of Object.entries(p?.radius||{}))d+=`--r-${k}:${v};`; // 회사 팔레트: 모서리 둥글기(작게·중간·크게·버튼)
+    // 어두운 배경 회사: 무대도 어둡게 해야 무대 위 글자가 보여요
+    if(p?.dark)d+=`--stage:color-mix(in srgb,${p.surface} 94%,#fff);--grid:color-mix(in srgb,${p.text} 20%,transparent);--tick:color-mix(in srgb,${p.text} 45%,transparent);color-scheme:dark;`;
     return d;
   };
   const themeCss=document.head.appendChild(document.createElement('style'));
@@ -1882,7 +1884,7 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
   // 같은 부품을 패널과 모달에서 같이 쓰고, 둘 다 같은 전체 설정(theme)을 바꿔요.
   const chips=p=>`<span class="chips" aria-hidden="true"><i style="background:${p.primary}"></i><i style="background:${p.primarySoft}"></i><i style="background:${p.text}"></i></span>`;
   const fontOpt=(f,sel)=>`<div class="dd-row"><button type="button" class="dd-opt" role="option" data-v="${f.id}" aria-selected="${sel}" data-n="${esc((f.name+' '+f.family+' '+(CAT_KO[f.category]||'')).toLowerCase())}" title="${esc(f.license||'')}" style="font-family:${esc(stack(f))}"><span class="fn">${esc(f.name)}</span><span class="fm"><span>가나다라 Aa</span><em>${CAT_KO[f.category]||''}</em></span></button></div>`;
-  const palOpt=(p,sel)=>`<div class="dd-row"><button type="button" class="dd-opt pal-opt" role="option" data-v="${p.id}" aria-selected="${sel}" data-n="${esc((p.name+' '+(p.en||'')).toLowerCase())}"${p.src?` title="oh-my-design에서 정리한 값 (회사 공식 파일 아님)"`:''}>${chips(p)}<span>${esc(p.name)}</span>${p.ai?'<span class="tag">AI</span>':p.src?'<span class="tag">회사</span>':''}</button>${p.ai?`<button type="button" class="dd-del" data-del="${p.id}" aria-label="${esc(p.name)} 팔레트 삭제" title="삭제">${ic('trash',15)}</button>`:''}</div>`;
+  const palOpt=(p,sel)=>`<div class="dd-row"><button type="button" class="dd-opt pal-opt" role="option" data-v="${p.id}" aria-selected="${sel}" data-n="${esc((p.name+' '+(p.en||'')).toLowerCase())}"${p.src?` title="oh-my-design에서 정리한 값 (회사 공식 파일 아님)${p.unverified?'. 아직 출처 검증을 마치지 않았어요':''}"`:''}>${chips(p)}<span>${esc(p.name)}</span>${p.ai?'<span class="tag">AI</span>':p.src?`<span class="tag">${p.unverified?'검증 전':'회사'}</span>`:''}</button>${p.ai?`<button type="button" class="dd-del" data-del="${p.id}" aria-label="${esc(p.name)} 팔레트 삭제" title="삭제">${ic('trash',15)}</button>`:''}</div>`;
   const label=(kind,v)=>{
     if(kind==='font'){const f=FONTS.find(x=>x.id===v)||FONTS[0];return `<span class="dd-cur" style="font-family:${esc(stack(f))}">${esc(f.name)}</span><em>${CAT_KO[f.category]||''}</em>`}
     const p=pals().find(x=>x.id===v)||PALS[0];return `${chips(p)}<span class="dd-cur">${esc(p.name)}</span>`;
@@ -1974,7 +1976,7 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
       `- font-family: \`${stack(f)}\``,
       ...(f.css?[`- 불러오기: \`<link rel="stylesheet" href="${f.css}">\``]:[]),'',
       `## 색 — ${p.name}`,'',
-      ...(p.src?[`출처: [oh-my-design](${p.src})에서 정리한 ${p.name}의 공개 디자인 값이에요. 회사 공식 파일은 아니고, 디자인 권리는 해당 회사에 있어요.`,'']:[]),
+      ...(p.src?[`출처: [oh-my-design](${p.src})에서 정리한 ${p.name}의 공개 디자인 값이에요. 회사 공식 파일은 아니고, 디자인 권리는 해당 회사에 있어요.${p.unverified?' 아직 출처 검증을 마치지 않은 값이에요.':''}`,'']:[]),
       '| 역할 | CSS 변수 | Hex | 쓰는 곳 |','|---|---|---|---|',
       ...Object.entries(ROLES).map(([r,v])=>`| ${ROLE_INFO[r][0]} | \`${v}\` | \`${p[r]}\` | ${ROLE_INFO[r][1]} |`),'',
       ...(p.radius?['## 모서리 둥글기','','| 크기 | CSS 변수 | 값 |','|---|---|---|',...Object.entries(p.radius).map(([k,v])=>`| ${{sm:'작게 (칩, 배지)',md:'중간 (입력칸)',lg:'크게 (카드)',btn:'버튼'}[k]} | \`--r-${k}\` | \`${v}\` |`),'']:[]),
