@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>모션 예시 · UI GuideBook</title>
+<link rel="icon" href="icons/fav-32.png" sizes="32x32"><link rel="icon" href="icons/fav-64.png" sizes="64x64"><link rel="apple-touch-icon" href="icons/touch-180.png">
+<style>
+/* 용어 사전과 같은 모노톤 서비스 화면 */
+:root{--ui-bg:#f2f2f2;--ui-surface:#fff;--ui-text:#141414;--ui-muted:#666;--ui-line:#dadada;--ui-accent:#141414;color-scheme:light}
+@font-face{font-family:'Gmarket Sans';font-weight:500;font-display:swap;src:url('https://cdn.jsdelivr.net/gh/fonts-archive/GmarketSans/GmarketSansMedium.woff2') format('woff2')}
+@font-face{font-family:'Gmarket Sans';font-weight:700;font-display:swap;src:url('https://cdn.jsdelivr.net/gh/fonts-archive/GmarketSans/GmarketSansBold.woff2') format('woff2')}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--ui-bg);color:var(--ui-text);font:15px/1.65 "Gmarket Sans",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",sans-serif;-webkit-font-smoothing:antialiased;word-break:keep-all}
+button,input{font:inherit;color:inherit}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}
+.bar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:12px 28px;background:color-mix(in srgb,var(--ui-bg) 88%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--ui-line)}
+.back{display:inline-flex;align-items:center;gap:6px;height:44px;padding:0 14px;border:1px solid var(--ui-line);border-radius:12px;background:var(--ui-surface);text-decoration:none;font-size:14px;white-space:nowrap}
+.search{flex:1;max-width:560px;height:44px;border:1px solid var(--ui-line);border-radius:12px;background:var(--ui-surface);padding:0 14px;outline:none}
+.search:focus{border-color:var(--ui-accent)}
+main{padding:28px 28px 64px;max-width:1480px}
+h1{margin:0;font-size:28px;line-height:1.25;letter-spacing:-.02em;display:flex;align-items:baseline;gap:10px}
+h1 .n{font-size:15px;font-weight:500;color:var(--ui-muted)}
+.lead{margin:6px 0 18px;color:var(--ui-muted);max-width:68ch}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px}
+.chips button{border:1px solid var(--ui-line);background:var(--ui-surface);border-radius:999px;padding:6px 12px;font-size:13px;cursor:pointer}
+.chips button[aria-pressed=true]{background:var(--ui-accent);border-color:var(--ui-accent);color:#fff}
+.chips button .n{opacity:.6;margin-left:4px;font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:16px}
+.card{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;background:var(--ui-surface);border:1px solid var(--ui-line);border-radius:14px;overflow:hidden}
+.card:hover{border-color:color-mix(in srgb,var(--ui-text) 35%,var(--ui-line))}
+.card:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}
+.thumb{position:relative;aspect-ratio:16/9;background:#e6e6e6}
+.thumb img,.thumb video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.meta{padding:12px 14px 14px}
+.meta b{display:block;font-size:15px;line-height:1.4}
+.meta small{display:flex;gap:6px;align-items:center;margin-top:4px;color:var(--ui-muted);font-size:12.5px}
+.tag{font-size:11px;font-weight:700;padding:2px 7px;border-radius:999px;background:#ebebeb;color:var(--ui-text)}
+.empty{color:var(--ui-muted);padding:40px 0}
+/* 상세: 영상 + 프롬프트 */
+dialog{width:min(1080px,calc(100vw - 32px));max-height:calc(100vh - 32px);padding:0;border:0;border-radius:18px;background:var(--ui-surface);color:var(--ui-text);overflow:hidden}
+dialog::backdrop{background:rgb(10 14 24/.55)}
+.dt{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);max-height:calc(100vh - 32px)}
+.dt video{width:100%;height:100%;max-height:calc(100vh - 32px);background:#000;object-fit:contain;display:block}
+.side{display:flex;flex-direction:column;gap:12px;padding:20px;overflow-y:auto;min-height:0}
+.side h2{margin:0;font-size:20px;line-height:1.35;padding-right:36px}
+.by{margin:0;font-size:13px;color:var(--ui-muted)}
+.by a{color:inherit}
+dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0;font-size:13px}
+dt{color:var(--ui-muted)}dd{margin:0}
+pre{margin:0;white-space:pre-wrap;word-break:break-word;font:13px/1.65 ui-monospace,SFMono-Regular,Menlo,monospace;background:#f5f5f5;border:1px solid var(--ui-line);border-radius:10px;padding:12px;max-height:46vh;overflow-y:auto}
+.act{align-self:flex-start;border:0;border-radius:10px;background:var(--ui-accent);color:#fff;padding:9px 14px;font-size:14px;cursor:pointer}
+.x{position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:50%;border:0;background:rgb(255 255 255/.9);cursor:pointer;font-size:18px;z-index:1}
+.note{margin:0;font-size:12px;color:var(--ui-muted)}
+@media (max-width:760px){.bar,main{padding-left:16px;padding-right:16px}.dt{grid-template-columns:1fr}.dt video{max-height:40vh}.back span{display:none}}
+@media (prefers-reduced-motion:reduce){.thumb video{display:none}}
+</style>
+</head>
+<body>
+<header class="bar">
+  <a class="back" href="ui-glossary.html" aria-label="용어 사전으로">←<span> 용어 사전</span></a>
+  <input class="search" id="q" type="search" autocomplete="off" spellcheck="false" placeholder="모션 예시 검색 (제목, 작성자, 프롬프트)" aria-label="모션 예시 검색">
+</header>
+<main>
+  <h1>모션 예시 <span class="n" id="count"></span></h1>
+  <p class="lead">Claude로 만든 모션 영상과 그 영상을 만든 프롬프트예요. 마우스를 올리면 재생되고, 누르면 프롬프트를 복사할 수 있어요. 출처: prompt-motion.com, 영상과 프롬프트의 권리는 각 작성자에게 있어요.</p>
+  <div class="chips" id="chips" role="group" aria-label="종류"></div>
+  <div class="grid" id="grid"></div>
+  <p class="empty" id="empty" hidden>맞는 예시가 없어요. 다른 종류를 고르거나 검색어를 바꿔 보세요.</p>
+</main>
+<dialog id="dlg" aria-labelledby="dt-title">
+  <button class="x" id="x" aria-label="닫기">✕</button>
+  <div class="dt"><video id="dv" controls loop playsinline></video><div class="side" id="ds"></div></div>
+</dialog>
+<script>
+(()=>{
+  const $=s=>document.querySelector(s);
+  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const TAG={'product-ui':'화면 UI','phone':'휴대폰','charts':'차트','diagrams':'다이어그램','kinetic-type':'키네틱 타이포','shapes':'도형','particles':'파티클','characters':'캐릭터','photos':'사진','music':'음악','code':'코드'};
+  const tagKo=t=>TAG[t]||t;
+  let all=[],tag='all';
+  const kind=e=>e.install?'스킬':'프롬프트';
+  const card=e=>`<button class="card" data-s="${esc(e.slug)}" aria-label="${esc(e.title)} 자세히 보기"><div class="thumb"><img src="${esc(e.poster)}" alt="" loading="lazy"></div><div class="meta"><b>${esc(e.title)}</b><small><span class="tag">${kind(e)}</span>@${esc(e.handle||e.author)} · ${(e.tags||[]).map(tagKo).join(', ')}</small></div></button>`;
+  const draw=()=>{
+    const q=$('#q').value.trim().toLowerCase();
+    const list=all.filter(e=>(tag==='all'||(tag==='skill'?e.install:e.tags.includes(tag)))&&(!q||[e.title,e.author,e.handle,e.prompt,e.skill,...e.tags.map(tagKo)].join(' ').toLowerCase().includes(q)));
+    $('#grid').innerHTML=list.map(card).join('');$('#count').textContent=list.length;$('#empty').hidden=list.length>0;
+  };
+  const drawChips=()=>{
+    const n={};all.forEach(e=>e.tags.forEach(t=>n[t]=(n[t]||0)+1));
+    const items=[['all','전체',all.length],...Object.entries(n).sort((a,b)=>b[1]-a[1]).map(([t,c])=>[t,tagKo(t),c]),['skill','스킬',all.filter(e=>e.install).length]];
+    $('#chips').innerHTML=items.map(([v,l,c])=>`<button data-t="${v}" aria-pressed="${v===tag}">${esc(l)}<span class="n">${c}</span></button>`).join('');
+  };
+  $('#chips').onclick=e=>{const b=e.target.closest('button');if(!b)return;tag=b.dataset.t;drawChips();draw()};
+  $('#q').oninput=draw;
+  // 타일: 마우스를 올렸을 때만 재생 (용어 사전 타일과 같은 규칙)
+  const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const play=c=>{if(reduced()||c.querySelector('video'))return;const e=all.find(x=>x.slug===c.dataset.s);c.querySelector('.thumb').insertAdjacentHTML('beforeend',`<video src="${esc(e.video)}" muted loop playsinline autoplay></video>`)};
+  const stop=c=>c.querySelector('video')?.remove();
+  $('#grid').addEventListener('mouseover',e=>{const c=e.target.closest('.card');if(c)play(c)});
+  $('#grid').addEventListener('mouseout',e=>{const c=e.target.closest('.card');if(c&&!c.contains(e.relatedTarget))stop(c)});
+  $('#grid').addEventListener('focusin',e=>{const c=e.target.closest('.card');if(c)play(c)});
+  $('#grid').addEventListener('focusout',e=>{const c=e.target.closest('.card');if(c)stop(c)});
+  // 상세
+  const dlg=$('#dlg'),dv=$('#dv');
+  const copy=async(text,btn)=>{try{await navigator.clipboard.writeText(text);const t=btn.textContent;btn.textContent='복사했어요';setTimeout(()=>btn.textContent=t,1400)}catch{btn.textContent='복사하지 못했어요'}};
+  const open=slug=>{
+    const e=all.find(x=>x.slug===slug);if(!e)return;
+    dv.poster=e.poster;dv.src=e.video;
+    $('#ds').innerHTML=`<h2 id="dt-title">${esc(e.title)}</h2>
+      <p class="by">@${esc(e.handle||'')} ${esc(e.author||'')}${e.post?` · <a href="${esc(e.post)}" target="_blank" rel="noopener">원문 글</a>`:''}</p>
+      <dl>${e.model?`<dt>모델</dt><dd>${esc(e.model)}</dd>`:''}${e.effort?`<dt>노력 수준</dt><dd>${esc(e.effort)}</dd>`:''}<dt>종류</dt><dd>${(e.tags||[]).map(tagKo).join(', ')}</dd>${e.date?`<dt>올린 날</dt><dd>${esc(e.date)}</dd>`:''}</dl>
+      ${e.prompt?`<pre>${esc(e.prompt)}</pre><button class="act" data-copy="prompt">프롬프트 복사</button>`:''}
+      ${e.install?`<p class="by">${esc(e.skill||'')}</p><pre>${esc(e.install)}</pre><button class="act" data-copy="install">설치 명령 복사</button>`:''}
+      <p class="note">영상과 프롬프트의 권리는 작성자에게 있어요. 참고용으로만 써요.</p>`;
+    $('#ds').dataset.s=slug;dlg.showModal();dv.play().catch(()=>{});
+    history.replaceState(null,'','#'+slug);
+  };
+  $('#ds').onclick=ev=>{const b=ev.target.closest('[data-copy]');if(!b)return;const e=all.find(x=>x.slug===$('#ds').dataset.s);copy(e[b.dataset.copy],b)};
+  $('#grid').onclick=e=>{const c=e.target.closest('.card');if(c)open(c.dataset.s)};
+  $('#x').onclick=()=>dlg.close();
+  dlg.addEventListener('click',e=>{if(e.target===dlg)dlg.close()});
+  dlg.addEventListener('close',()=>{dv.pause();dv.removeAttribute('src');dv.load();history.replaceState(null,'',location.pathname)});
+  fetch('/motion.json').then(r=>r.ok?r.json():[]).then(list=>{
+    all=list;drawChips();draw();
+    if(location.hash)open(decodeURIComponent(location.hash.slice(1)));
+  }).catch(()=>{$('#empty').hidden=false;$('#empty').textContent='모션 예시를 불러오지 못했어요. 새로고침해 보세요.'});
+})();
+</script>
+</body>
+</html>

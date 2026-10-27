@@ -7,6 +7,7 @@ import sources from '../sources.config.mjs';
 import { walk } from '../extractors/markdown.mjs';
 import { buildFontList } from './fonts.mjs';
 import { buildCompanyList } from './companies.mjs';
+import { buildMotionList } from './motion.mjs';
 
 const configDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const root = path.join(configDir, '..'); // 개발 체크리스트 폴더
@@ -15,7 +16,7 @@ const out = path.join(configDir, 'public');
 const filesIn = dir => fs.readdirSync(dir, { withFileTypes: true }).filter(e => e.isFile() && !e.name.startsWith('.')).map(e => path.join(dir, e.name));
 const files = sources.flatMap(s => {
   const p = path.join(configDir, s.path);
-  const assets = (s.assets ?? []).flatMap(a => filesIn(path.join(configDir, a)));
+  const assets = (s.assets ?? []).map(a => path.join(configDir, a)).flatMap(a => (fs.statSync(a).isDirectory() ? filesIn(a) : [a]));
   return [...(s.extractor === 'markdown' ? walk(p, s.exclude ?? []) : [p]), ...assets];
 });
 fs.rmSync(out, { recursive: true, force: true });
@@ -39,4 +40,7 @@ fs.writeFileSync(path.join(out, 'fonts.json'), JSON.stringify(fonts));
 // 예시 테마의 회사 팔레트 (oh-my-design). 받아오지 못해도 배포는 계속해요
 const companies = await buildCompanyList(fonts).catch(err => { console.warn(`회사 팔레트를 받지 못했어요: ${err.message}`); return []; });
 fs.writeFileSync(path.join(out, 'companies.json'), JSON.stringify(companies));
-console.log(`public/에 ${files.length}개 파일, 문서 목록(${docs.length}개), 글꼴 목록(${fonts.length}개), 회사 팔레트(${companies.length}개)를 만들었어요`);
+// 모션 예시 (prompt-motion). 받아오지 못하면 저장해 둔 목록을 써요
+const motion = await buildMotionList().catch(err => { console.warn(`모션 예시를 새로 받지 못했어요: ${err.message}`); return JSON.parse(fs.readFileSync(path.join(configDir, 'data', 'motion.json'), 'utf8')); });
+fs.writeFileSync(path.join(out, 'motion.json'), JSON.stringify(motion));
+console.log(`public/에 ${files.length}개 파일, 문서 목록(${docs.length}개), 글꼴 목록(${fonts.length}개), 회사 팔레트(${companies.length}개), 모션 예시(${motion.length}개)를 만들었어요`);
