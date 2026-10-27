@@ -10,9 +10,11 @@ const configDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const root = path.join(configDir, '..'); // 개발 체크리스트 폴더
 const out = path.join(configDir, 'public');
 
+const filesIn = dir => fs.readdirSync(dir, { withFileTypes: true }).filter(e => e.isFile() && !e.name.startsWith('.')).map(e => path.join(dir, e.name));
 const files = sources.flatMap(s => {
   const p = path.join(configDir, s.path);
-  return s.extractor === 'markdown' ? [...walk(p, s.exclude ?? [])] : [p];
+  const assets = (s.assets ?? []).flatMap(a => filesIn(path.join(configDir, a)));
+  return [...(s.extractor === 'markdown' ? walk(p, s.exclude ?? []) : [p]), ...assets];
 });
 fs.rmSync(out, { recursive: true, force: true });
 const docs = [];
