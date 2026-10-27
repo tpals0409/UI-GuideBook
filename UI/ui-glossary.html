@@ -74,7 +74,15 @@ main{padding:4px 28px 64px;max-width:1480px;width:100%}
 .card{background:var(--ui-surface);border:1px solid var(--ui-line);border-radius:14px;padding:6px;display:flex;flex-direction:column;min-width:0;cursor:pointer;transition:border-color .15s}
 .card:hover{border-color:color-mix(in srgb,var(--ui-text) 26%,var(--ui-line))}
 .card:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}
-.card .demo{cursor:auto;min-height:224px}
+.card .demo{cursor:pointer;min-height:224px}
+/* 타일 자동 재생: 가짜 커서와 누르는 표시 */
+.play-cursor{position:absolute;left:0;top:0;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:rgb(20 20 20/.22);box-shadow:0 0 0 2px rgb(255 255 255/.9),0 1px 4px rgb(0 0 0/.3);pointer-events:none;z-index:20;opacity:0;transition:transform .5s cubic-bezier(.2,.8,.2,1),opacity .2s}
+.play-cursor.on{opacity:1}
+.play-cursor.tap::after{content:'';position:absolute;inset:-6px;border-radius:50%;border:2px solid rgb(20 20 20/.35);animation:tap .45s ease-out forwards}
+@keyframes tap{from{transform:scale(.4);opacity:1}to{transform:scale(1.5);opacity:0}}
+.lift.is-hover{transform:translateY(-6px);box-shadow:0 14px 26px rgb(0 0 0/.16)}
+.lift.scale.is-hover{transform:scale(1.06)}
+.tt.is-hover [role=tooltip]{opacity:1;transform:translateX(-50%)}
 .cap{padding:12px 10px 8px;display:flex;flex-direction:column;gap:3px}
 .cap h3{margin:0;font-size:16px;font-weight:600;line-height:1.35;letter-spacing:-.005em;display:flex;flex-wrap:wrap;align-items:baseline;column-gap:8px}
 .cap h3 .ko{font-size:13px;font-weight:400;color:var(--ui-muted)}
@@ -367,7 +375,7 @@ function menuToggle(btn,menu){
   });
 }
 const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
-addEventListener('pointerdown',()=>document.documentElement.classList.add('mouse'),true);
+addEventListener('pointerdown',e=>{if(e.isTrusted)document.documentElement.classList.add('mouse')},true);
 addEventListener('keydown',()=>document.documentElement.classList.remove('mouse'),true);
 </script>
 
@@ -1678,7 +1686,7 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
   }).join('');
   // 타일: 위는 직접 만져 보는 부품, 아래는 이름과 한 줄 설명. 출처·별칭·차이는 상세 모달에서 보여줘요.
   const card=t=>`<article class="card" id="${t.id}" tabindex="0" aria-haspopup="dialog" aria-label="${esc(t.en+' '+t.ko)} 자세히 보기" data-q="${esc(norm([t.en,t.ko,t.aka,t.desc].join(' ')))}">
-    <div class="demo" data-demo="${t.id}"></div>
+    <div class="demo" data-demo="${t.id}" inert></div>
     <div class="cap"><h3>${t.en}<span class="ko">${t.ko}</span></h3><p>${t.desc}</p></div>
   </article>`;
   const INTRO={action:'누르고, 고르고, 입력하는 부품이에요.',overlay:'화면 위에 잠깐 떠서 알리거나 묻는 부품이에요.',nav:'다른 화면이나 위치로 옮겨 가는 부품이에요.',content:'정보를 묶어서 보여주는 부품이에요.',layout:'화면을 나누고 정렬하는 규칙이에요.',effect:'움직임과 질감으로 상태를 전하는 표현이에요.',concept:'모든 부품에 공통으로 적용되는 기준이에요.'};
@@ -1689,13 +1697,64 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
 
   // 데모는 화면 근처에 올 때만 그려요
   const byId=Object.fromEntries(TERMS.map(t=>[t.id,t]));
+  const renderDemo=(el,t)=>{el.innerHTML=t.demo;try{t.init?.(el)}catch(err){console.error(t.id,err)}};
   const io=new IntersectionObserver(es=>es.forEach(e=>{
     if(!e.isIntersecting)return;
-    const el=e.target,t=byId[el.dataset.demo];io.unobserve(el);
-    el.innerHTML=t.demo;
-    try{t.init?.(el)}catch(err){console.error(t.id,err)}
+    const el=e.target;io.unobserve(el);renderDemo(el,byId[el.dataset.demo]);
   }),{rootMargin:'400px'});
   $$('.demo[data-demo]').forEach(d=>io.observe(d)); // 모달의 예시 영역은 open()이 직접 그려요
+
+  // ───── 타일 자동 재생: 예시를 영상처럼 시연해요 (직접 조작은 상세 모달에서) ─────
+  // 용어마다 대본을 쓰지 않고, 예시 안의 조작 요소를 찾아 가짜 커서로 차례대로 눌러 봐요.
+  // 몇 단계를 돌면 처음 상태로 되돌려 반복하고, 화면에 보이는 타일만 재생해요.
+  const wait=ms=>new Promise(r=>setTimeout(r,ms));
+  const PICK='button,[role=option],[role=tab],summary,input,select,textarea,.ctx-area,.tilt-w,.lift,.tt,.rip-card';
+  // 실제로 영향을 주는 조작(파일 선택, 클립보드 복사, 삭제)과 화면 위로 뜨는 팝오버는 건너뛰어요
+  const SKIP='input[type=file],.dz,.chip.in button,.code .btn,[popovertarget],[popover]';
+  const shown=n=>{const r=n.getBoundingClientRect();return r.width>2&&r.height>2&&!n.closest('[hidden],dialog:not([open])')};
+  const scrollers=demo=>$$('*',demo).filter(n=>{const c=getComputedStyle(n);return(/auto|scroll/.test(c.overflowY)&&n.scrollHeight>n.clientHeight+24)||(/auto|scroll/.test(c.overflowX)&&n.scrollWidth>n.clientWidth+24)});
+  const stepsOf=demo=>[...scrollers(demo).map(n=>({n,scroll:true})),...$$(PICK,demo).filter(n=>!n.closest(SKIP)&&shown(n)).map(n=>({n}))];
+  const fire=(n,type,init={})=>n.dispatchEvent(new(type.startsWith('pointer')?PointerEvent:type==='contextmenu'?MouseEvent:Event)(type,{bubbles:true,cancelable:true,...init}));
+  const sampleText=n=>n.closest('.cb')?'블':n.closest('.otp')?String([...n.parentNode.children].indexOf(n)+1):n.type==='email'?'name@site':n.type==='search'?'버튼':'안녕하세요';
+  async function act(demo,{n,scroll},sig){
+    const cursor=$('.play-cursor',demo)||demo.appendChild(Object.assign(document.createElement('span'),{className:'play-cursor'}));
+    const a=n.getBoundingClientRect(),b=demo.getBoundingClientRect(),cx=a.left+a.width/2,cy=a.top+a.height/2;
+    cursor.style.transform=`translate(${cx-b.left}px,${cy-b.top}px)`;cursor.classList.add('on');
+    await wait(520);if(sig.stop)return;
+    cursor.classList.remove('tap');void cursor.offsetWidth;cursor.classList.add('tap');
+    if(scroll){const v=n.scrollHeight>n.clientHeight+24,max=v?n.scrollHeight-n.clientHeight:n.scrollWidth-n.clientWidth,now=v?n.scrollTop:n.scrollLeft;return n.scrollTo({[v?'top':'left']:now>max/2?0:max,behavior:'smooth'})}
+    const box=$('dialog',demo);
+    if(box&&!n.closest('dialog')&&n.matches('button')){box.setAttribute('open','');setTimeout(()=>box.removeAttribute('open'),1800);return} // 화면을 막는 대화상자 대신 잠깐 펼쳐 보여줘요
+    if(n.matches('input[type=range]')){const lo=+n.min||0,hi=+n.max||100,to=lo+Math.round(Math.random()*(hi-lo)),from=+n.value;for(let i=1;i<=10&&!sig.stop;i++){n.value=String(Math.round(from+(to-from)*i/10));fire(n,'input');await wait(40)}return}
+    if(n.matches('input[type=color]')){n.value=['#e2552d','#1f7a4d','#6246d6','#0a6f8c'][Math.floor(Math.random()*4)];return fire(n,'input')}
+    if(n.matches('input[type=date],input[type=time]')){n.value=n.type==='date'?'2026-11-03':'18:30';fire(n,'input');return fire(n,'change')}
+    if(n.matches('input:not([type=checkbox],[type=radio]),textarea')){n.value='';for(const ch of sampleText(n)){if(sig.stop)return;n.value+=ch;fire(n,'input');await wait(90)}if(n.type==='email')fire(n,'blur');return}
+    if(n.matches('select')){n.selectedIndex=(n.selectedIndex+1)%n.options.length;fire(n,'input');return fire(n,'change')}
+    if(n.matches('.ctx-area'))return fire(n,'contextmenu',{clientX:cx,clientY:cy});
+    if(n.matches('.tilt-w')){const r=($('.tilt',n)||n).getBoundingClientRect();for(let i=0;i<=14&&!sig.stop;i++){const t=i/14*Math.PI*2;fire(n,'pointermove',{clientX:r.left+r.width*(.5+.4*Math.cos(t)),clientY:r.top+r.height*(.5+.4*Math.sin(t))});await wait(60)}return fire(n,'pointerleave')}
+    if(n.matches('.lift,.tt')){n.classList.add('is-hover');setTimeout(()=>n.classList.remove('is-hover'),1100);return}
+    const rip=n.closest('.rip');if(rip)fire(rip,'pointerdown',{clientX:cx,clientY:cy});
+    n.click();
+  }
+  const players=new Map();
+  async function play(card){
+    const demo=$('.demo',card),t=byId[card.id],sig={stop:false};players.set(card,sig);
+    let i=0;
+    while(!sig.stop){
+      if(dlg.open||!demo.childElementCount){await wait(600);continue} // 상세 모달이 열려 있거나 아직 안 그려졌으면 기다려요
+      const list=stepsOf(demo);if(!list.length)break; // 조작할 게 없는 예시(그라데이션 등)는 자체 애니메이션만
+      await act(demo,list[i%list.length],sig);
+      i++;await wait(900);
+      if(i>=Math.min(Math.max(list.length,3),6)){await wait(600);if(sig.stop)break;renderDemo(demo,t);i=0;await wait(500)}
+    }
+    $('.play-cursor',demo)?.classList.remove('on');
+  }
+  const playIO=new IntersectionObserver(es=>es.forEach(e=>{
+    const card=e.target;
+    if(e.isIntersecting&&!players.has(card))play(card).finally(()=>players.delete(card));
+    else if(!e.isIntersecting&&players.has(card))players.get(card).stop=true;
+  }),{threshold:.55});
+  if(!reduced())$$('.card').forEach(c=>playIO.observe(c));
 
   let cat='all';
   const catCount=c=>TERMS.filter(t=>t.cat===c).length;
@@ -1759,7 +1818,7 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
   };
   const step=d=>{const v=visible(),i=v.indexOf(cur);if(v[i+d])open(v[i+d])};
   $('#app').addEventListener('click',e=>{
-    if(e.target.closest('.demo,a.src'))return;
+    if(!e.isTrusted||e.target.closest('a.src'))return; // 타일 어디를 눌러도 열려요. 자동 재생의 가짜 클릭은 무시
     const c=e.target.closest('.card');if(!c)return;
     e.preventDefault();open(c.id);
   });
@@ -1855,6 +1914,7 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
     applyTheme();drawAll();aiMsg.textContent=`"${p.name}" 팔레트를 지웠어요.`;
   };
   document.addEventListener('click',e=>{
+    if(!e.isTrusted)return;
     const path=e.composedPath(),dd=e.target.closest?.('.dd');
     DDS().forEach(x=>{if(!path.includes(x))setDD(x,false)});
     if(!dd)return;
@@ -1885,7 +1945,7 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
     drawAll();
   }).catch(()=>{});
   tBtn.onclick=e=>{e.stopPropagation();setPanel(tPanel.hidden)};
-  document.addEventListener('click',e=>{const path=e.composedPath();if(!tPanel.hidden&&!path.includes(tPanel)&&!path.includes(tBtn))setPanel(false)});
+  document.addEventListener('click',e=>{if(!e.isTrusted)return;const path=e.composedPath();if(!tPanel.hidden&&!path.includes(tPanel)&&!path.includes(tBtn))setPanel(false)});
   addEventListener('keydown',e=>{if(e.key==='Escape'&&!tPanel.hidden){setPanel(false);tBtn.focus()}});
   tPanel.addEventListener('click',e=>{
     if(!e.target.closest('.tp-reset'))return;
