@@ -343,7 +343,6 @@ html:has(.dt[open]){overflow:hidden}
 <aside class="side" id="side">
   <div class="brand"><b>UI GuideBook</b></div>
   <nav aria-label="용어"><p class="nav-h">용어</p><div class="cats" id="cats"></div><div class="cats" id="mo-cats" hidden></div><div class="cats" id="an-cats" hidden></div></nav>
-  <nav class="docs" id="docs" aria-label="문서" hidden><p class="nav-h">문서</p><div id="docs-list"></div></nav>
   <nav class="docs" aria-label="갤러리"><p class="nav-h">갤러리</p><a href="#motion" id="mo-link">영상</a><a href="#anim" id="an-link">코드</a></nav>
   <div class="legend">
     <p>출처</p>
@@ -1973,13 +1972,6 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
   const spy=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)$$('#cats button').forEach(b=>b.classList.toggle('here',b.dataset.cat===e.target.dataset.cat))}),{rootMargin:'-90px 0px -65% 0px'});
   $$('.cat').forEach(s=>spy.observe(s));
 
-  // 사이트에서 열었을 때만: 배포할 때 만든 문서 목록(docs.json)을 사이드바에 보여줘요
-  if(location.protocol.startsWith('http'))fetch('/docs.json').then(r=>r.ok?r.json():[]).then(list=>{
-    list=list.filter(d=>!/(^|\/)README\.md$/i.test(d.url)); // README는 이 사이트 자체라 빼요
-    if(!list.length)return;
-    $('#docs-list').innerHTML=list.map(d=>`<a href="/${d.url.split('/').map(encodeURIComponent).join('/')}" target="_blank" rel="noopener">${esc(d.title)}</a>`).join('');
-    $('#docs').hidden=false;
-  }).catch(()=>{});
   const filter=()=>{
     const q=norm($('#q').value);let n=0;
     $$('.cat').forEach(s=>{
