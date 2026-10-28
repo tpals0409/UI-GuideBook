@@ -2063,8 +2063,12 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
   };
   $('#an-chips').onclick=e=>{const b=e.target.closest('button');if(!b)return;anSel=b.dataset.t;drawAn()};
   // 무대: 배포 때 우리 사이트에 직접 묶은 미리보기(tween-preview)를 띄워요. 같은 주소라 예시 테마(색·글꼴)가 그대로 들어가요
-  // 타일은 등장이 끝난 뒤 멈춘 화면(?still)으로 두고, 마우스를 올렸을 때만 처음부터 움직여요 (용어 타일과 같은 규칙)
-  const PREVIEW=(n,still)=>`tween-preview/preview.html?n=${encodeURIComponent(n)}${still?'&still=1':''}`;
+  // 타일은 빌드 때 미리 그려 둔 정지 화면(still/*.html, JS 없음)으로 빠르게 보여주고, 마우스를 올렸을 때만 움직이는 미리보기로 바꿔요
+  const PREVIEW=(n,still)=>still?`tween-preview/still/${encodeURIComponent(n)}.html`:`tween-preview/preview.html?n=${encodeURIComponent(n)}`;
+  // 코드는 상세를 열 때만 받아요 (목록 tween.json에는 이름·설명만)
+  // 처음 모습이 '숨김'인 것들(등장 애니메이션으로 나타남)은 정지 화면이 비어 보여서 타일에서도 움직이는 미리보기를 써요
+  const LIVE_TILE=new Set(['avatar-reveal','number-counter','svg-draw','wordmark-reveal','strip-wipe','kinetic-type-ring','morphing-text','integration-hub']);
+  const anCode={};const loadCode=n=>anCode[n]||=fetch(`tween-code/${encodeURIComponent(n)}.json`).then(r=>r.ok?r.json():[]).catch(()=>[]);
   const anOf=n=>an.find(x=>x.name===n);
   const fit=(f,box,kind)=>{ // 컴포넌트는 실제 크기로, 화면 블록(넓은 섹션)은 폭 1200px 기준으로 줄여서 보여줘요
     const w=box.clientWidth,h=box.clientHeight,k=kind==='block'?Math.min(1,w/1200):1;
@@ -2077,12 +2081,12 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
     f.onload=()=>{themeFrame(f);
       // 타일 무대 안도 마우스로 직접 만져 볼 수 있어요(올리기·누르기로 움직이는 컴포넌트가 많아서). 누르면 상세가 열려요
       if(box.closest('.an-tile'))try{f.contentDocument.addEventListener('click',()=>anOpen(e.name))}catch{}
-      setTimeout(()=>{try{const el=f.contentDocument.querySelector('#root>div'),sw=Math.max(el.scrollWidth,...[...el.querySelectorAll(':scope>*,:scope>*>*')].map(c=>c.getBoundingClientRect().width)),w=box.clientWidth;if(e.kind!=='block'&&sw>w){const k=w/(sw+24);Object.assign(f.style,{width:w/k+'px',height:box.clientHeight/k+'px',transform:`scale(${k})`})}}catch{}f.classList.add('on')},250)};
+      setTimeout(()=>{try{const el=f.contentDocument.querySelector('#root>div'),sw=Math.max(el.scrollWidth,...[...el.querySelectorAll(':scope>*,:scope>*>*')].map(c=>c.getBoundingClientRect().width)),w=box.clientWidth;if(e.kind!=='block'&&sw>w){const k=w/(sw+24);Object.assign(f.style,{width:w/k+'px',height:box.clientHeight/k+'px',transform:`scale(${k})`})}}catch{}f.classList.add('on')},still?0:250)}; // 미리 그린 정지 화면은 바로, React 미리보기는 그려질 때까지 잠깐 기다려요
     fit(f,box,e.kind);f.classList.remove('on');f.src=PREVIEW(e.name,still);
   };
-  const tileIO=new IntersectionObserver(es=>es.forEach(x=>{if(!x.isIntersecting)return;tileIO.unobserve(x.target);const t=x.target;mount($('.an-stage',t),anOf(t.dataset.n),true)}),{rootMargin:'300px'});
+  const tileIO=new IntersectionObserver(es=>es.forEach(x=>{if(!x.isIntersecting)return;tileIO.unobserve(x.target);const t=x.target;mount($('.an-stage',t),anOf(t.dataset.n),!LIVE_TILE.has(t.dataset.n))}),{rootMargin:'300px'});
   const anTile=e=>e.target.closest?.('.an-tile');
-  const tilePlay=(t,on)=>{if(reduced()&&on)return;const box=$('.an-stage',t);if(!$('iframe',box))return;t.dataset.live=on?'1':'';mount(box,anOf(t.dataset.n),!on)};
+  const tilePlay=(t,on)=>{if(reduced()&&on)return;const box=$('.an-stage',t);if(!$('iframe',box))return;t.dataset.live=on?'1':'';mount(box,anOf(t.dataset.n),!on&&!LIVE_TILE.has(t.dataset.n))};
   $('#an-grid').addEventListener('mouseover',e=>{const t=anTile(e);if(t&&!t.contains(e.relatedTarget)&&!t.dataset.live)tilePlay(t,true)});
   // 무대 iframe 안으로 들어갈 때도 mouseout이 와요. 정말 타일을 벗어났는지(:hover) 확인하고 멈춰요
   $('#an-grid').addEventListener('mouseout',e=>{const t=anTile(e);if(t&&t.dataset.live)setTimeout(()=>{if(!t.matches(':hover'))tilePlay(t,false)},60)});
@@ -2097,7 +2101,7 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
     $('.srcs',anDlg).innerHTML=`<span class="src src-idiom">Tween UI</span>`;
     $('.desc',anDlg).textContent=e.desc||e.en;
     $('.an-src dl',anDlg).innerHTML=`<dt>필요한 것</dt><dd>React 19, Tailwind CSS v4${e.deps.length?', '+esc(e.deps.join(', ')):''}</dd><dt>설치</dt><dd><code>${esc(e.install)}</code></dd>`;
-    $('.an-files',anDlg).innerHTML=e.files.map(f=>`<p class="tp-note">${esc(f.path)}</p><pre>${esc(f.content)}</pre>`).join('');
+    $('.an-files',anDlg).innerHTML='';loadCode(name).then(files=>{if(anCur===name)$('.an-files',anDlg).innerHTML=files.map(f=>`<p class="tp-note">${esc(f.path)}</p><pre>${esc(f.content)}</pre>`).join('')});
     $('.an-credit',anDlg).innerHTML=`출처: <a href="${esc(e.page)}" target="_blank" rel="noopener">Tween UI</a> (MIT). 원문 설명: ${esc(e.en)}`;
     const v=anList.length?anList:an,i=v.findIndex(x=>x.name===name);
     $('.an-pos',anDlg).textContent=i<0?'':`${i+1} / ${v.length}`;
@@ -2116,8 +2120,8 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
     if(ev.target===anDlg)return anDlg.close();
     if(ev.target.closest('.an-re')){const e=anOf(anCur);mount($('.an-stage',anDlg),e,false);return}
     const b=ev.target.closest('[data-copy]');if(!b)return;
-    const e=anOf(anCur),t=b.textContent;
-    const text=b.dataset.copy==='code'?e.files.map(f=>e.files.length>1?`// ${f.path}\n${f.content}`:f.content).join('\n\n'):e.install;
+    const e=anOf(anCur),t=b.textContent,files=b.dataset.copy==='code'?await loadCode(anCur):[];
+    const text=b.dataset.copy==='code'?files.map(f=>files.length>1?`// ${f.path}\n${f.content}`:f.content).join('\n\n'):e.install;
     try{await navigator.clipboard.writeText(text);b.textContent='복사했어요'}catch{b.textContent='복사하지 못했어요'}
     setTimeout(()=>b.textContent=t,1400);
   });

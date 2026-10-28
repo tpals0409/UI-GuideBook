@@ -48,7 +48,10 @@ const motion = await buildMotionList().catch(err => { console.warn(`모션 예�
 fs.writeFileSync(path.join(out, 'motion.json'), JSON.stringify(motion));
 // 애니메이션 코드 모음 (Tween UI). 받아오지 못하면 저장해 둔 목록을 써요
 const tween = await buildTweenList().catch(err => { console.warn(`애니메이션 코드를 새로 받지 못했어요: ${err.message}`); return savedTweenList(); });
-fs.writeFileSync(path.join(out, 'tween.json'), JSON.stringify(tween.map(({ demo, needs, ...e }) => e)));
+// 목록에는 이름·설명만, 코드는 항목마다 따로 (상세를 열 때만 받아요)
+fs.writeFileSync(path.join(out, 'tween.json'), JSON.stringify(tween.map(({ demo, needs, files, ...e }) => e)));
+fs.mkdirSync(path.join(out, 'UI', 'tween-code'), { recursive: true });
+for (const e of tween) fs.writeFileSync(path.join(out, 'UI', 'tween-code', `${e.name}.json`), JSON.stringify(e.files));
 // 미리보기는 우리 사이트에서 직접 묶어요 (예시 테마를 넣을 수 있게)
 await buildTweenPreviews(tween, path.join(out, 'UI', 'tween-preview'));
 // 움직이는 아이콘: 쓰는 아이콘만 묶은 작은 스크립트

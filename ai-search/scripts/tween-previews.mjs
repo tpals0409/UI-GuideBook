@@ -2,7 +2,8 @@
 // 같은 주소에서 열리니 용어 사전이 예시 테마(색·글꼴)를 미리보기 안에 넣을 수 있어요.
 // 1) data/tween.json의 컴포넌트와 사용 예시를 임시 폴더(.tween-build)에 풀어요
 // 2) Tween UI의 고정 색(청록·라임·잉크 등)을 CSS 변수(--tp-*)로 바꿔요. 변수의 기본값은 우리 기본 테마(코발트)예요
-// 3) React + Tailwind v4로 한 번에 묶어요. preview.html?n=<이름> 으로 하나씩 열려요
+// 3) React + Tailwind v4로 한 번에 묶어요. preview.html?n=<이름> 으로 하나씩 열려요 (움직이는 미리보기)
+// 4) 같은 컴포넌트를 빌드 때 미리 HTML로 그려 둬요(SSR) → still/<이름>.html. 목록 타일은 JS 없이 이걸 보여줘서 빨라요
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -61,7 +62,6 @@ export async function buildTweenPreviews(list, outDir) {
   --tp-brand-deep:color-mix(in srgb,var(--tp-brand) 70%,#000);
 }
 html,body{margin:0;min-height:100%}
-.still *,.still *::before,.still *::after{animation-play-state:paused!important;transition:none!important}
 body{font-family:var(--demo-font,"Gmarket Sans",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",sans-serif);background:transparent;color:var(--tp-ink)} /* 용어 사전의 무대(점 격자)가 비쳐 보여요 */
 #root{min-height:100vh;display:flex;align-items:center;justify-content:center}
 #root>div{width:100%;display:flex;justify-content:center;align-items:center} /* w-full 컴포넌트가 0 폭이 되지 않게 */
@@ -80,20 +80,13 @@ const demos = import.meta.glob('./examples/*-demo.tsx');
 const BLOCKS = new Set(${JSON.stringify(blocks)});
 // 페이지 스크롤에 맞춰 움직이는 것들 (ScrollTrigger·스크롤 위치를 씀)
 const SCROLLY = new Set(${JSON.stringify(SCROLLY)});
-const still = new URLSearchParams(location.search).has('still');
 const n = new URLSearchParams(location.search).get('n') || '';
 const load = demos['./examples/' + n + '-demo.tsx'];
 const root = createRoot(document.getElementById('root')!);
 if (!load) root.render(<p>미리보기가 없어요: {n}</p>);
 else load().then((m: any) => { const Demo = m.default; root.render(<div className={BLOCKS.has(n) ? 'block' : ''}><Demo /></div>); });
-// ?still=1: 목록 썸네일용. 등장 애니메이션이 끝날 즈음(1.8초) 멈춰서 정지 화면처럼 보여요
-if (still) setTimeout(async () => {
-  const { gsap } = await import('gsap');
-  gsap.globalTimeline.pause();
-  document.documentElement.classList.add('still');
-}, 1800);
 // 움직이는 미리보기에서는 스크롤 예시를 위→아래로 천천히 자동 스크롤하고 반복해요. 직접 휠·터치로 스크롤하면 멈춰요
-if (!still && SCROLLY.has(n) && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+if (SCROLLY.has(n) && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
   document.documentElement.classList.add('scrolly');
   let y = 0, on = true;
   const stop = () => { on = false; };
@@ -115,4 +108,27 @@ if (!still && SCROLLY.has(n) && !matchMedia('(prefers-reduced-motion: reduce)').
     resolve: { alias: { '@/components/tweenui': path.join(src, 'components', 'tweenui'), '@/lib': path.join(src, 'lib'), '@': src } },
     build: { outDir, emptyOutDir: true, rollupOptions: { input: path.join(src, 'preview.html') }, chunkSizeWarningLimit: 2000 },
   });
+
+  // SSR: 모든 사용 예시를 서버에서 HTML로 그려 정지 화면을 만들어요 (애니메이션은 브라우저에서만 돌아서 처음 모습 그대로예요)
+  fs.writeFileSync(path.join(src, 'ssr.tsx'), `import { renderToString } from 'react-dom/server';
+const demos = import.meta.glob('./examples/*-demo.tsx', { eager: true }) as Record<string, any>;
+export function render(n: string, block: boolean) {
+  const D = demos['./examples/' + n + '-demo.tsx']?.default;
+  return D ? renderToString(<div className={block ? 'block' : ''}><D /></div>) : '';
+}
+`);
+  const ssrOut = path.join(src, 'ssr-out');
+  await build({
+    root: src, logLevel: 'warn', configFile: false, plugins: [react()],
+    resolve: { alias: { '@/components/tweenui': path.join(src, 'components', 'tweenui'), '@/lib': path.join(src, 'lib'), '@': src } },
+    ssr: { noExternal: true }, build: { ssr: path.join(src, 'ssr.tsx'), outDir: ssrOut, emptyOutDir: true },
+  });
+  const { render } = await import(path.join(ssrOut, 'ssr.js'));
+  const css = fs.readFileSync(path.join(outDir, 'preview.html'), 'utf8').match(/href="\.\/(assets\/[^"]+\.css)"/)[1];
+  fs.mkdirSync(path.join(outDir, 'still'), { recursive: true });
+  for (const e of list) {
+    let body = '';
+    try { body = render(e.name, e.kind === 'block'); } catch (err) { console.warn('미리 그리지 못했어요', e.name, err.message); }
+    fs.writeFileSync(path.join(outDir, 'still', `${e.name}.html`), `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="../${css}"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/GmarketSans/GmarketSans.css"></head><body><div id="root">${body}</div></body></html>`);
+  }
 }
