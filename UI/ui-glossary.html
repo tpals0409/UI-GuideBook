@@ -91,20 +91,23 @@ main{padding:4px 28px 64px;max-width:1480px;width:100%}
 .cap{padding:12px 10px 8px;display:flex;flex-direction:column;gap:3px}
 .cap h3{margin:0;font-size:16px;font-weight:600;line-height:1.35;letter-spacing:-.005em;display:flex;flex-wrap:wrap;align-items:baseline;column-gap:8px}
 .cap h3 .ko{font-size:13px;font-weight:400;color:var(--ui-muted)}
-.cap p{margin:0;font-size:13.5px;line-height:1.55;color:var(--ui-muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cap p{margin:0;font-size:13.5px;line-height:1.55;color:var(--ui-muted);display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
 .empty-msg{margin:0;padding:80px 28px;color:var(--ui-muted)}
 /* 모션: prompt-motion의 모션 영상과 프롬프트 (사이드바 "참고 → 모션") */
 body[data-view]:not([data-view=terms]) :is(#app,#empty,#ai,#ai-panel){display:none!important}
 /* 애니메이션 코드 모음 (Tween UI): 글자 카드 + 코드 보기 */
 /* 애니메이션 타일: 용어 타일과 같은 모양 (무대 + 이름표). 무대 안은 같은 주소의 미리보기 iframe */
-.an-tile{background:var(--ui-surface);border:1px solid var(--ui-line);border-radius:14px;padding:6px;display:flex;flex-direction:column;min-width:0;cursor:pointer;transition:border-color .15s}
-.an-tile:hover{border-color:color-mix(in srgb,var(--ui-text) 26%,var(--ui-line))}
-.an-tile:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}
-.an-tile .demo{min-height:224px}
+.an-tile,.mo-tile{background:var(--ui-surface);border:1px solid var(--ui-line);border-radius:14px;padding:6px;display:flex;flex-direction:column;min-width:0;cursor:pointer;transition:border-color .15s}
+.an-tile:hover,.mo-tile:hover{border-color:color-mix(in srgb,var(--ui-text) 26%,var(--ui-line))}
+.an-tile:focus-visible,.mo-tile:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}
+.an-tile .demo,.mo-tile .demo{min-height:224px}
+.demo.mo-stage{padding:0;overflow:hidden;display:block}
+.mo-stage img,.mo-stage video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.mo-stage video{z-index:1}
 .demo.an-stage{position:relative;overflow:hidden;padding:0;display:block}
 .an-stage iframe{position:absolute;left:0;top:0;border:0;transform-origin:0 0;opacity:0;transition:opacity .25s;background:transparent}
 .an-stage iframe.on{opacity:1}
-.dt .an-stage{height:min(56vh,520px);min-height:300px}
+.dt .an-stage{height:min(56vh,520px);min-height:220px;transition:height .2s}
 .an-src{display:flex;flex-direction:column;gap:10px}
 .an-src dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0;font-size:13px}
 .an-src dt{color:var(--ui-muted);white-space:nowrap}.an-src dd{margin:0}
@@ -117,19 +120,7 @@ body[data-view]:not([data-view=terms]) :is(#app,#empty,#ai,#ai-panel){display:no
 .dt-tween .tw-list button:hover{border-color:var(--ui-text)}
 .docs a[aria-current=page]{background:var(--ui-surface);font-weight:600;box-shadow:inset 0 0 0 1px var(--ui-line)}
 .mo{padding:4px 28px 64px;max-width:1480px}
-.mo-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px}
-.mo-chips button{border:1px solid var(--ui-line);background:var(--ui-surface);color:var(--ui-text);font:inherit;border-radius:999px;padding:6px 12px;font-size:13px;cursor:pointer}
-.mo-chips button[aria-pressed=true]{background:var(--ui-accent);border-color:var(--ui-accent);color:var(--ui-on-accent)}
-.mo-chips .n{opacity:.6;margin-left:4px;font-size:12px}
-.mo-card{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;background:var(--ui-surface);border:1px solid var(--ui-line);border-radius:14px;overflow:hidden}
-.mo-card:hover{border-color:color-mix(in srgb,var(--ui-text) 35%,var(--ui-line))}
-.mo-card:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}
-.mo-th{position:relative;aspect-ratio:16/9;background:var(--ui-soft)}
-.mo-th img,.mo-th video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.mo-meta{padding:12px 14px 14px}
-.mo-meta b{display:block;font-size:15px;line-height:1.4}
-.mo-meta small{display:block;margin-top:4px;color:var(--ui-muted);font-size:12.5px}
-.mo-tag{font-size:11px;font-weight:700;padding:2px 7px;border-radius:999px;background:var(--ui-soft);margin-right:6px}
+.mo-tag{font-size:11px;font-weight:700;padding:1px 6px;border-radius:999px;background:var(--ui-soft);color:var(--ui-text);margin-right:6px;vertical-align:1px}
 .mo-dlg{width:min(1080px,calc(100vw - 32px));max-height:calc(100vh - 32px);padding:0;border:0;border-radius:18px;background:var(--ui-surface);color:var(--ui-text);overflow:hidden;box-shadow:0 24px 80px rgb(0 0 0/.35)}
 .mo-dlg::backdrop{background:rgb(10 14 24/.55)}
 .mo-dt{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);max-height:calc(100vh - 32px)}
@@ -144,11 +135,11 @@ body[data-view]:not([data-view=terms]) :is(#app,#empty,#ai,#ai-panel){display:no
 .mo-act{align-self:flex-start;border:0;border-radius:10px;background:var(--ui-accent);color:var(--ui-on-accent);font:inherit;padding:9px 14px;font-size:14px;cursor:pointer}
 .mo-x{position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:50%;border:0;background:rgb(255 255 255/.9);cursor:pointer;display:grid;place-items:center;z-index:1}
 @media (max-width:760px){.mo{padding:4px 16px 48px}.mo-dt{grid-template-columns:1fr}.mo-dt video{max-height:40vh}}
-@media (prefers-reduced-motion:reduce){.mo-th video{display:none}}
+@media (prefers-reduced-motion:reduce){.mo-stage video{display:none}}
 html.mouse :focus{outline:none!important}
 
 .aka{font-size:13px;color:var(--ui-muted)}
-.srcs{display:flex;flex-wrap:wrap;gap:4px}
+.srcs{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
 .src{font-size:11.5px;font-weight:600;padding:2px 7px;border-radius:5px;text-decoration:none;border:1px solid transparent;line-height:1.5}
 a.src:hover{text-decoration:underline}
 .src-APG{background:#e2ecfb;color:#1c4a8a}.src-MDN{background:#e8e9ed;color:#1b1d24}.src-M3{background:#ece4fa;color:#57298c}
@@ -198,13 +189,13 @@ html:has(.dt[open]){overflow:hidden}
 @keyframes dtIn{from{opacity:0;transform:translateY(14px) scale(.98)}}
 @keyframes fadeIn{from{opacity:0}}
 .dt-head{display:flex;align-items:flex-start;gap:12px;padding:18px 16px 12px 22px;border-bottom:1px solid var(--ui-line)}
-.dt-head>div{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.dt-head>div{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
 .dt-head h2{margin:0;font-size:22px;letter-spacing:-.02em}
 .dt-head .ko{font-size:14px;color:var(--ui-muted);font-weight:500;margin-left:6px}
 .dt-body{flex:1;min-height:0;padding:16px 22px 22px;overflow:auto;display:flex;flex-direction:column;gap:14px}
 .dt-body .desc{font-size:15px}
 .dt .dt-demo{min-height:340px;padding:32px 24px}
-.dt-how h3,.dt-demo-l{font-size:13px;margin:0 0 8px;color:var(--ui-muted);font-weight:600}
+.dt-how h3,.dt-tween h3,.dt-demo-l{font-size:13px;margin:0 0 8px;color:var(--ui-muted);font-weight:600}
 .dt-how ol{margin:0;padding:0;list-style:none;counter-reset:s;display:flex;flex-direction:column;gap:8px}
 .dt-how li{counter-increment:s;display:flex;gap:10px;font-size:14px;align-items:flex-start}
 .dt-how li::before{content:counter(s);flex:none;width:22px;height:22px;margin-top:1px;border-radius:50%;background:var(--ui-soft);color:var(--ui-accent);font-size:12px;font-weight:700;display:grid;place-items:center}
@@ -260,7 +251,8 @@ html:has(.dt[open]){overflow:hidden}
 .tp-act,.dt-prompt{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 13px;border:1px solid var(--ui-line);border-radius:10px;background:var(--ui-surface);color:var(--ui-text);font-size:13px;cursor:pointer;white-space:nowrap}
 .tp-act:hover,.dt-prompt:hover{border-color:color-mix(in srgb,var(--ui-text) 40%,var(--ui-line))}
 .tp-act:focus-visible,.dt-prompt:focus-visible{outline:2px solid var(--ui-text);outline-offset:2px}
-.dt-prompt{flex:none;align-self:center;background:var(--ui-accent);color:var(--ui-on-accent);border-color:transparent}
+.dt-prompt{flex:none;align-self:flex-start;margin-top:2px;background:var(--ui-accent);color:var(--ui-on-accent);border-color:transparent}
+.dt-head .dt-x{align-self:flex-start;margin:-2px -4px 0 0}
 .dt-prompt:hover{border-color:transparent;filter:brightness(1.3)}
 .dt-theme-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:10px}
 .font-q{height:36px;border:1px solid var(--ui-line);border-radius:10px;padding:0 12px;font:inherit;font-size:13px;background:var(--ui-surface);color:var(--ui-text)}
@@ -273,8 +265,13 @@ html:has(.dt[open]){overflow:hidden}
 .tp-msg{margin:0;font-size:12.5px;color:var(--ui-muted);min-height:1.2em}
 .tp-msg:empty{display:none}
 .tp-reset{all:unset;align-self:flex-start;cursor:pointer;font-size:13px;color:var(--ui-muted);text-decoration:underline;text-underline-offset:3px}
-.dt-theme{display:flex;flex-direction:column;gap:8px}
-.dt-theme h3{font-size:13px;margin:0;color:var(--ui-muted);font-weight:700}
+.dt-theme{border-top:1px solid var(--ui-line);padding-top:12px}
+.dt-theme summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px;font-size:13px;color:var(--ui-muted);font-weight:700;user-select:none}
+.dt-theme summary::-webkit-details-marker{display:none}
+.dt-theme summary::before{content:'';width:6px;height:6px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(-45deg);transition:transform .15s;margin:0 4px 2px 2px}
+.dt-theme[open] summary::before{transform:rotate(45deg)}
+.dt-theme[open] summary{margin-bottom:10px}
+.dt-theme .dt-theme-row{margin-bottom:8px}
 @media (max-width:900px){.tpanel{right:16px}.theme-btn{padding:0;width:44px;justify-content:center}.theme-btn .lbl{display:none}}
 
 /* 데모 공통 */
@@ -338,7 +335,7 @@ html:has(.dt[open]){overflow:hidden}
 <div class="shell" id="shell">
 <aside class="side" id="side">
   <div class="brand"><b>UI GuideBook</b></div>
-  <nav aria-label="분류"><p class="nav-h">분류</p><div class="cats" id="cats"></div></nav>
+  <nav aria-label="분류"><p class="nav-h">분류</p><div class="cats" id="cats"></div><div class="cats" id="mo-cats" hidden></div><div class="cats" id="an-cats" hidden></div></nav>
   <nav class="docs" id="docs" aria-label="문서" hidden><p class="nav-h">문서</p><div id="docs-list"></div></nav>
   <nav class="docs" aria-label="참고"><p class="nav-h">참고</p><a href="#motion" id="mo-link">모션</a><a href="#anim" id="an-link">애니메이션</a></nav>
   <div class="legend">
@@ -368,13 +365,11 @@ html:has(.dt[open]){overflow:hidden}
   <main id="app"></main>
   <section class="mo" id="an" hidden aria-labelledby="an-h">
     <div class="cat-head"><h2 id="an-h">애니메이션 <span class="n" id="an-count"></span></h2></div>
-    <div class="mo-chips" id="an-chips" role="group" aria-label="종류"></div>
     <div class="grid" id="an-grid"></div>
     <p class="empty-msg" id="an-empty" hidden>맞는 항목이 없어요. 다른 종류를 고르거나 검색어를 바꿔 보세요.</p>
   </section>
   <section class="mo" id="mo" hidden aria-labelledby="mo-h">
     <div class="cat-head"><h2 id="mo-h">모션 <span class="n" id="mo-count"></span></h2></div>
-    <div class="mo-chips" id="mo-chips" role="group" aria-label="종류"></div>
     <div class="grid" id="mo-grid"></div>
     <p class="empty-msg" id="mo-empty" hidden>맞는 예시가 없어요. 다른 종류를 고르거나 검색어를 바꿔 보세요.</p>
   </section>
@@ -386,8 +381,8 @@ html:has(.dt[open]){overflow:hidden}
   <div class="dt-body">
     <p class="desc"></p>
     <div><p class="dt-demo-l">직접 해 보기</p><div class="demo dt-demo an-stage"></div></div>
-    <section class="dt-theme"><h3>예시 테마</h3><div class="dt-theme-row"><div><p class="tp-h">글꼴</p><div class="dd" data-kind="font" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><input class="font-q" type="search" autocomplete="off" spellcheck="false" aria-label="글꼴 검색" placeholder="글꼴 검색 (예: 명조, 손글씨, Pretendard)"><div class="dd-list" role="listbox" aria-label="글꼴"></div></div></div></div><div><p class="tp-h">색</p><div class="dd" data-kind="pal" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><input class="font-q" type="search" autocomplete="off" spellcheck="false" aria-label="색 검색" placeholder="색·회사 검색 (예: 토스, Kakao)"><div class="dd-list" role="listbox" aria-label="색 팔레트"></div></div></div></div><div><p class="tp-h">아이콘</p><div class="dd" data-kind="icon" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><div class="dd-list" role="listbox" aria-label="아이콘"></div></div></div></div></div><div class="tp-actions"><button type="button" class="tp-act" data-act="hex">Hex 코드 복사</button></div></section>
     <section class="an-src"><h3 class="dt-demo-l">코드</h3><dl></dl><div class="mo-acts"><button class="mo-act" data-copy="code">코드 복사</button><button class="mo-act sub" data-copy="install">설치 명령 복사</button></div><div class="an-files"></div><p class="tp-note an-credit"></p></section>
+    <details class="dt-theme"><summary>예시 테마</summary><div class="dt-theme-row"><div><p class="tp-h">글꼴</p><div class="dd" data-kind="font" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><input class="font-q" type="search" autocomplete="off" spellcheck="false" aria-label="글꼴 검색" placeholder="글꼴 검색 (예: 명조, 손글씨, Pretendard)"><div class="dd-list" role="listbox" aria-label="글꼴"></div></div></div></div><div><p class="tp-h">색</p><div class="dd" data-kind="pal" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><input class="font-q" type="search" autocomplete="off" spellcheck="false" aria-label="색 검색" placeholder="색·회사 검색 (예: 토스, Kakao)"><div class="dd-list" role="listbox" aria-label="색 팔레트"></div></div></div></div><div><p class="tp-h">아이콘</p><div class="dd" data-kind="icon" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><div class="dd-list" role="listbox" aria-label="아이콘"></div></div></div></div></div><div class="tp-actions"><button type="button" class="tp-act" data-act="hex">Hex 코드 복사</button></div></details>
   </div>
   <div class="dt-foot"><button class="btn sm text an-prev-b">‹ 이전</button><span class="an-pos"></span><button class="btn sm text an-next-b">다음 ›</button></div>
 </dialog>
@@ -397,10 +392,10 @@ html:has(.dt[open]){overflow:hidden}
   <div class="dt-body">
     <p class="desc"></p>
     <div><p class="dt-demo-l">직접 해 보기</p><div class="demo dt-demo"></div></div>
-    <section class="dt-theme"><h3>예시 테마</h3><div class="dt-theme-row"><div><p class="tp-h">글꼴</p><div class="dd" data-kind="font" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><input class="font-q" type="search" autocomplete="off" spellcheck="false" aria-label="글꼴 검색" placeholder="글꼴 검색 (예: 명조, 손글씨, Pretendard)"><div class="dd-list" role="listbox" aria-label="글꼴"></div></div></div></div><div><p class="tp-h">색</p><div class="dd" data-kind="pal" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><input class="font-q" type="search" autocomplete="off" spellcheck="false" aria-label="색 검색" placeholder="색·회사 검색 (예: 토스, Kakao)"><div class="dd-list" role="listbox" aria-label="색 팔레트"></div></div></div></div><div><p class="tp-h">아이콘</p><div class="dd" data-kind="icon" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><div class="dd-list" role="listbox" aria-label="아이콘"></div></div></div></div></div><div class="tp-actions"><button type="button" class="tp-act" data-act="hex">Hex 코드 복사</button></div></section>
     <section class="dt-how"><h3>동작 방식</h3><ol></ol></section>
     <section class="dt-tween" hidden><h3>애니메이션 코드</h3><div class="tw-list"></div></section>
     <p class="diff"></p>
+    <details class="dt-theme"><summary>예시 테마</summary><div class="dt-theme-row"><div><p class="tp-h">글꼴</p><div class="dd" data-kind="font" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><input class="font-q" type="search" autocomplete="off" spellcheck="false" aria-label="글꼴 검색" placeholder="글꼴 검색 (예: 명조, 손글씨, Pretendard)"><div class="dd-list" role="listbox" aria-label="글꼴"></div></div></div></div><div><p class="tp-h">색</p><div class="dd" data-kind="pal" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><input class="font-q" type="search" autocomplete="off" spellcheck="false" aria-label="색 검색" placeholder="색·회사 검색 (예: 토스, Kakao)"><div class="dd-list" role="listbox" aria-label="색 팔레트"></div></div></div></div><div><p class="tp-h">아이콘</p><div class="dd" data-kind="icon" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><div class="dd-list" role="listbox" aria-label="아이콘"></div></div></div></div></div><div class="tp-actions"><button type="button" class="tp-act" data-act="hex">Hex 코드 복사</button></div></details>
   </div>
   <div class="dt-foot"><button class="btn sm text dt-prev">‹ 이전</button><span class="dt-pos"></span><button class="btn sm text dt-next">다음 ›</button></div>
 </dialog>
@@ -1994,10 +1989,10 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
     if(!mo)return;
     const q=$('#q').value.trim().toLowerCase();
     const list=mo.filter(e=>(moSel==='all'||(moSel==='skill'?e.install:e.tags.includes(moSel)))&&(!q||[e.title,e.author,e.handle,e.prompt,e.skill,...e.tags.map(moTag)].join(' ').toLowerCase().includes(q)));
-    $('#mo-grid').innerHTML=list.map(e=>`<button class="mo-card" data-s="${esc(e.slug)}" aria-label="${esc(e.title)} 자세히 보기"><div class="mo-th"><img src="${esc(e.poster)}" alt="" loading="lazy"></div><div class="mo-meta"><b>${esc(e.title)}</b><small><span class="mo-tag">${moKind(e)}</span>@${esc(e.handle||e.author)} · ${e.tags.map(moTag).join(', ')}</small></div></button>`).join('');
+    $('#mo-grid').innerHTML=list.map(e=>`<article class="mo-tile" data-s="${esc(e.slug)}" tabindex="0" role="button" aria-haspopup="dialog" aria-label="${esc(e.title)} 자세히 보기"><div class="demo mo-stage"><img src="${esc(e.poster)}" alt="" loading="lazy"></div><div class="cap"><h3>${esc(e.title)}<span class="ko">@${esc(e.handle||e.author)}</span></h3><p><span class="mo-tag">${moKind(e)}</span>${e.tags.map(moTag).join(' · ')}</p></div></article>`).join('');
     $('#mo-count').textContent=list.length;$('#mo-empty').hidden=list.length>0;
     const n={};mo.forEach(e=>e.tags.forEach(t=>n[t]=(n[t]||0)+1));
-    $('#mo-chips').innerHTML=[['all','전체',mo.length],...Object.entries(n).sort((a,b)=>b[1]-a[1]).map(([t,c])=>[t,moTag(t),c]),['skill','스킬',mo.filter(e=>e.install).length]]
+    $('#mo-cats').innerHTML=[['all','전체',mo.length],...Object.entries(n).sort((a,b)=>b[1]-a[1]).map(([t,c])=>[t,moTag(t),c]),['skill','스킬',mo.filter(e=>e.install).length]]
       .map(([v,l,c])=>`<button data-t="${v}" aria-pressed="${v===moSel}">${esc(l)}<span class="n">${c}</span></button>`).join('');
   };
   // 참고 화면(모션, 애니메이션)과 용어 목록을 바꿔 보여줘요. 주소는 #motion, #anim
@@ -2008,16 +2003,19 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
   function setView(v){
     const r=REF[v];
     document.body.dataset.view=r?v:'terms';
+    setPanel(false);
+    $('#cats').hidden=!!r;$('#mo-cats').hidden=v!=='motion';$('#an-cats').hidden=v!=='anim';
     for(const[k,x]of Object.entries(REF)){$(x.sec).hidden=k!==v;$(x.link).toggleAttribute('aria-current',k===v);if(k===v)$(x.link).setAttribute('aria-current','page')}
     if(r)$$('#cats button').forEach(x=>{x.setAttribute('aria-pressed',false);x.classList.remove('here')});
     $('#q').placeholder=r?.ph||qPh;
     if(r)r.show();else if(/^#(motion|anim)/.test(location.hash))history.replaceState(null,'',location.pathname);
   }
-  for(const v of Object.keys(REF))$(REF[v].link).onclick=e=>{e.preventDefault();$('#q').value='';setView(v);history.replaceState(null,'','#'+v);scrollTo({top:0});setNav(false)};
-  $('#mo-chips').onclick=e=>{const b=e.target.closest('button');if(!b)return;moSel=b.dataset.t;drawMo()};
+  // 참고 링크는 보통 링크처럼 주소(#motion 등)를 바꾸고, 아래 route()가 화면을 바꿔요 (뒤로 가기도 돼요)
+  for(const v of Object.keys(REF))$(REF[v].link).onclick=()=>{$('#q').value='';scrollTo({top:0});setNav(false)};
+  $('#mo-cats').onclick=e=>{const b=e.target.closest('button');if(!b)return;moSel=b.dataset.t;drawMo();scrollTo({top:0});setNav(false)};
   // 타일: 마우스를 올렸을 때만 재생 (용어 타일과 같은 규칙)
-  const moCard=e=>e.target.closest?.('.mo-card');
-  const moPlay=c=>{if(reduced()||$('video',c))return;const e=mo.find(x=>x.slug===c.dataset.s);$('.mo-th',c).insertAdjacentHTML('beforeend',`<video src="${esc(e.video)}" muted loop playsinline autoplay></video>`)};
+  const moCard=e=>e.target.closest?.('.mo-tile');
+  const moPlay=c=>{if(reduced()||$('video',c))return;const e=mo.find(x=>x.slug===c.dataset.s);$('.mo-stage',c).insertAdjacentHTML('beforeend',`<video src="${esc(e.video)}" muted loop playsinline autoplay></video>`)};
   const moStop=c=>$('video',c)?.remove();
   $('#mo-grid').addEventListener('mouseover',e=>{const c=moCard(e);if(c)moPlay(c)});
   $('#mo-grid').addEventListener('mouseout',e=>{const c=moCard(e);if(c&&!c.contains(e.relatedTarget))moStop(c)});
@@ -2025,7 +2023,7 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
   $('#mo-grid').addEventListener('focusout',e=>{const c=moCard(e);if(c)moStop(c)});
   const moDlg=$('#mo-dlg'),moV=$('#mo-v');
   const moOpen=slug=>{
-    const e=mo?.find(x=>x.slug===slug);if(!e)return;
+    const e=mo?.find(x=>x.slug===slug);if(!e)return;setPanel(false);
     moV.poster=e.poster;moV.src=e.video;
     $('#mo-side').dataset.s=slug;
     $('#mo-side').innerHTML=`<h2 id="mo-title">${esc(e.title)}</h2>
@@ -2038,6 +2036,7 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
     history.replaceState(null,'','#motion/'+slug);
   };
   $('#mo-grid').addEventListener('click',e=>{const c=moCard(e);if(c)moOpen(c.dataset.s)});
+  $('#mo-grid').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.classList.contains('mo-tile')){e.preventDefault();moOpen(e.target.dataset.s)}});
   $('#mo-side').addEventListener('click',async ev=>{
     const b=ev.target.closest('[data-copy]');if(!b)return;
     const e=mo.find(x=>x.slug===$('#mo-side').dataset.s),t=b.textContent;
@@ -2061,10 +2060,10 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
     $('#an-count').textContent=anList.length;$('#an-empty').hidden=anList.length>0;
     $$('#an-grid .an-tile').forEach(t=>tileIO.observe(t));
     const n={};an.forEach(e=>n[e.group]=(n[e.group]||0)+1);
-    $('#an-chips').innerHTML=[['all','전체',an.length],...Object.entries(n).sort((a,b)=>b[1]-a[1]).map(([g,c])=>[g,AN_GROUP[g]||g,c])]
+    $('#an-cats').innerHTML=[['all','전체',an.length],...Object.entries(n).sort((a,b)=>b[1]-a[1]).map(([g,c])=>[g,AN_GROUP[g]||g,c])]
       .map(([v,l,c])=>`<button data-t="${v}" aria-pressed="${v===anSel}">${esc(l)}<span class="n">${c}</span></button>`).join('');
   };
-  $('#an-chips').onclick=e=>{const b=e.target.closest('button');if(!b)return;anSel=b.dataset.t;drawAn()};
+  $('#an-cats').onclick=e=>{const b=e.target.closest('button');if(!b)return;anSel=b.dataset.t;drawAn();scrollTo({top:0});setNav(false)};
   // 무대: 배포 때 우리 사이트에 직접 묶은 미리보기(tween-preview)를 띄워요. 같은 주소라 예시 테마(색·글꼴)가 그대로 들어가요
   // 타일은 빌드 때 미리 그려 둔 정지 화면(still/*.html, JS 없음)으로 빠르게 보여주고, 마우스를 올렸을 때만 움직이는 미리보기로 바꿔요
   const PREVIEW=(n,still)=>still?`tween-preview/still/${encodeURIComponent(n)}.html`:`tween-preview/preview.html?n=${encodeURIComponent(n)}`;
@@ -2084,7 +2083,17 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
     f.onload=()=>{themeFrame(f);
       // 타일 무대 안도 마우스로 직접 만져 볼 수 있어요(올리기·누르기로 움직이는 컴포넌트가 많아서). 누르면 상세가 열려요
       if(box.closest('.an-tile'))try{f.contentDocument.addEventListener('click',()=>anOpen(e.name))}catch{}
-      setTimeout(()=>{try{const el=f.contentDocument.querySelector('#root>div'),sw=Math.max(el.scrollWidth,...[...el.querySelectorAll(':scope>*,:scope>*>*')].map(c=>c.getBoundingClientRect().width)),w=box.clientWidth;if(e.kind!=='block'&&sw>w){const k=w/(sw+24);Object.assign(f.style,{width:w/k+'px',height:box.clientHeight/k+'px',transform:`scale(${k})`})}}catch{}f.classList.add('on')},still?0:250)}; // 미리 그린 정지 화면은 바로, React 미리보기는 그려질 때까지 잠깐 기다려요
+      setTimeout(()=>{try{
+        const el=f.contentDocument.querySelector('#root>div');let k=1;
+        if(e.kind==='block')k=Math.min(1,box.clientWidth/1200);
+        else{
+          const sw=Math.max(el.scrollWidth,...[...el.querySelectorAll(':scope>*,:scope>*>*')].map(c=>c.getBoundingClientRect().width)),w=box.clientWidth;
+          if(sw>w)k=w/(sw+24); // 무대보다 넓으면 줄여요
+          // 모달에서는 무대 높이를 컴포넌트 높이에 맞춰요 (버튼 하나에 화면 절반을 쓰지 않게)
+          if(box.closest('.dt'))box.style.height=Math.max(220,Math.min(520,el.getBoundingClientRect().height*k+96))+'px';
+        }
+        Object.assign(f.style,{width:box.clientWidth/k+'px',height:box.clientHeight/k+'px',transform:k<1?`scale(${k})`:''});
+      }catch{}f.classList.add('on')},still?0:250)}; // 미리 그린 정지 화면은 바로, React 미리보기는 그려질 때까지 잠깐 기다려요
     fit(f,box,e.kind);f.classList.remove('on');f.src=PREVIEW(e.name,still);
   };
   const tileIO=new IntersectionObserver(es=>es.forEach(x=>{if(!x.isIntersecting)return;tileIO.unobserve(x.target);const t=x.target;mount($('.an-stage',t),anOf(t.dataset.n),!LIVE_TILE.has(t.dataset.n))}),{rootMargin:'300px'});
@@ -2098,7 +2107,7 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
   // 상세: 용어 모달과 같은 모양 (직접 해 보기 → 예시 테마 → 코드)
   const anDlg=$('#an-dlg');let anCur=null;
   const anOpen=name=>{
-    const e=an?.find(x=>x.name===name);if(!e)return;anCur=name;
+    const e=an?.find(x=>x.name===name);if(!e)return;anCur=name;setPanel(false);
     $('#an-title').innerHTML=`${esc(e.title)}<span class="ko">${esc(e.ko||'')}</span>`;
     $('.aka',anDlg).textContent=`${e.kind==='block'?'화면 블록':'컴포넌트'} · ${AN_GROUP[e.group]||e.group}`;
     $('.srcs',anDlg).innerHTML=`<span class="src src-idiom">Tween UI</span>`;
@@ -2111,7 +2120,7 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
     $('.an-prev-b',anDlg).disabled=i<=0;$('.an-next-b',anDlg).disabled=i<0||i>=v.length-1;
     $('.dt-body',anDlg).scrollTop=0;drawAll();
     if(!anDlg.open)anDlg.showModal();
-    const box=$('.an-stage',anDlg);box.innerHTML='<button class="an-re" type="button">다시 재생</button>';mount(box,e,false);$('iframe',box).tabIndex=0;$('iframe',box).removeAttribute('aria-hidden');$('iframe',box).title=`${e.title} 미리보기`;
+    const box=$('.an-stage',anDlg);box.innerHTML='<button class="an-re" type="button">다시 재생</button>';box.style.height='';mount(box,e,false);$('iframe',box).tabIndex=0;$('iframe',box).removeAttribute('aria-hidden');$('iframe',box).title=`${e.title} 미리보기`;
     history.replaceState(null,'','#anim/'+name);
   };
   const anStep=d=>{const v=anList.length?anList:an,i=v.findIndex(x=>x.name===anCur);if(v[i+d])anOpen(v[i+d].name)};
@@ -2156,7 +2165,7 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
   const uniq=h=>h.replace(/\b(id|for|name|popovertarget|aria-describedby|aria-labelledby|aria-controls)="([^"]+)"/g,'$1="$2-m"');
   const visible=()=>$$('.card:not([hidden])').map(c=>c.id).filter(id=>!$('#'+id).closest('.cat[hidden]'));
   const open=id=>{
-    const t=byId[id];if(!t)return;cur=id;
+    const t=byId[id];if(!t)return;cur=id;setPanel(false);
     $('#dt-title',dlg).innerHTML=`${t.en}<span class="ko">${t.ko}</span>`;
     $('.aka',dlg).textContent=t.aka?`별칭 · ${t.aka}`:'';
     $('.srcs',dlg).innerHTML=srcHtml(t.src);
@@ -2202,7 +2211,7 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
       old.replaceWith(svg);
     }
   };
-  const iconHost=t=>t.closest?.('.card,.mo-card,button,a,label,summary,[role=button],[role=tab],[role=menuitem]');
+  const iconHost=t=>t.closest?.('.card,.mo-tile,.an-tile,button,a,label,summary,[role=button],[role=tab],[role=menuitem]');
   document.addEventListener('mouseover',e=>{const h=iconHost(e.target);if(h&&!h.contains(e.relatedTarget))h.querySelectorAll('svg[data-set]').forEach(s=>s._p?.start())});
   document.addEventListener('focusin',e=>{const h=iconHost(e.target);if(h)h.querySelectorAll('svg[data-set]').forEach(s=>s._p?.start())});
   if(location.protocol.startsWith('http')){
@@ -2211,13 +2220,24 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
     document.head.append(sc);
   }
 
-  // 주소에 #용어가 있으면, 아래 초기화(테마 등)가 끝난 뒤 그 용어를 열어요
-  queueMicrotask(()=>{
-    const h=decodeURIComponent(location.hash.slice(1));if(!h)return;
-    if(h==='motion'||h.startsWith('motion/')){setView('motion');moLoad().then(()=>h.includes('/')&&moOpen(h.slice(7)));return}
-    if(h==='anim'||h.startsWith('anim/')){setView('anim');anLoad().then(()=>h.includes('/')&&anOpen(h.slice(5)));return}
-    $("#"+h)?.scrollIntoView();open(h);
-  });
+  // 주소(#)에 따라 화면을 맞춰요: #용어 → 그 용어 열기, #motion·#anim → 참고 화면, 비어 있으면 용어 목록
+  // 처음 열 때(초기화가 끝난 뒤)와 주소가 바뀔 때(링크·뒤로 가기·직접 입력) 모두 여기로 와요
+  const route=()=>{
+    const h=decodeURIComponent(location.hash.slice(1)),view=document.body.dataset.view;
+    const ref=h.split('/')[0];
+    if(REF[ref]){
+      if(view!==ref)setView(ref);
+      const sub=h.slice(ref.length+1);
+      if(ref==='motion')moLoad().then(()=>sub?moOpen(sub):moDlg.open&&moDlg.close());
+      else anLoad().then(()=>sub?anOpen(sub):anDlg.open&&anDlg.close());
+      return;
+    }
+    if(view!=='terms')setView('terms');
+    if(h){$("#"+CSS.escape(h))?.scrollIntoView();open(h)}
+    else for(const d of [dlg,anDlg,moDlg])if(d.open)d.close();
+  };
+  queueMicrotask(route);
+  addEventListener('hashchange',route);
 
   // ───── 예시 테마: 용어 예시의 글꼴과 색을 바꿔요 (저장하지 않아요) ─────
   // 고른 값은 모든 .demo(타일과 모달 예시)에 CSS 변수로 덮어써요. 서비스 화면은 --ui-* 변수라 영향이 없어요.
