@@ -98,6 +98,7 @@ body[data-view]:not([data-view=terms]) :is(#app,#empty,.mainc>footer,#ai,#ai-pan
 .an-card .an-body{display:flex;flex-direction:column;gap:6px;padding:12px 14px 14px;flex:1}
 .mo-th iframe{position:absolute;left:0;top:0;border:0;transform-origin:0 0;pointer-events:none;opacity:0;transition:opacity .25s;background:#18181b}
 .mo-th iframe.on{opacity:1}
+.mo-th iframe.live{z-index:1}
 .an-prev{position:relative;aspect-ratio:16/10;max-height:58vh;width:100%;border-radius:12px;overflow:hidden;background:#18181b;flex:none}
 .an-prev iframe{width:100%;height:100%;border:0;display:block}
 .an-re{position:absolute;right:10px;bottom:10px;border:0;border-radius:999px;background:rgb(255 255 255/.92);color:#141414;font:inherit;font-size:12.5px;padding:6px 12px;cursor:pointer}
@@ -2051,7 +2052,7 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
     const q=$('#q').value.trim().toLowerCase();
     const list=an.filter(e=>(anSel==='all'||e.group===anSel)&&(!q||[e.title,e.ko,e.desc,e.en,e.name].join(' ').toLowerCase().includes(q)));
     $('#an-grid').innerHTML=list.map(e=>`<button class="mo-card an-card" data-n="${esc(e.name)}" aria-label="${esc(e.ko||e.title)} 미리보기와 코드"><div class="mo-th"><img src="tween/${esc(e.name)}.webp" alt="" loading="lazy" onerror="this.remove()"></div><div class="an-body"><b>${esc(e.ko||e.title)}<small>${esc(e.title)}</small></b><p>${esc(e.desc||e.en)}</p><span class="mo-meta-row"><span class="mo-tag">${e.kind==='block'?'블록':'컴포넌트'}</span>${AN_GROUP[e.group]||e.group}</span></div></button>`).join('');
-    $('#an-count').textContent=list.length;$('#an-empty').hidden=list.length>0;
+    $('#an-count').textContent=list.length;$('#an-empty').hidden=list.length>0;refreshThumbs();
     const n={};an.forEach(e=>n[e.group]=(n[e.group]||0)+1);
     $('#an-chips').innerHTML=[['all','전체',an.length],...Object.entries(n).sort((a,b)=>b[1]-a[1]).map(([g,c])=>[g,AN_GROUP[g]||g,c])]
       .map(([v,l,c])=>`<button data-t="${v}" aria-pressed="${v===anSel}">${esc(l)}<span class="n">${c}</span></button>`).join('');
@@ -2062,12 +2063,25 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
   const PREVIEW=n=>`tween-preview/preview.html?n=${encodeURIComponent(n)}`;
   const anCard=e=>e.target.closest?.('.an-card');
   const anPlay=c=>{
-    if(reduced()||$('iframe',c))return;const e=an.find(x=>x.name===c.dataset.n),th=$('.mo-th',c),base=e.kind==='block'?1200:720;
-    const f=document.createElement('iframe');f.className='tp';f.src=PREVIEW(e.name);f.tabIndex=-1;f.title='';f.setAttribute('aria-hidden','true');
+    if(reduced()||$('iframe.live',c))return;const e=an.find(x=>x.name===c.dataset.n),th=$('.mo-th',c),base=e.kind==='block'?1200:720;
+    const f=document.createElement('iframe');f.className='tp live';f.src=PREVIEW(e.name);f.tabIndex=-1;f.title='';f.setAttribute('aria-hidden','true');
     const k=th.clientWidth/base;Object.assign(f.style,{width:base+'px',height:th.clientHeight/k+'px',transform:`scale(${k})`});
     f.onload=()=>{themeFrame(f);f.classList.add('on')};th.append(f);
   };
-  const anStop=c=>$('iframe',c)?.remove();
+  const anStop=c=>$('iframe.live',c)?.remove();
+  // 썸네일 사진은 기본 테마로 찍은 거예요. 테마를 바꾸면 화면 근처 카드에 멈춘 미리보기(?still)를 대신 띄워 같은 색으로 보여줘요
+  const stillIO=new IntersectionObserver(es=>es.forEach(x=>{
+    if(!x.isIntersecting)return;const c=x.target;stillIO.unobserve(c);
+    if($('iframe.still',c))return;const e=an.find(y=>y.name===c.dataset.n),th=$('.mo-th',c),base=e.kind==='block'?1200:720;
+    const f=document.createElement('iframe');f.className='tp still';f.src=PREVIEW(e.name)+'&still=1';f.tabIndex=-1;f.title='';f.setAttribute('aria-hidden','true');
+    const k=th.clientWidth/base;Object.assign(f.style,{width:base+'px',height:th.clientHeight/k+'px',transform:`scale(${k})`});
+    f.onload=()=>{themeFrame(f);f.classList.add('on')};th.append(f);
+  }),{rootMargin:'300px'});
+  const refreshThumbs=window.refreshThumbs=()=>{
+    if(document.body.dataset.view!=='anim')return;
+    const plain=theme.font===DEFAULT.font&&theme.pal===DEFAULT.pal;
+    $$('#an-grid .an-card').forEach(c=>{if(plain){stillIO.unobserve(c);$('iframe.still',c)?.remove()}else if(!$('iframe.still',c))stillIO.observe(c)});
+  };
   $('#an-grid').addEventListener('mouseover',e=>{const c=anCard(e);if(c)anPlay(c)});
   $('#an-grid').addEventListener('mouseout',e=>{const c=anCard(e);if(c&&!c.contains(e.relatedTarget))anStop(c)});
   $('#an-grid').addEventListener('focusin',e=>{const c=anCard(e);if(c)anPlay(c)});
@@ -2239,6 +2253,7 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
   const applyTheme=()=>{
     themeCss.textContent=`.demo{${decl(theme.font,theme.pal)}}`;
     $$('iframe.tp').forEach(themeFrame); // 애니메이션 미리보기에도 같은 테마
+    window.refreshThumbs?.(); // 테마가 기본이 아니면 목록 썸네일도 같은 색으로
     upIcons(document.body); // 아이콘 모양이 바뀌었으면 예시 안의 아이콘을 다시 그려요
   };
   // ── 드롭다운: 버튼을 누르면 목록이 펼쳐져요. 글꼴은 검색할 수 있고, AI로 만든 팔레트는 지울 수 있어요 ──

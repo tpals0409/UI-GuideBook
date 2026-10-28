@@ -54,6 +54,7 @@ export async function buildTweenPreviews(list, outDir) {
   --tp-brand-deep:color-mix(in srgb,var(--tp-brand) 70%,#000);
 }
 html,body{margin:0;min-height:100%}
+.still *,.still *::before,.still *::after{animation-play-state:paused!important;transition:none!important}
 body{font-family:var(--demo-font,"Gmarket Sans",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",sans-serif);background:#f7f7f7;color:var(--tp-ink)}
 #root{min-height:100vh;display:flex;align-items:center;justify-content:center}
 #root>.block{width:100%;align-self:stretch}
@@ -72,6 +73,12 @@ const load = demos['./examples/' + n + '-demo.tsx'];
 const root = createRoot(document.getElementById('root')!);
 if (!load) root.render(<p>미리보기가 없어요: {n}</p>);
 else load().then((m: any) => { const Demo = m.default; root.render(<div className={BLOCKS.has(n) ? 'block' : ''}><Demo /></div>); });
+// ?still=1: 목록 썸네일용. 등장 애니메이션이 끝날 즈음(1.8초) 멈춰서 정지 화면처럼 보여요
+if (new URLSearchParams(location.search).has('still')) setTimeout(async () => {
+  const { gsap } = await import('gsap');
+  gsap.globalTimeline.pause();
+  document.documentElement.classList.add('still');
+}, 1800);
 `);
   fs.writeFileSync(path.join(src, 'tsconfig.json'), JSON.stringify({ compilerOptions: { jsx: 'react-jsx', baseUrl: '.', paths: { '@/*': ['./*'] } } }));
   await build({
