@@ -28,12 +28,14 @@ export async function buildTweenList() {
   const list = [];
   for (let i = 0; i < items.length; i += 6) {
     list.push(...await Promise.all(items.slice(i, i + 6).map(async it => {
-      const r = await json(`${SITE}/r/${it.name}.json`);
+      const [r, demo] = await Promise.all([json(`${SITE}/r/${it.name}.json`), json(`${SITE}/r/${it.name}-demo.json`).catch(() => null)]);
       const kind = it.type.endsWith('block') ? 'block' : 'component';
       return {
         name: it.name, kind, group: groupOf(it.name), title: it.title, ko: KO[it.name]?.[0], desc: KO[it.name]?.[1], en: it.description,
         deps: r.dependencies || [], install: `npx shadcn@latest add @tween-ui/${it.name}`, page: `${SITE}/${kind}/${it.name}`,
         files: (r.files || []).map(f => ({ path: f.path, content: f.content })),
+        // 미리보기를 우리 사이트에서 직접 만들 때 쓰는 사용 예시 (scripts/tween-previews.mjs)
+        demo: demo?.files?.[0]?.content, needs: (r.registryDependencies || []).map(u => u.split('/').pop().replace('.json', '')),
       };
     })));
   }

@@ -368,7 +368,7 @@ html:has(.dt[open]){overflow:hidden}
   <section class="ai-panel" id="ai-panel" aria-live="polite" hidden></section>
   <main id="app"></main>
   <section class="mo" id="an" hidden aria-labelledby="an-h">
-    <div class="cat-head"><h2 id="an-h">애니메이션 <span class="n" id="an-count"></span></h2><p>움직임이 들어간 React 컴포넌트와 화면 블록이에요. 마우스를 올리면 실제로 움직이고, 누르면 크게 보면서 전체 코드와 설치 명령을 복사할 수 있어요. 출처는 Tween UI(MIT)이고, React 19·Tailwind CSS v4·GSAP 기준이에요.</p></div>
+    <div class="cat-head"><h2 id="an-h">애니메이션 <span class="n" id="an-count"></span></h2><p>움직임이 들어간 React 컴포넌트와 화면 블록이에요. 마우스를 올리면 실제로 움직이고, 누르면 크게 보면서 전체 코드와 설치 명령을 복사할 수 있어요. 미리보기에는 예시 테마(색·글꼴)가 함께 적용돼요. 출처는 Tween UI(MIT)이고, React 19·Tailwind CSS v4·GSAP 기준이에요.</p></div>
     <div class="mo-chips" id="an-chips" role="group" aria-label="종류"></div>
     <div class="grid" id="an-grid"></div>
     <p class="empty-msg" id="an-empty" hidden>맞는 항목이 없어요. 다른 종류를 고르거나 검색어를 바꿔 보세요.</p>
@@ -448,6 +448,15 @@ function menuToggle(btn,menu){
 }
 const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
 // 버튼을 누르면 CSS 애니메이션(.play)을 처음부터 다시 재생해요. 모달에서는 열자마자 한 번 재생해요
+// 애니메이션 미리보기(같은 주소의 iframe)에 예시 테마의 색·글꼴을 넣어요. 테마를 바꾸면 applyTheme이 다시 불러요
+function themeFrame(fr){
+  try{
+    const d=fr.contentDocument;if(!d?.documentElement||!window.themeVars)return;
+    const{vars,css}=window.themeVars();
+    for(const[k,v]of Object.entries(vars))d.documentElement.style.setProperty(k,v);
+    if(css&&!d.querySelector(`link[href="${css}"]`))d.head.insertAdjacentHTML('beforeend',`<link rel="stylesheet" href="${css}">`);
+  }catch{}
+}
 const replay=(n,btn,el)=>{const go=()=>{n.classList.remove('play');void n.offsetWidth;n.classList.add('play')};btn.onclick=go;if(!el.closest('.card'))go()};
 addEventListener('pointerdown',e=>{if(e.isTrusted)document.documentElement.classList.add('mouse')},true);
 addEventListener('keydown',()=>document.documentElement.classList.remove('mouse'),true);
@@ -2048,14 +2057,15 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
       .map(([v,l,c])=>`<button data-t="${v}" aria-pressed="${v===anSel}">${esc(l)}<span class="n">${c}</span></button>`).join('');
   };
   $('#an-chips').onclick=e=>{const b=e.target.closest('button');if(!b)return;anSel=b.dataset.t;drawAn()};
-  // 미리보기: Tween UI의 미리보기 페이지(/preview/<이름>)를 이 페이지 안에 띄워요. 타일은 마우스를 올렸을 때만 실제로 움직여요
-  const PREVIEW=n=>`https://tween-ui.vercel.app/preview/${encodeURIComponent(n)}`;
+  // 미리보기: 배포 때 우리 사이트에 직접 묶은 미리보기(tween-preview)를 띄워요. 같은 주소라 예시 테마를 넣을 수 있어요
+  // 타일은 마우스를 올렸을 때만 실제로 움직여요
+  const PREVIEW=n=>`tween-preview/preview.html?n=${encodeURIComponent(n)}`;
   const anCard=e=>e.target.closest?.('.an-card');
   const anPlay=c=>{
     if(reduced()||$('iframe',c))return;const e=an.find(x=>x.name===c.dataset.n),th=$('.mo-th',c),base=e.kind==='block'?1200:720;
-    const f=document.createElement('iframe');f.src=PREVIEW(e.name);f.tabIndex=-1;f.title='';f.setAttribute('aria-hidden','true');f.setAttribute('sandbox','allow-scripts allow-same-origin');
+    const f=document.createElement('iframe');f.className='tp';f.src=PREVIEW(e.name);f.tabIndex=-1;f.title='';f.setAttribute('aria-hidden','true');
     const k=th.clientWidth/base;Object.assign(f.style,{width:base+'px',height:th.clientHeight/k+'px',transform:`scale(${k})`});
-    f.onload=()=>f.classList.add('on');th.append(f);
+    f.onload=()=>{themeFrame(f);f.classList.add('on')};th.append(f);
   };
   const anStop=c=>$('iframe',c)?.remove();
   $('#an-grid').addEventListener('mouseover',e=>{const c=anCard(e);if(c)anPlay(c)});
@@ -2067,7 +2077,7 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
     const e=an?.find(x=>x.name===name);if(!e)return;
     $('#an-side').dataset.n=name;
     $('#an-side').innerHTML=`<h2 id="an-title">${esc(e.ko||e.title)} <small class="mo-by">${esc(e.title)}</small></h2>
-      <div class="an-prev"><iframe src="${PREVIEW(e.name)}" title="${esc(e.ko||e.title)} 미리보기" sandbox="allow-scripts allow-same-origin" loading="lazy"></iframe><button class="an-re" type="button">다시 재생</button></div>
+      <div class="an-prev"><iframe class="tp" src="${PREVIEW(e.name)}" title="${esc(e.ko||e.title)} 미리보기" onload="themeFrame(this)"></iframe><button class="an-re" type="button">다시 재생</button></div>
       <p>${esc(e.desc||e.en)}</p>
       <dl><dt>종류</dt><dd>${e.kind==='block'?'블록(화면 한 부분)':'컴포넌트'} · ${AN_GROUP[e.group]||e.group}</dd><dt>필요한 것</dt><dd>React 19, Tailwind CSS v4${e.deps.length?', '+esc(e.deps.join(', ')):''}</dd><dt>설치</dt><dd><code>${esc(e.install)}</code></dd></dl>
       <div class="mo-acts"><button class="mo-act" data-copy="code">코드 복사</button><button class="mo-act sub" data-copy="install">설치 명령 복사</button></div>
@@ -2228,6 +2238,7 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
   const themeCss=document.head.appendChild(document.createElement('style'));
   const applyTheme=()=>{
     themeCss.textContent=`.demo{${decl(theme.font,theme.pal)}}`;
+    $$('iframe.tp').forEach(themeFrame); // 애니메이션 미리보기에도 같은 테마
     upIcons(document.body); // 아이콘 모양이 바뀌었으면 예시 안의 아이콘을 다시 그려요
   };
   // ── 드롭다운: 버튼을 누르면 목록이 펼쳐져요. 글꼴은 검색할 수 있고, AI로 만든 팔레트는 지울 수 있어요 ──
@@ -2312,6 +2323,7 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
   // ── 내보내기: design.md, Hex 코드, 용어별 AI 프롬프트 ──
   const ROLE_INFO={primary:['강조색','주요 버튼, 선택 상태, 링크'],onPrimary:['강조색 위 글자','강조색 배경 위의 글자·아이콘'],primarySoft:['연한 강조색','보조 버튼, 선택된 칩 배경'],surface:['표면','카드, 입력칸, 모달 배경'],surface2:['보조 표면','구역 배경, 마우스를 올렸을 때 배경'],text:['본문 글자','제목, 본문'],muted:['보조 글자','설명, 도움말'],border:['테두리','입력칸·카드 테두리, 구분선']};
   const resolved=()=>({f:FONTS.find(x=>x.id===theme.font)||FONTS[0],p:pals().find(x=>x.id===theme.pal)||PALS[0]});
+  window.themeVars=()=>{const{f,p}=resolved();return{vars:{...Object.fromEntries(Object.entries(ROLES).map(([r,v])=>[v,p[r]])),'--demo-font':stack(f)},css:f.css}};
   const plain=h=>{const d=document.createElement('div');d.innerHTML=h||'';return d.textContent.trim()};
   const lum=h=>{const c=[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)/255).map(v=>v<=.03928?v/12.92:((v+.055)/1.055)**2.4);return .2126*c[0]+.7152*c[1]+.0722*c[2]};
   const ratio=(a,b)=>{const x=lum(a),y=lum(b);return(Math.max(x,y)+.05)/(Math.min(x,y)+.05)};
