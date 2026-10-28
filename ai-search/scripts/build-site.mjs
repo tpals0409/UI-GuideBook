@@ -17,7 +17,7 @@ const root = path.join(configDir, '..'); // 개발 체크리스트 폴더
 const out = path.join(configDir, 'public');
 
 const filesIn = dir => fs.readdirSync(dir, { withFileTypes: true }).filter(e => e.isFile() && !e.name.startsWith('.')).map(e => path.join(dir, e.name));
-const files = sources.flatMap(s => {
+const files = sources.filter(s => s.site !== false).flatMap(s => { // site:false는 검색에만 넣는 자료
   const p = path.join(configDir, s.path);
   const assets = (s.assets ?? []).map(a => path.join(configDir, a)).flatMap(a => (fs.statSync(a).isDirectory() ? filesIn(a) : [a]));
   return [...(s.extractor === 'markdown' ? walk(p, s.exclude ?? []) : [p]), ...assets];

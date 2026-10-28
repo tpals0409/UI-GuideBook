@@ -4,18 +4,24 @@ import Anthropic from "@anthropic-ai/sdk";
 const EMBED_MODEL = "@cf/baai/bge-m3"; // 한국어를 포함한 다국어 임베딩, 1024차원. 질문-자료 점수 매기기(재정렬)에도 써요.
 const CLAUDE_MODEL = "claude-opus-5-5";
 const RETRIEVE = 20; // 벡터 검색으로 먼저 고르는 조각 수
-const TOP = 8; // 재정렬 후 Claude에 보내는 자료 수
+const TOP = 10; // 재정렬 후 Claude에 보내는 자료 수
+const HOP_PER_SEED = 3, HOP_MAX = 12; // 그래프에서 찾은 자료의 이웃을 이만큼 더 후보에 넣어요
+// 관계 이름 (edges.rel) → 사람이 읽는 말
+const REL_KO: Record<string, string> = { compare: "비교 대상", mentions: "관련", code: "코드 버전", uses: "함께 씀" };
 const MAX_QUESTION = 200;
 const EMBED_BATCH = 50;
 
 const SYSTEM = `당신은 개발 참고 자료 검색 도우미예요. 사용자의 질문에 맞는 자료를 <자료>에서 골라 답해요.
 - <자료>에 있는 내용만 근거로 답해요. 없는 내용은 지어내지 말고, 맞는 자료가 없으면 results를 비우고 answer에 그렇게 적어요.
 - answer: 질문에 대한 답을 2~3문장으로 적어요. 디자이너나 개발자가 아닌 사람도 이해할 수 있는 쉬운 한국어로, 꾸밈말 없이 간결하게 써요.
-- results: 질문과 관련 있는 자료만, 관련도가 높은 순서로 최대 5개 골라요. reason에는 이 자료가 왜 맞는지 한 문장으로 적어요.`;
+- results: 질문과 관련 있는 자료만, 관련도가 높은 순서로 최대 5개 골라요. reason에는 이 자료가 왜 맞는지 한 문장으로 적어요.
+- <관계>는 자료 사이의 연결이에요. 두 항목의 차이나 "이 부품의 움직이는 버전" 같은 질문에는 관계를 따라 답하고, 관계가 있는 자료는 함께 골라요.`;
 
 type Chunk = { n: number; text: string };
 type DocIn = { id: string; source: string; title: string; url: string; hash: string; chunks: Chunk[] };
 type Row = { vector_id: string; doc_id: string; text: string; title: string; url: string; source: string };
+type Edge = { src: string; rel: string; dst: string; weight: number };
+type Related = { id: string; title: string; url: string; source: string; rel: string };
 
 const enc = new TextEncoder();
 
@@ -37,6 +43,21 @@ async function embed(env: Env, texts: string[]) {
 
 const placeholders = (n: number) => Array(n).fill("?").join(",");
 
+// ───── 그래프 ─────
+// 마이그레이션 없이도 동작하게 Worker가 표를 만들어요 (migrations/0002_graph.sql과 같은 모양)
+const ensureEdges = (env: Env) => env.DB.batch([
+  env.DB.prepare("CREATE TABLE IF NOT EXISTS edges (src TEXT NOT NULL, rel TEXT NOT NULL, dst TEXT NOT NULL, weight REAL NOT NULL DEFAULT 1, PRIMARY KEY (src, rel, dst))"),
+  env.DB.prepare("CREATE INDEX IF NOT EXISTS edges_dst ON edges (dst)"),
+]);
+
+// 주어진 자료들에 닿아 있는 관계를 모두 가져와요 (양방향)
+async function edgesAround(env: Env, ids: string[]) {
+  if (!ids.length) return [] as Edge[];
+  const ph = placeholders(ids.length);
+  const { results } = await env.DB.prepare(`SELECT src, rel, dst, weight FROM edges WHERE src IN (${ph}) OR dst IN (${ph})`).bind(...ids, ...ids).all<Edge>();
+  return results;
+}
+
 // ───── 검색 ─────
 async function search(env: Env, q: string, source?: string) {
   const empty = { answer: "관련 자료를 찾지 못했어요. 다른 말로 다시 물어봐 주세요.", results: [] };
@@ -50,6 +71,26 @@ async function search(env: Env, q: string, source?: string) {
   ).bind(...vids).all<Row>();
   if (!rows.length) return empty;
 
+  // 그래프: 찾은 자료의 이웃을 한 단계 더 후보에 넣어요 (관계가 센 것부터, 자료당 몇 개까지만)
+  const seeds = [...new Set(rows.map(r => r.doc_id))];
+  const edges = await edgesAround(env, seeds).catch(() => [] as Edge[]); // 표가 아직 없으면 그냥 넘어가요
+  // 벡터 점수가 높은 자료부터 이웃을 채워요 (seeds는 점수 순서예요)
+  const hop: string[] = [];
+  for (const seed of seeds) {
+    let n = 0;
+    for (const e of edges.filter(e => e.src === seed || e.dst === seed).sort((a, b) => b.weight - a.weight)) {
+      const other = e.src === seed ? e.dst : e.src;
+      if (seeds.includes(other) || hop.includes(other) || hop.length >= HOP_MAX || n >= HOP_PER_SEED) continue;
+      hop.push(other); n++;
+    }
+  }
+  if (hop.length) {
+    const { results: more } = await env.DB.prepare(
+      `SELECT c.vector_id, c.doc_id, c.text, d.title, d.url, d.source FROM chunks c JOIN docs d ON d.id = c.doc_id WHERE c.n = 0 AND c.doc_id IN (${placeholders(hop.length)})${source ? " AND d.source = ?" : ""}`,
+    ).bind(...hop, ...(source ? [source] : [])).all<Row>();
+    rows.push(...more);
+  }
+
   // 질문과 각 조각을 직접 비교해 순서를 다시 정하고, 문서당 가장 잘 맞는 조각 하나만 남겨요
   const scored = await env.AI.run(EMBED_MODEL, { query: q, contexts: rows.map(r => ({ text: `${r.title}\n${r.text}` })) });
   const order = ("response" in scored && scored.response ? scored.response : [])
@@ -60,6 +101,11 @@ async function search(env: Env, q: string, source?: string) {
     if (!top.some(t => t.doc_id === r.doc_id)) top.push(r);
     if (top.length === TOP) break;
   }
+
+  // 고른 자료들 사이의 관계만 Claude에게 보여줘요
+  const topIds = new Set(top.map(t => t.doc_id)), titleOf = new Map(rows.map(r => [r.doc_id, r.title]));
+  const links = edges.filter(e => topIds.has(e.src) && topIds.has(e.dst));
+  const relText = links.length ? `\n<관계>\n${links.map(e => `${titleOf.get(e.src)} —${REL_KO[e.rel] ?? e.rel}→ ${titleOf.get(e.dst)}`).join("\n")}\n</관계>` : "";
 
   const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
   const msg = await client.beta.messages.create({
@@ -94,7 +140,7 @@ async function search(env: Env, q: string, source?: string) {
     system: SYSTEM,
     messages: [{
       role: "user",
-      content: `질문: ${q}\n\n<자료>\n${top.map(t => `<doc id="${t.doc_id}">\n제목: ${t.title}\n${t.text}\n</doc>`).join("\n")}\n</자료>`,
+      content: `질문: ${q}\n\n<자료>\n${top.map(t => `<doc id="${t.doc_id}">\n제목: ${t.title}\n${t.text}\n</doc>`).join("\n")}\n</자료>${relText}`,
     }],
   });
 
@@ -102,12 +148,26 @@ async function search(env: Env, q: string, source?: string) {
   const block = msg.content.find(b => b.type === "text");
   if (!block || block.type !== "text") throw new Error("응답에 텍스트가 없어요");
   const parsed = JSON.parse(block.text) as { answer: string; results: { id: string; reason: string }[] };
-  const byId = new Map(top.map(t => [t.doc_id, t]));
+  const byId = new Map<string, { title: string; url: string; source: string }>(rows.map(r => [r.doc_id, r]));
+  // 결과마다 이어지는 자료를 칩으로 붙여요. 후보에 없던 이웃은 제목만 따로 가져와요
+  const picked = parsed.results.map(r => r.id).filter(id => byId.has(id));
+  const near = edges.filter(e => picked.includes(e.src) || picked.includes(e.dst));
+  const missing = [...new Set(near.flatMap(e => [e.src, e.dst]))].filter(id => !byId.has(id));
+  if (missing.length) {
+    const { results: docs } = await env.DB.prepare(`SELECT id, title, url, source FROM docs WHERE id IN (${placeholders(missing.length)})`).bind(...missing).all<{ id: string; title: string; url: string; source: string }>();
+    for (const d of docs) byId.set(d.id, d);
+  }
+  const relatedOf = (id: string): Related[] => near
+    .filter(e => e.src === id || e.dst === id)
+    .map(e => ({ other: e.src === id ? e.dst : e.src, rel: e.rel }))
+    .filter(x => byId.has(x.other) && x.other !== id)
+    .slice(0, 4)
+    .map(x => { const d = byId.get(x.other)!; return { id: x.other, title: d.title, url: d.url, source: d.source, rel: REL_KO[x.rel] ?? x.rel }; });
   return {
     answer: parsed.answer,
     results: parsed.results.filter(r => byId.has(r.id)).map(r => {
       const t = byId.get(r.id)!;
-      return { id: r.id, title: t.title, source: t.source, url: t.url, reason: r.reason };
+      return { id: r.id, title: t.title, source: t.source, url: t.url, reason: r.reason, related: relatedOf(r.id) };
     }),
   };
 }
@@ -252,9 +312,23 @@ async function remove(env: Env, ids: string[]) {
   return { deleted: ids.length };
 }
 
+// 관계 전체를 받아 바꿔 넣어요. 내용 해시가 같으면 건너뛰어요
+async function putEdges(env: Env, body: { hash: string; edges: Edge[] }) {
+  await ensureEdges(env);
+  if ((await getMeta(env, "edges_hash")) === body.hash) return { edges: body.edges.length, unchanged: true };
+  await env.DB.batch([env.DB.prepare("DELETE FROM edges")]);
+  for (let i = 0; i < body.edges.length; i += 100) {
+    await env.DB.batch(body.edges.slice(i, i + 100).map(e =>
+      env.DB.prepare("INSERT OR REPLACE INTO edges (src, rel, dst, weight) VALUES (?, ?, ?, ?)").bind(e.src, e.rel, e.dst, e.weight ?? 1)));
+  }
+  await env.DB.batch([setMeta(env, "edges_hash", body.hash)]);
+  return { edges: body.edges.length, unchanged: false };
+}
+
 async function stats(env: Env) {
   const { results } = await env.DB.prepare("SELECT source, COUNT(*) AS docs FROM docs GROUP BY source").all();
-  return { sources: results, embedModel: await getMeta(env, "embed_model"), indexedAt: await getMeta(env, "indexed_at") };
+  const edges = await env.DB.prepare("SELECT COUNT(*) AS n FROM edges").first<{ n: number }>().catch(() => null);
+  return { sources: results, edges: edges?.n ?? 0, embedModel: await getMeta(env, "embed_model"), indexedAt: await getMeta(env, "indexed_at") };
 }
 
 // ───── HTTP ─────
@@ -330,6 +404,7 @@ export default {
         }
         if (pathname === "/ingest/upsert") return reply(await upsert(env, body.docs));
         if (pathname === "/ingest/delete") return reply(await remove(env, body.ids));
+        if (pathname === "/ingest/edges") return reply(await putEdges(env, body));
       }
       return reply({ error: "없는 경로예요." }, 404);
     } catch (err) {

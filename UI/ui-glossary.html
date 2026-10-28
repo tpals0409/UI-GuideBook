@@ -177,9 +177,14 @@ a.src:hover{text-decoration:underline}
 .ai-head .icon-btn{width:32px;height:32px}
 .ai-ans{margin:0;font-size:15px}
 .ai-res{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(260px,100%),1fr));gap:8px}
-.ai-res button{all:unset;box-sizing:border-box;width:100%;height:100%;display:flex;flex-direction:column;gap:4px;padding:10px 12px;border:1px solid var(--ui-line);border-radius:var(--ui-r-md);background:var(--ui-surface-2);cursor:pointer;font-size:13px}
-.ai-res button:hover{border-color:var(--ui-accent)}
-.ai-res button:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}
+.ai-rel{display:flex;flex-wrap:wrap;gap:4px;padding:0 0 10px 12px}
+.ai-rel-c{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 8px;border-radius:999px;border:1px solid var(--ui-line);background:var(--ui-surface);font-size:12px;color:var(--ui-text);cursor:pointer;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ai-rel-c em{font-style:normal;font-size:11px;color:var(--ui-muted)}
+.ai-rel-c:hover{border-color:var(--ui-text)}
+.ai-res li{display:flex;flex-direction:column;min-width:0}
+.ai-res li>button{all:unset;box-sizing:border-box;width:100%;flex:1;display:flex;flex-direction:column;gap:4px;padding:10px 12px;border:1px solid var(--ui-line);border-radius:var(--ui-r-md);background:var(--ui-surface-2);cursor:pointer;font-size:13px}
+.ai-res li>button:hover{border-color:var(--ui-accent)}
+.ai-res li>button:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}
 .ai-res b{font-size:14px}
 .ai-res .pill{align-self:flex-start}
 .ai-note,.ai-load{margin:0;font-size:12px;color:var(--ui-muted);display:flex;align-items:center;gap:8px}
@@ -2476,7 +2481,7 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
   applyTheme();
 
   // AI 검색: 버튼이나 Enter를 누를 때만 Worker에 물어봐요 (글자 검색은 위의 filter가 그대로 처리)
-  const aiBtn=$('#ai'),panel=$('#ai-panel'),SRC_LABEL={'ui-glossary':'UI 용어 사전'};
+  const aiBtn=$('#ai'),panel=$('#ai-panel'),SRC_LABEL={'ui-glossary':'용어','tween':'코드','motion':'영상','docs':'문서'};
   const GLOSSARY='UI/ui-glossary.html#';
   if(AI_ENDPOINT){
     aiBtn.hidden=false;
@@ -2493,7 +2498,7 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
         if(!res.ok)throw new Error(data.error||'요청에 실패했어요.');
         panel.innerHTML=`<div class="ai-box"><div class="ai-head"><b>✦ AI 답변</b><button class="icon-btn ai-x" aria-label="AI 답변 닫기">${ic('close',16)}</button></div>
           <p class="ai-ans">${esc(data.answer)}</p>
-          ${data.results.length?`<ul class="ai-res">${data.results.map(r=>`<li><button data-url="${esc(r.url)}"><span class="pill">${esc(SRC_LABEL[r.source]||r.url.split('/')[0])}</span><b>${esc(r.title)}</b><span class="muted">${esc(r.reason)}</span></button></li>`).join('')}</ul>`:''}
+          ${data.results.length?`<ul class="ai-res">${data.results.map(r=>`<li><button data-url="${esc(r.url)}"><span class="pill">${esc(SRC_LABEL[r.source]||r.url.split('/')[0])}</span><b>${esc(r.title)}</b><span class="muted">${esc(r.reason)}</span></button>${r.related?.length?`<span class="ai-rel">${r.related.map(x=>`<button type="button" class="ai-rel-c" data-url="${esc(x.url)}" title="${esc(x.rel)}"><em>${esc(x.rel)}</em>${esc(x.title)}</button>`).join('')}</span>`:''}</li>`).join('')}</ul>`:''}
           <p class="ai-note">AI 답변은 틀릴 수 있어요. 항목을 눌러 원문을 확인하세요.</p></div>`;
       }catch(err){
         panel.innerHTML=`<div class="ai-box"><p class="ai-err">${esc(err instanceof TypeError?'AI 검색 서버에 연결하지 못했어요.':err.message)}</p></div>`;
@@ -2504,8 +2509,8 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
     panel.addEventListener('click',e=>{
       if(e.target.closest('.ai-x')){panel.hidden=true;return}
       const url=e.target.closest('[data-url]')?.dataset.url;if(!url)return;
-      // 용어 사전 항목은 상세 모달로, 다른 문서는 새 탭으로 (url은 '개발 체크리스트' 폴더 기준)
-      if(url.startsWith(GLOSSARY))open(url.slice(GLOSSARY.length));else window.open('../'+url,'_blank','noopener');
+      // 용어·코드·영상은 이 페이지 안에서 열고(주소 # 로), 다른 문서는 새 탭으로 (url은 '개발 체크리스트' 폴더 기준)
+      if(url.startsWith(GLOSSARY)){const h=url.slice(GLOSSARY.length);if(location.hash==='#'+h)route();else location.hash=h}else window.open('../'+url,'_blank','noopener');
     });
   }
 })();

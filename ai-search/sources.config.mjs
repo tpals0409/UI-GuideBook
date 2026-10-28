@@ -6,4 +6,7 @@ export default [
   { source: 'ui-glossary', extractor: 'glossary', path: '../UI/ui-glossary.html', assets: ['../UI/icons'] },
   // 모든 폴더의 .md 문서 (결제, 로그인, 인프라 등에 새 문서를 넣으면 자동으로 포함돼요)
   { source: 'docs', extractor: 'markdown', path: '..', exclude: ['ai-search', 'node_modules', '.git'] },
+  // 갤러리: 코드(Tween UI)와 영상(prompt-motion). 사이트에는 따로 올리므로(build-site) 여기서는 검색에만 넣어요
+  { source: 'tween', extractor: 'tween', path: './data/tween.json', site: false },
+  { source: 'motion', extractor: 'motion', path: './data/motion.json', site: false },
 ];

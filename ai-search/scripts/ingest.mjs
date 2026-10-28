@@ -8,8 +8,11 @@ import { fileURLToPath } from 'node:url';
 import sources from '../sources.config.mjs';
 import glossary from '../extractors/glossary.mjs';
 import markdown from '../extractors/markdown.mjs';
+import tween from '../extractors/tween.mjs';
+import motion from '../extractors/motion.mjs';
+import buildEdges from './graph.mjs';
 
-const EXTRACTORS = { glossary, markdown };
+const EXTRACTORS = { glossary, markdown, tween, motion };
 const CHUNK = 800, OVERLAP = 100, BATCH = 25;
 const here = path.dirname(fileURLToPath(import.meta.url));
 const configDir = path.join(here, '..');
@@ -43,6 +46,12 @@ for (const d of docs) {
 const bySource = {};
 for (const d of docs) bySource[d.source] = (bySource[d.source] || 0) + 1;
 console.log(`추출: 문서 ${docs.length}개, 청크 ${docs.reduce((n, d) => n + d.chunks.length, 0)}개`, bySource);
+// 관계(그래프): 문서 사이의 연결. 전체를 한 번에 올리고, 내용이 같으면 Worker가 건너뛰어요
+const edges = buildEdges(docs, { glossaryHtml: path.join(configDir, '..', 'UI', 'ui-glossary.html'), tweenJson: path.join(configDir, 'data', 'tween.json') });
+const edgesHash = crypto.createHash('sha256').update(JSON.stringify(edges)).digest('hex');
+const byRel = {};
+for (const e of edges) byRel[e.rel] = (byRel[e.rel] || 0) + 1;
+console.log(`관계: ${edges.length}개`, byRel);
 if (args.has('--dry-run')) process.exit(0);
 
 const { AI_SEARCH_URL, ADMIN_TOKEN } = process.env;
@@ -65,4 +74,5 @@ for (let i = 0; i < changed.length; i += BATCH) {
   console.log(`업로드 ${Math.min(i + BATCH, changed.length)} / ${changed.length}`);
 }
 if (plan.deleted.length) await call('/ingest/delete', { ids: plan.deleted });
+console.log('관계', await call('/ingest/edges', { hash: edgesHash, edges }));
 console.log({ added: plan.added, updated: plan.updated, deleted: plan.deleted.length, unchanged: docs.length - changed.length });
