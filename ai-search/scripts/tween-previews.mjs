@@ -39,12 +39,18 @@ export async function buildTweenPreviews(list, outDir) {
     for (const f of e.files) {
       const p = path.join(src, f.path);
       fs.mkdirSync(path.dirname(p), { recursive: true });
-      fs.writeFileSync(p, theme(f.content));
+      // 미리보기 전용: 마우스를 올리면 무조건 멈추는 코드를 빼요 (보여 주는 코드는 원본 그대로)
+      const src2 = f.content.replace(/onMouseEnter=\{(?:pause|\(\) => (?:pauseRef\.current\(\)|swiperRef\.current\?\.autoplay\?\.pause\(\)))\}/g, 'onMouseEnter={undefined}');
+      fs.writeFileSync(p, theme(src2));
     }
     if (e.demo) {
       fs.mkdirSync(path.join(src, 'examples'), { recursive: true });
       // 몇몇 예시는 레이아웃 파일(<html><body>…)이라 그대로 그리면 아무것도 안 보여요. 겉 태그만 빼요
-      const demo = e.demo.replace(/<html[^>]*>|<body[^>]*>/g, '<>').replace(/<\/html>|<\/body>/g, '</>');
+      let demo = e.demo.replace(/<html[^>]*>|<body[^>]*>/g, '<>').replace(/<\/html>|<\/body>/g, '</>');
+      // '마우스를 올리면 멈춤'이 기본인 컴포넌트는 미리보기에서 그 기능을 꺼요 (보려고 마우스를 올리면 멈춰 버려서)
+      const tag = demo.match(new RegExp(`import (\\w+) from '@/components/tweenui/${e.name}'`))?.[1];
+      if (tag && e.files.some(f => /pauseOnHover\??:/.test(f.content)) && !/pauseOnHover/.test(demo))
+        demo = demo.replace(new RegExp(`<${tag}(?=[\\s>/])`, 'g'), `<${tag} pauseOnHover={false}`);
       fs.writeFileSync(path.join(src, 'examples', `${e.name}-demo.tsx`), theme(demo));
     }
   }
