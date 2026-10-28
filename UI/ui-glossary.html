@@ -369,13 +369,13 @@ html:has(.dt[open]){overflow:hidden}
   <section class="ai-panel" id="ai-panel" aria-live="polite" hidden></section>
   <main id="app"></main>
   <section class="mo" id="an" hidden aria-labelledby="an-h">
-    <div class="cat-head"><h2 id="an-h">애니메이션 <span class="n" id="an-count"></span></h2><p>움직임이 들어간 React 컴포넌트와 화면 블록이에요. 마우스를 올리면 실제로 움직이고, 누르면 크게 보면서 전체 코드와 설치 명령을 복사할 수 있어요. 미리보기에는 예시 테마(색·글꼴)가 함께 적용돼요. 출처는 Tween UI(MIT)이고, React 19·Tailwind CSS v4·GSAP 기준이에요.</p></div>
+    <div class="cat-head"><h2 id="an-h">애니메이션 <span class="n" id="an-count"></span></h2></div>
     <div class="mo-chips" id="an-chips" role="group" aria-label="종류"></div>
     <div class="grid" id="an-grid"></div>
     <p class="empty-msg" id="an-empty" hidden>맞는 항목이 없어요. 다른 종류를 고르거나 검색어를 바꿔 보세요.</p>
   </section>
   <section class="mo" id="mo" hidden aria-labelledby="mo-h">
-    <div class="cat-head"><h2 id="mo-h">모션 <span class="n" id="mo-count"></span></h2><p>Claude로 만든 모션 영상과 그 영상을 만든 프롬프트예요. 마우스를 올리면 재생되고, 누르면 프롬프트를 복사할 수 있어요. 출처는 prompt-motion.com이고, 영상과 프롬프트의 권리는 각 작성자에게 있어요.</p></div>
+    <div class="cat-head"><h2 id="mo-h">모션 <span class="n" id="mo-count"></span></h2></div>
     <div class="mo-chips" id="mo-chips" role="group" aria-label="종류"></div>
     <div class="grid" id="mo-grid"></div>
     <p class="empty-msg" id="mo-empty" hidden>맞는 예시가 없어요. 다른 종류를 고르거나 검색어를 바꿔 보세요.</p>
@@ -389,7 +389,7 @@ html:has(.dt[open]){overflow:hidden}
   <div class="dt-body">
     <p class="desc"></p>
     <div><p class="dt-demo-l">직접 해 보기</p><div class="demo dt-demo an-stage"></div></div>
-    <section class="dt-theme"><h3>예시 테마</h3><p class="tp-note">바꾸면 모든 용어 예시에 함께 적용돼요. 상단 바의 "테마"와 같은 설정이에요.</p><div class="dt-theme-row"><div><p class="tp-h">글꼴</p><div class="dd" data-kind="font" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><input class="font-q" type="search" autocomplete="off" spellcheck="false" aria-label="글꼴 검색" placeholder="글꼴 검색 (예: 명조, 손글씨, Pretendard)"><div class="dd-list" role="listbox" aria-label="글꼴"></div></div></div></div><div><p class="tp-h">색</p><div class="dd" data-kind="pal" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><input class="font-q" type="search" autocomplete="off" spellcheck="false" aria-label="색 검색" placeholder="색·회사 검색 (예: 토스, Kakao)"><div class="dd-list" role="listbox" aria-label="색 팔레트"></div></div></div></div><div><p class="tp-h">아이콘</p><div class="dd" data-kind="icon" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><div class="dd-list" role="listbox" aria-label="아이콘"></div></div></div></div></div><div class="tp-actions"><button type="button" class="tp-act" data-act="hex">Hex 코드 복사</button></div></section>
+    <section class="dt-theme"><h3>예시 테마</h3><div class="dt-theme-row"><div><p class="tp-h">글꼴</p><div class="dd" data-kind="font" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><input class="font-q" type="search" autocomplete="off" spellcheck="false" aria-label="글꼴 검색" placeholder="글꼴 검색 (예: 명조, 손글씨, Pretendard)"><div class="dd-list" role="listbox" aria-label="글꼴"></div></div></div></div><div><p class="tp-h">색</p><div class="dd" data-kind="pal" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><input class="font-q" type="search" autocomplete="off" spellcheck="false" aria-label="색 검색" placeholder="색·회사 검색 (예: 토스, Kakao)"><div class="dd-list" role="listbox" aria-label="색 팔레트"></div></div></div></div><div><p class="tp-h">아이콘</p><div class="dd" data-kind="icon" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><div class="dd-list" role="listbox" aria-label="아이콘"></div></div></div></div></div><div class="tp-actions"><button type="button" class="tp-act" data-act="hex">Hex 코드 복사</button></div></section>
     <section class="an-src"><h3 class="dt-demo-l">코드</h3><dl></dl><div class="mo-acts"><button class="mo-act" data-copy="code">코드 복사</button><button class="mo-act sub" data-copy="install">설치 명령 복사</button></div><div class="an-files"></div><p class="tp-note an-credit"></p></section>
   </div>
   <div class="dt-foot"><button class="btn sm text an-prev-b">‹ 이전</button><span class="an-pos"></span><button class="btn sm text an-next-b">다음 ›</button></div>
@@ -402,7 +402,7 @@ html:has(.dt[open]){overflow:hidden}
     <div><p class="dt-demo-l">직접 해 보기</p><div class="demo dt-demo"></div></div>
     <section class="dt-theme"><h3>예시 테마</h3><p class="tp-note">바꾸면 모든 용어 예시에 함께 적용돼요. 상단 바의 "테마"와 같은 설정이에요.</p><div class="dt-theme-row"><div><p class="tp-h">글꼴</p><div class="dd" data-kind="font" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><input class="font-q" type="search" autocomplete="off" spellcheck="false" aria-label="글꼴 검색" placeholder="글꼴 검색 (예: 명조, 손글씨, Pretendard)"><div class="dd-list" role="listbox" aria-label="글꼴"></div></div></div></div><div><p class="tp-h">색</p><div class="dd" data-kind="pal" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><input class="font-q" type="search" autocomplete="off" spellcheck="false" aria-label="색 검색" placeholder="색·회사 검색 (예: 토스, Kakao)"><div class="dd-list" role="listbox" aria-label="색 팔레트"></div></div></div></div><div><p class="tp-h">아이콘</p><div class="dd" data-kind="icon" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><div class="dd-list" role="listbox" aria-label="아이콘"></div></div></div></div></div><div class="tp-actions"><button type="button" class="tp-act" data-act="hex">Hex 코드 복사</button></div></section>
     <section class="dt-how"><h3>동작 방식</h3><ol></ol></section>
-    <section class="dt-tween" hidden><h3>애니메이션 코드</h3><p class="tp-note">움직임을 더한 React 버전이에요. 누르면 코드를 볼 수 있어요.</p><div class="tw-list"></div></section>
+    <section class="dt-tween" hidden><h3>애니메이션 코드</h3><div class="tw-list"></div></section>
     <p class="diff"></p>
   </div>
   <div class="dt-foot"><button class="btn sm text dt-prev">‹ 이전</button><span class="dt-pos"></span><button class="btn sm text dt-next">다음 ›</button></div>
