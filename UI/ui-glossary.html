@@ -227,6 +227,7 @@ html:has(.dt[open]){overflow:hidden}
 .dd-opt .fm em,.dd-btn em{font-family:"Gmarket Sans",sans-serif}
 .dd-opt .fm em{font-style:normal;font-size:11px}
 .pal-opt{flex-direction:row;align-items:center;gap:10px}
+.ic-prev{display:inline-flex;gap:5px;flex:none;color:var(--ui-text)}
 .pal-opt .tag{margin-left:auto;font-size:11px;color:var(--ui-muted);border:1px solid var(--ui-line);border-radius:5px;padding:0 5px}
 .dd-opt:hover,.dd-opt:focus{background:var(--ui-soft)}
 .dd-opt:focus-visible{outline:2px solid var(--ui-text);outline-offset:-2px}
@@ -337,6 +338,7 @@ html:has(.dt[open]){overflow:hidden}
       <p class="tp-note">모든 용어 예시의 글꼴과 색을 바꿔요. 글꼴은 무료·오픈소스 글꼴만 있어요(이름에 마우스를 올리면 라이선스가 보여요). 색에는 실제 회사의 디자인 시스템(oh-my-design 정리, 공식 아님)도 있어요. 새로고침하면 처음으로 돌아가요.</p>
       <p class="tp-h">글꼴</p><div class="dd" data-kind="font" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><input class="font-q" type="search" autocomplete="off" spellcheck="false" aria-label="글꼴 검색" placeholder="글꼴 검색 (예: 명조, 손글씨, Pretendard)"><div class="dd-list" role="listbox" aria-label="글꼴"></div></div></div>
       <p class="tp-h">색</p><div class="dd" data-kind="pal" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><input class="font-q" type="search" autocomplete="off" spellcheck="false" aria-label="색 검색" placeholder="색·회사 검색 (예: 토스, Kakao)"><div class="dd-list" role="listbox" aria-label="색 팔레트"></div></div></div>
+      <p class="tp-h">아이콘</p><div class="dd" data-kind="icon" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><div class="dd-list" role="listbox" aria-label="아이콘"></div></div></div>
       <form class="ai-pal"><input aria-label="원하는 느낌" autocomplete="off" maxlength="100" placeholder="원하는 느낌 (예: 따뜻한 카페)"><button type="submit">✦ AI로 만들기</button></form>
       <p class="tp-msg" aria-live="polite"></p>
       <div class="tp-actions"><button type="button" class="tp-act" data-act="md">design.md 내려받기</button><button type="button" class="tp-act" data-act="hex">Hex 코드 복사</button></div>
@@ -361,7 +363,7 @@ html:has(.dt[open]){overflow:hidden}
   <div class="dt-body">
     <p class="desc"></p>
     <div><p class="dt-demo-l">직접 해 보기</p><div class="demo dt-demo"></div></div>
-    <section class="dt-theme"><h3>예시 테마</h3><p class="tp-note">바꾸면 모든 용어 예시에 함께 적용돼요. 상단 바의 "테마"와 같은 설정이에요.</p><div class="dt-theme-row"><div><p class="tp-h">글꼴</p><div class="dd" data-kind="font" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><input class="font-q" type="search" autocomplete="off" spellcheck="false" aria-label="글꼴 검색" placeholder="글꼴 검색 (예: 명조, 손글씨, Pretendard)"><div class="dd-list" role="listbox" aria-label="글꼴"></div></div></div></div><div><p class="tp-h">색</p><div class="dd" data-kind="pal" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><input class="font-q" type="search" autocomplete="off" spellcheck="false" aria-label="색 검색" placeholder="색·회사 검색 (예: 토스, Kakao)"><div class="dd-list" role="listbox" aria-label="색 팔레트"></div></div></div></div></div><div class="tp-actions"><button type="button" class="tp-act" data-act="hex">Hex 코드 복사</button></div></section>
+    <section class="dt-theme"><h3>예시 테마</h3><p class="tp-note">바꾸면 모든 용어 예시에 함께 적용돼요. 상단 바의 "테마"와 같은 설정이에요.</p><div class="dt-theme-row"><div><p class="tp-h">글꼴</p><div class="dd" data-kind="font" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><input class="font-q" type="search" autocomplete="off" spellcheck="false" aria-label="글꼴 검색" placeholder="글꼴 검색 (예: 명조, 손글씨, Pretendard)"><div class="dd-list" role="listbox" aria-label="글꼴"></div></div></div></div><div><p class="tp-h">색</p><div class="dd" data-kind="pal" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><input class="font-q" type="search" autocomplete="off" spellcheck="false" aria-label="색 검색" placeholder="색·회사 검색 (예: 토스, Kakao)"><div class="dd-list" role="listbox" aria-label="색 팔레트"></div></div></div></div><div><p class="tp-h">아이콘</p><div class="dd" data-kind="icon" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><div class="dd-list" role="listbox" aria-label="아이콘"></div></div></div></div></div><div class="tp-actions"><button type="button" class="tp-act" data-act="hex">Hex 코드 복사</button></div></section>
     <section class="dt-how"><h3>동작 방식</h3><ol></ol></section>
     <p class="diff"></p>
   </div>
@@ -1935,21 +1937,25 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
   // ───── 움직이는 아이콘: ic()로 그린 아이콘을 @animateicons(Lucide 모양) 아이콘으로 바꿔요 ─────
   // 배포 때 만든 icons.js가 있을 때만(사이트에서 열었을 때). 없으면 지금 아이콘 그대로예요.
   // 버튼·링크에 마우스를 올리면 그 안의 아이콘이, 타일에 올리면 타일 안의 아이콘이 한 번 움직여요.
+  const iconSet=svg=>svg.closest('.demo')?theme.icon:'lucide';
   const upIcons=root=>{
     const A=window.AnimIcons;if(!A||!root.querySelectorAll)return;
     for(const old of [...(root.matches?.('svg[data-ic]')?[root]:[]),...root.querySelectorAll('svg[data-ic]')]){
-      const d=A.icons[old.dataset.ic];if(!d||!old.isConnected)continue;
-      const svg=A.renderIcon(d,+old.getAttribute('width')||20);
-      svg.setAttribute('aria-hidden','true');svg.setAttribute('data-up',old.dataset.ic);
-      old.replaceWith(svg);svg._p=A.play(svg,d);
+      const want=iconSet(old),n=old.dataset.ic,size=+old.getAttribute('width')||20,d=A.icons[want]?.[n];
+      const have=old.dataset.set||'static';
+      if(have===(d?want:'static')||!old.isConnected)continue;
+      let svg;
+      if(d){svg=A.renderIcon(d,size);svg.setAttribute('aria-hidden','true');svg.dataset.ic=n;svg.dataset.set=want;svg._p=A.play(svg,d)}
+      else{const t=document.createElement('template');t.innerHTML=ic(n,size);svg=t.content.firstChild} // 정지 아이콘(원래 그림)
+      old.replaceWith(svg);
     }
   };
   const iconHost=t=>t.closest?.('.card,.mo-card,button,a,label,summary,[role=button],[role=tab],[role=menuitem]');
-  document.addEventListener('mouseover',e=>{const h=iconHost(e.target);if(h&&!h.contains(e.relatedTarget))h.querySelectorAll('svg[data-up]').forEach(s=>s._p?.start())});
-  document.addEventListener('focusin',e=>{const h=iconHost(e.target);if(h)h.querySelectorAll('svg[data-up]').forEach(s=>s._p?.start())});
+  document.addEventListener('mouseover',e=>{const h=iconHost(e.target);if(h&&!h.contains(e.relatedTarget))h.querySelectorAll('svg[data-set]').forEach(s=>s._p?.start())});
+  document.addEventListener('focusin',e=>{const h=iconHost(e.target);if(h)h.querySelectorAll('svg[data-set]').forEach(s=>s._p?.start())});
   if(location.protocol.startsWith('http')){
     const sc=document.createElement('script');sc.src='icons.js';
-    sc.onload=()=>{upIcons(document.body);new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(upIcons))).observe(document.body,{childList:true,subtree:true})};
+    sc.onload=()=>{upIcons(document.body);drawAll();new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(upIcons))).observe(document.body,{childList:true,subtree:true})};
     document.head.append(sc);
   }
 
@@ -1979,7 +1985,14 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
     pal('ocean','오션',['#0a6f8c','#ffffff','#d6eef5','#fafdfe','#ecf6f8','#10262e','#4a666f','#cde3e9']),
     pal('mono','모노',['#141414','#ffffff','#e8e8e8','#ffffff','#f3f3f3','#141414','#616161','#dadada']),
   ];
-  const DEFAULT={font:'gmarket-sans',pal:'cobalt'};
+  const DEFAULT={font:'gmarket-sans',pal:'cobalt',icon:'lucide'};
+  // 아이콘 모양: 움직이는 아이콘 두 가지(@animateicons) + 원래 그린 정지 아이콘. 서비스 화면 아이콘은 늘 Lucide예요
+  const ICON_SETS=[
+    {id:'lucide',name:'Lucide',note:'움직임',site:'https://lucide.dev'},
+    {id:'huge',name:'Huge Icons',note:'움직임',site:'https://hugeicons.com'},
+    {id:'static',name:'기본',note:'정지'},
+  ];
+  const iconPreview=id=>['heart','bell','star'].map(n=>{const d=window.AnimIcons?.icons[id]?.[n];if(!d)return ic(n,18);const el=AnimIcons.renderIcon(d,18);el.setAttribute('aria-hidden','true');return el.outerHTML}).join('');
   const theme={...DEFAULT},aiPals=[],COMPANIES=[];let aiSeq=0;
   const pals=()=>[...PALS,...aiPals,...COMPANIES];
   const loadedFonts=new Set();
@@ -2004,13 +2017,16 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
   const themeCss=document.head.appendChild(document.createElement('style'));
   const applyTheme=()=>{
     themeCss.textContent=`.demo{${decl(theme.font,theme.pal)}}`;
+    upIcons(document.body); // 아이콘 모양이 바뀌었으면 예시 안의 아이콘을 다시 그려요
   };
   // ── 드롭다운: 버튼을 누르면 목록이 펼쳐져요. 글꼴은 검색할 수 있고, AI로 만든 팔레트는 지울 수 있어요 ──
   // 같은 부품을 패널과 모달에서 같이 쓰고, 둘 다 같은 전체 설정(theme)을 바꿔요.
   const chips=p=>`<span class="chips" aria-hidden="true"><i style="background:${p.primary}"></i><i style="background:${p.primarySoft}"></i><i style="background:${p.text}"></i></span>`;
   const fontOpt=(f,sel)=>`<div class="dd-row"><button type="button" class="dd-opt" role="option" data-v="${f.id}" aria-selected="${sel}" data-n="${esc((f.name+' '+f.family+' '+(CAT_KO[f.category]||'')).toLowerCase())}" title="${esc(f.license||'')}" style="font-family:${esc(stack(f))}"><span class="fn">${esc(f.name)}</span><span class="fm"><span>가나다라 Aa</span><em>${CAT_KO[f.category]||''}</em></span></button></div>`;
   const palOpt=(p,sel)=>`<div class="dd-row"><button type="button" class="dd-opt pal-opt" role="option" data-v="${p.id}" aria-selected="${sel}" data-n="${esc((p.name+' '+(p.en||'')).toLowerCase())}"${p.src?` title="oh-my-design에서 정리한 값 (회사 공식 파일 아님)${p.unverified?'. 아직 출처 검증을 마치지 않았어요':''}"`:''}>${chips(p)}<span>${esc(p.name)}</span>${p.ai?'<span class="tag">AI</span>':p.src?`<span class="tag">${p.unverified?'검증 전':'회사'}</span>`:''}</button>${p.ai?`<button type="button" class="dd-del" data-del="${p.id}" aria-label="${esc(p.name)} 팔레트 삭제" title="삭제">${ic('trash',15)}</button>`:''}</div>`;
+  const iconOpt=(x,sel)=>`<div class="dd-row"><button type="button" class="dd-opt pal-opt" role="option" data-v="${x.id}" aria-selected="${sel}"><span class="ic-prev" aria-hidden="true">${iconPreview(x.id)}</span><span>${esc(x.name)}</span><span class="tag">${x.note}</span></button></div>`;
   const label=(kind,v)=>{
+    if(kind==='icon'){const x=ICON_SETS.find(i=>i.id===v)||ICON_SETS[0];return `<span class="ic-prev" aria-hidden="true">${iconPreview(x.id)}</span><span class="dd-cur">${esc(x.name)}</span><em>${x.note}</em>`}
     if(kind==='font'){const f=FONTS.find(x=>x.id===v)||FONTS[0];return `<span class="dd-cur" style="font-family:${esc(stack(f))}">${esc(f.name)}</span><em>${CAT_KO[f.category]||''}</em>`}
     const p=pals().find(x=>x.id===v)||PALS[0];return `${chips(p)}<span class="dd-cur">${esc(p.name)}</span>`;
   };
@@ -2018,7 +2034,7 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
   const drawDD=dd=>{
     const{kind}=dd.dataset,v=theme[kind];
     $('.dd-btn',dd).innerHTML=label(kind,v)+`<span class="dd-caret" aria-hidden="true">${ic('chev-d',16)}</span>`;
-    $('.dd-list',dd).innerHTML=(kind==='font'?FONTS.map(f=>fontOpt(f,v===f.id)):pals().map(p=>palOpt(p,v===p.id))).join('');
+    $('.dd-list',dd).innerHTML=(kind==='font'?FONTS.map(f=>fontOpt(f,v===f.id)):kind==='icon'?ICON_SETS.map(x=>iconOpt(x,v===x.id)):pals().map(p=>palOpt(p,v===p.id))).join('');
     filterDD(dd);
   };
   const DDS=()=>$$('.dd');
@@ -2100,6 +2116,7 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
       `- 글꼴: **${f.name}** (${CAT_KO[f.category]||f.category||'-'}) — 라이선스: ${f.license||'-'}`,
       `- font-family: \`${stack(f)}\``,
       ...(f.css?[`- 불러오기: \`<link rel="stylesheet" href="${f.css}">\``]:[]),'',
+      ...(()=>{const x=ICON_SETS.find(i=>i.id===theme.icon);return['## 아이콘','',x.site?`- **${x.name}** (${x.site}). 움직이는 버전은 \`@animateicons/vanilla\`(React는 \`@animateicons/react\`)의 \`${x.id}\` 모음이에요.`:'- 선 굵기 2px, 둥근 끝의 단순한 선 아이콘이에요.','- 크기 20px(작은 곳 16~18px), 색은 글자색(currentColor)을 따라요.','']})(),
       `## 색 — ${p.name}`,'',
       ...(p.src?[`출처: [oh-my-design](${p.src})에서 정리한 ${p.name}의 공개 디자인 값이에요. 회사 공식 파일은 아니고, 디자인 권리는 해당 회사에 있어요.${p.unverified?' 아직 출처 검증을 마치지 않은 값이에요.':''}`,'']:[]),
       '| 역할 | CSS 변수 | Hex | 쓰는 곳 |','|---|---|---|---|',
