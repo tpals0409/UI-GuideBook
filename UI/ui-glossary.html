@@ -23,6 +23,9 @@
 @font-face{font-family:'Gmarket Sans';font-weight:500;font-display:swap;src:url('https://cdn.jsdelivr.net/gh/fonts-archive/GmarketSans/GmarketSansMedium.woff2') format('woff2'),url('https://cdn.jsdelivr.net/gh/fonts-archive/GmarketSans/GmarketSansMedium.woff') format('woff')}
 @font-face{font-family:'Gmarket Sans';font-weight:700;font-display:swap;src:url('https://cdn.jsdelivr.net/gh/fonts-archive/GmarketSans/GmarketSansBold.woff2') format('woff2'),url('https://cdn.jsdelivr.net/gh/fonts-archive/GmarketSans/GmarketSansBold.woff') format('woff')}
 *,*::before,*::after{box-sizing:border-box}
+/* 스크롤바는 숨기고 스크롤은 그대로 */
+*{scrollbar-width:none}
+*::-webkit-scrollbar{display:none}
 [hidden]{display:none!important}
 html{scroll-padding-top:84px}
 body{margin:0;background:var(--ui-bg);color:var(--ui-text);font:15px/1.65 "Gmarket Sans",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;-webkit-font-smoothing:antialiased;word-break:keep-all}

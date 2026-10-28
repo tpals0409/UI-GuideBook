@@ -62,6 +62,8 @@ export async function buildTweenPreviews(list, outDir) {
   --tp-brand-deep:color-mix(in srgb,var(--tp-brand) 70%,#000);
 }
 html,body{margin:0;min-height:100%}
+*{scrollbar-width:none}
+*::-webkit-scrollbar{display:none}
 body{font-family:var(--demo-font,"Gmarket Sans",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",sans-serif);background:transparent;color:var(--tp-ink)} /* 용어 사전의 무대(점 격자)가 비쳐 보여요 */
 #root{min-height:100vh;display:flex;align-items:center;justify-content:center}
 #root>div{width:100%;display:flex;justify-content:center;align-items:center} /* w-full 컴포넌트가 0 폭이 되지 않게 */
