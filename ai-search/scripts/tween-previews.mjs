@@ -25,7 +25,7 @@ const COLORS = {
 };
 const theme = code => code
   .replace(/#(045f64|c6f56f|12161f|9fd4d6|e8f3f2|0b3b3e)\b/gi, (_, h) => COLORS[h.toLowerCase()])
-  .replace(/(["'`])\/(avatars|logos|photos|audio)\//g, `$1${SITE}/$2/`); // 사진·로고·소리는 원래 사이트 것을 써요
+  .replace(/(["'`])\/(avatars|logos|photos|audio|services|images)\//g, `$1${SITE}/$2/`); // 사진·로고·소리는 원래 사이트 것을 써요
 
 export async function buildTweenPreviews(list, outDir) {
   fs.rmSync(src, { recursive: true, force: true });
@@ -55,9 +55,10 @@ export async function buildTweenPreviews(list, outDir) {
 }
 html,body{margin:0;min-height:100%}
 .still *,.still *::before,.still *::after{animation-play-state:paused!important;transition:none!important}
-body{font-family:var(--demo-font,"Gmarket Sans",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",sans-serif);background:#f7f7f7;color:var(--tp-ink)}
+body{font-family:var(--demo-font,"Gmarket Sans",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",sans-serif);background:transparent;color:var(--tp-ink)} /* 용어 사전의 무대(점 격자)가 비쳐 보여요 */
 #root{min-height:100vh;display:flex;align-items:center;justify-content:center}
-#root>.block{width:100%;align-self:stretch}
+#root>div{width:100%;display:flex;justify-content:center;align-items:center} /* w-full 컴포넌트가 0 폭이 되지 않게 */
+#root>.block{display:block;align-self:stretch}
 `);
   fs.writeFileSync(path.join(src, 'preview.html'), `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>미리보기</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/GmarketSans/GmarketSans.css"></head>
