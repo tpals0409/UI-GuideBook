@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { mcpFetch } from "./mcp.ts";
 
 // 임베딩 모델을 바꾸면 Vectorize 인덱스 차원도 맞춰야 하고, `npm run ingest -- --full`로 전체를 다시 색인해야 해요.
 const EMBED_MODEL = "@cf/baai/bge-m3"; // 한국어를 포함한 다국어 임베딩, 1024차원. 질문-자료 점수 매기기(재정렬)에도 써요.
@@ -7,7 +8,7 @@ const RETRIEVE = 20; // 벡터 검색으로 먼저 고르는 조각 수
 const TOP = 10; // 재정렬 후 Claude에 보내는 자료 수
 const HOP_PER_SEED = 3, HOP_MAX = 12; // 그래프에서 찾은 자료의 이웃을 이만큼 더 후보에 넣어요
 // 관계 이름 (edges.rel) → 사람이 읽는 말
-const REL_KO: Record<string, string> = { compare: "비교 대상", mentions: "관련", code: "코드 버전", uses: "함께 씀", kind_of: "상위 개념" };
+export const REL_KO: Record<string, string> = { compare: "비교 대상", mentions: "관련", code: "코드 버전", uses: "함께 씀", kind_of: "상위 개념" };
 // 글에서 관계를 뽑을 때 쓰는 모델과 한 번에 읽는 자료 수. 자료가 바뀐 것만 다시 읽어요
 const EXTRACT_MODEL = "claude-sonnet-5-5";
 const EXTRACT_SOURCES = ["ui-glossary", "tween"];
@@ -67,7 +68,7 @@ async function ensureEdges(env: Env) {
 }
 
 // 주어진 자료들에 닿아 있는 관계를 모두 가져와요 (양방향)
-async function edgesAround(env: Env, ids: string[]) {
+export async function edgesAround(env: Env, ids: string[]) {
   if (!ids.length) return [] as Edge[];
   const ph = placeholders(ids.length);
   const { results } = await env.DB.prepare(`SELECT src, rel, dst, weight FROM edges WHERE src IN (${ph}) OR dst IN (${ph})`).bind(...ids, ...ids).all<Edge>();
@@ -75,7 +76,7 @@ async function edgesAround(env: Env, ids: string[]) {
 }
 
 // ───── 검색 ─────
-async function search(env: Env, q: string, source?: string) {
+export async function search(env: Env, q: string, source?: string) {
   const empty = { answer: "관련 자료를 찾지 못했어요. 다른 말로 다시 물어봐 주세요.", results: [] };
   const [vec] = await embed(env, [q]);
   const found = await env.VECTORIZE.query(vec, { topK: RETRIEVE, ...(source ? { filter: { source } } : {}) });
@@ -464,6 +465,7 @@ export default {
     // 페이지·검색은 Access로 잠긴 사이트 주소에서만 열어요. 다른 주소(workers.dev)는 관리용 경로만 받아요.
     if (hostname !== env.SITE_HOST && !isAdminPath) return new Response("Not found", { status: 404 });
     if (hostname === env.SITE_HOST && pathname === "/") return Response.redirect(new URL("/UI/ui-glossary.html", req.url).href, 302);
+    if (hostname === env.SITE_HOST && pathname === "/mcp") return mcpFetch(req, env); // 다른 프로젝트의 Claude Code용 (src/mcp.ts)
     if (hostname === env.SITE_HOST && pathname === "/graph" && req.method === "GET") {
       return Response.json(await graphAll(env), { headers: { "Cache-Control": "public, max-age=300" } }); // 5분 캐시
     }

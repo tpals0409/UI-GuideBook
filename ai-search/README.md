@@ -93,3 +93,27 @@ AI_SEARCH_URL=https://dev-reference-ai-search.<계정>.workers.dev ADMIN_TOKEN=<
 
 - `GET /stats` — 출처별 문서 수, 임베딩 모델, 마지막 색인 시각
 - `POST /ingest/plan`, `/ingest/upsert`, `/ingest/delete` — `npm run ingest`가 사용
+
+## 다른 프로젝트에서 쓰기 (MCP)
+
+`https://ui.leo0409.work/mcp`는 MCP 서버예요(`src/mcp.ts`). 다른 폴더의 Claude Code가 용어·회사 디자인 시스템·Tween 코드·영상 프롬프트·관계를 바로 가져다 써요. 자료는 D1과 `public/`에 이미 있는 것을 읽으니 따로 동기화할 게 없어요.
+
+| 도구 | 하는 일 | 비용 |
+|---|---|---|
+| `company` | 회사 이름으로 팔레트·둥글기·글꼴 + CSS 변수 블록 (`q` 비면 회사 목록) | 0 |
+| `list` | 출처(`ui-glossary`/`tween`/`motion`/`docs`)별 제목·id, `q`로 제목 걸러보기 | 0 |
+| `get` | id 하나의 전문 — 용어 설명, 코드는 React 소스 전부, 영상은 프롬프트 + 관계 | 0 |
+| `graph` | 관계 따라가기 (`hops` 1–2) | 0 |
+| `search` | 자연어 질문 → AI 답 + 관련 id (사이트의 "✦ AI에게 묻기"와 같음) | Claude 호출 |
+
+사이트가 Cloudflare Access 뒤에 있어서 **서비스 토큰**으로 들어가요 (한 번만):
+1. Zero Trust → Access → Service Auth → 서비스 토큰 만들기 (예: `claude-mcp`). Client ID·Secret을 복사해요.
+2. Access 앱 `ui.leo0409.work`의 정책에 **Service Auth** 정책을 추가하고 Include에 그 토큰을 넣어요.
+3. 내 계정 전체에 등록 (값은 `~/.claude.json`에만 저장돼요):
+   ```bash
+   claude mcp add --transport http -s user ui-ref https://ui.leo0409.work/mcp \
+     --header "CF-Access-Client-Id: <ID>" --header "CF-Access-Client-Secret: <SECRET>"
+   ```
+   `claude mcp list`에 `ui-ref … ✔ Connected`가 나오면 끝이에요.
+
+로컬에서 확인하려면 하네스를 띄우고 `claude mcp add --transport http -s local ui-ref-test http://localhost:8812/mcp`로 붙여요 (Access 없음).
