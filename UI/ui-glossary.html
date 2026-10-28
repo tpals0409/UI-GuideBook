@@ -90,9 +90,8 @@ main{padding:4px 28px 64px;max-width:1480px;width:100%}
 .cap h3 .ko{font-size:13px;font-weight:400;color:var(--ui-muted)}
 .cap p{margin:0;font-size:13.5px;line-height:1.55;color:var(--ui-muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .empty-msg{margin:0;padding:80px 28px;color:var(--ui-muted)}
-footer{padding:0 28px 40px;font-size:12.5px;color:var(--ui-muted);max-width:76ch}
 /* 모션: prompt-motion의 모션 영상과 프롬프트 (사이드바 "참고 → 모션") */
-body[data-view]:not([data-view=terms]) :is(#app,#empty,.mainc>footer,#ai,#ai-panel){display:none!important}
+body[data-view]:not([data-view=terms]) :is(#app,#empty,#ai,#ai-panel){display:none!important}
 /* 애니메이션 코드 모음 (Tween UI): 글자 카드 + 코드 보기 */
 /* 애니메이션 타일: 용어 타일과 같은 모양 (무대 + 이름표). 무대 안은 같은 주소의 미리보기 iframe */
 .an-tile{background:var(--ui-surface);border:1px solid var(--ui-line);border-radius:14px;padding:6px;display:flex;flex-direction:column;min-width:0;cursor:pointer;transition:border-color .15s}
@@ -164,7 +163,6 @@ a.src:hover{text-decoration:underline}
   .menu-btn{display:inline-grid}
   .bar{padding:10px 16px;gap:8px}
   main{padding:0 16px 56px}
-  footer{padding:0 16px 32px}
   .empty-msg{padding:60px 16px}
   .cat-head{margin:30px 0 14px}
   .cat-head h2{font-size:23px}
@@ -337,14 +335,13 @@ html:has(.dt[open]){overflow:hidden}
 <body>
 <div class="shell" id="shell">
 <aside class="side" id="side">
-  <div class="brand"><b>UI GuideBook</b><p>화면을 이루는 부품을 직접 눌러 보며 이름을 찾는 용어 사전이에요.</p></div>
+  <div class="brand"><b>UI GuideBook</b></div>
   <nav aria-label="분류"><p class="nav-h">분류</p><div class="cats" id="cats"></div></nav>
   <nav class="docs" id="docs" aria-label="문서" hidden><p class="nav-h">문서</p><div id="docs-list"></div></nav>
   <nav class="docs" aria-label="참고"><p class="nav-h">참고</p><a href="#motion" id="mo-link">모션</a><a href="#anim" id="an-link">애니메이션</a></nav>
   <div class="legend">
-    <p>출처 표시</p>
+    <p>출처</p>
     <span class="src src-APG">WAI-ARIA APG</span><span class="src src-MDN">MDN</span><span class="src src-M3">Material 3</span><span class="src src-HIG">Apple HIG</span><span class="src src-WCAG">WCAG 2.2</span><span class="src src-idiom">관용어</span>
-    <p>제목은 공식 영문 이름이에요. "관용어"는 공식 문서에는 없지만 업계에서 널리 쓰는 이름이에요.</p>
   </div>
 </aside>
 <div class="nav-scrim" id="nav-scrim" hidden></div>
@@ -356,7 +353,6 @@ html:has(.dt[open]){overflow:hidden}
     <button class="tool-btn theme-btn" id="theme-btn" aria-label="예시 테마" aria-expanded="false" aria-controls="tpanel"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.9 1.6-1.6 0-.9-.9-1.5-.9-2.4 0-.9.7-1.6 1.6-1.6H16a5 5 0 0 0 5-5C21 6.6 17 3 12 3z"/><path d="M7.5 11h.01M10 7.5h.01M14.5 7.5h.01"/></svg><span class="lbl">테마</span></button>
     <div class="tpanel" id="tpanel" role="dialog" aria-label="예시 테마" hidden>
       <h3>예시 테마</h3>
-      <p class="tp-note">모든 용어 예시의 글꼴과 색을 바꿔요. 글꼴은 무료·오픈소스 글꼴만 있어요(이름에 마우스를 올리면 라이선스가 보여요). 색에는 실제 회사의 디자인 시스템(oh-my-design 정리, 공식 아님)도 있어요. 새로고침하면 처음으로 돌아가요.</p>
       <p class="tp-h">글꼴</p><div class="dd" data-kind="font" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><input class="font-q" type="search" autocomplete="off" spellcheck="false" aria-label="글꼴 검색" placeholder="글꼴 검색 (예: 명조, 손글씨, Pretendard)"><div class="dd-list" role="listbox" aria-label="글꼴"></div></div></div>
       <p class="tp-h">색</p><div class="dd" data-kind="pal" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><input class="font-q" type="search" autocomplete="off" spellcheck="false" aria-label="색 검색" placeholder="색·회사 검색 (예: 토스, Kakao)"><div class="dd-list" role="listbox" aria-label="색 팔레트"></div></div></div>
       <p class="tp-h">아이콘</p><div class="dd" data-kind="icon" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><div class="dd-list" role="listbox" aria-label="아이콘"></div></div></div>
@@ -381,7 +377,6 @@ html:has(.dt[open]){overflow:hidden}
     <p class="empty-msg" id="mo-empty" hidden>맞는 예시가 없어요. 다른 종류를 고르거나 검색어를 바꿔 보세요.</p>
   </section>
   <p class="empty-msg" id="empty" hidden>검색 결과가 없어요.</p>
-  <footer>이름은 WAI-ARIA APG → HTML·CSS 표준(MDN) → Material Design 3 → Apple HIG 순서로 따랐어요. 출처마다 이름이 다르면 나머지는 "별칭"에 적었어요.</footer>
 </div>
 </div>
 <dialog class="dt" id="an-dlg" aria-labelledby="an-title">
@@ -400,7 +395,7 @@ html:has(.dt[open]){overflow:hidden}
   <div class="dt-body">
     <p class="desc"></p>
     <div><p class="dt-demo-l">직접 해 보기</p><div class="demo dt-demo"></div></div>
-    <section class="dt-theme"><h3>예시 테마</h3><p class="tp-note">바꾸면 모든 용어 예시에 함께 적용돼요. 상단 바의 "테마"와 같은 설정이에요.</p><div class="dt-theme-row"><div><p class="tp-h">글꼴</p><div class="dd" data-kind="font" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><input class="font-q" type="search" autocomplete="off" spellcheck="false" aria-label="글꼴 검색" placeholder="글꼴 검색 (예: 명조, 손글씨, Pretendard)"><div class="dd-list" role="listbox" aria-label="글꼴"></div></div></div></div><div><p class="tp-h">색</p><div class="dd" data-kind="pal" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><input class="font-q" type="search" autocomplete="off" spellcheck="false" aria-label="색 검색" placeholder="색·회사 검색 (예: 토스, Kakao)"><div class="dd-list" role="listbox" aria-label="색 팔레트"></div></div></div></div><div><p class="tp-h">아이콘</p><div class="dd" data-kind="icon" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><div class="dd-list" role="listbox" aria-label="아이콘"></div></div></div></div></div><div class="tp-actions"><button type="button" class="tp-act" data-act="hex">Hex 코드 복사</button></div></section>
+    <section class="dt-theme"><h3>예시 테마</h3><div class="dt-theme-row"><div><p class="tp-h">글꼴</p><div class="dd" data-kind="font" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><input class="font-q" type="search" autocomplete="off" spellcheck="false" aria-label="글꼴 검색" placeholder="글꼴 검색 (예: 명조, 손글씨, Pretendard)"><div class="dd-list" role="listbox" aria-label="글꼴"></div></div></div></div><div><p class="tp-h">색</p><div class="dd" data-kind="pal" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><input class="font-q" type="search" autocomplete="off" spellcheck="false" aria-label="색 검색" placeholder="색·회사 검색 (예: 토스, Kakao)"><div class="dd-list" role="listbox" aria-label="색 팔레트"></div></div></div></div><div><p class="tp-h">아이콘</p><div class="dd" data-kind="icon" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><div class="dd-list" role="listbox" aria-label="아이콘"></div></div></div></div></div><div class="tp-actions"><button type="button" class="tp-act" data-act="hex">Hex 코드 복사</button></div></section>
     <section class="dt-how"><h3>동작 방식</h3><ol></ol></section>
     <section class="dt-tween" hidden><h3>애니메이션 코드</h3><div class="tw-list"></div></section>
     <p class="diff"></p>
@@ -1883,10 +1878,9 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
     <div class="demo" data-demo="${t.id}" inert></div>
     <div class="cap"><h3>${t.en}<span class="ko">${t.ko}</span></h3><p>${t.desc}</p></div>
   </article>`;
-  const INTRO={action:'누르고, 고르고, 입력하는 부품이에요.',overlay:'화면 위에 잠깐 떠서 알리거나 묻는 부품이에요.',nav:'다른 화면이나 위치로 옮겨 가는 부품이에요.',content:'정보를 묶어서 보여주는 부품이에요.',layout:'화면을 나누고 정렬하는 규칙이에요.',effect:'움직임과 질감으로 상태를 전하는 표현이에요.',concept:'모든 부품에 공통으로 적용되는 기준이에요.'};
   $('#app').innerHTML=Object.entries(CATS).map(([c,label])=>{
     const items=TERMS.filter(t=>t.cat===c);
-    return `<section class="cat" data-cat="${c}" id="cat-${c}" aria-labelledby="h-${c}"><div class="cat-head"><h2 id="h-${c}">${label}<span class="n">${items.length}</span></h2><p>${INTRO[c]||''}</p></div><div class="grid">${items.map(card).join('')}</div></section>`;
+    return `<section class="cat" data-cat="${c}" id="cat-${c}" aria-labelledby="h-${c}"><div class="cat-head"><h2 id="h-${c}">${label}<span class="n">${items.length}</span></h2></div><div class="grid">${items.map(card).join('')}</div></section>`;
   }).join('');
 
   // 데모는 화면 근처에 올 때만 그려요

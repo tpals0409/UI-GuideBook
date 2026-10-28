@@ -12,7 +12,6 @@ import tailwind from '@tailwindcss/vite';
 
 const dir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const src = path.join(dir, '.tween-build');
-const SITE = 'https://tween-ui.vercel.app';
 
 // Tween UI 색 → 우리 테마 역할. 어두운 배경색(#03110f 등)은 그대로 둬요
 const COLORS = {
@@ -25,7 +24,9 @@ const COLORS = {
 };
 const theme = code => code
   .replace(/#(045f64|c6f56f|12161f|9fd4d6|e8f3f2|0b3b3e)\b/gi, (_, h) => COLORS[h.toLowerCase()])
-  .replace(/(["'`])\/(avatars|logos|photos|audio|services|images)\//g, `$1${SITE}/$2/`); // 사진·로고·소리는 원래 사이트 것을 써요
+  // 사용 예시의 사진·로고 파일은 원래 사이트에도 없어요. 로고는 Tween UI 미리보기처럼 아이콘 서비스로, 사진은 자리 표시 사진으로 바꿔요
+  .replace(/(["'`])\/logos\/([a-z0-9]+?)(?:-dark)?\.svg/g, '$1https://api.iconify.design/simple-icons/$2.svg')
+  .replace(/(["'`])\/(?:photos|avatars|services|images)\/([\w-]+)\.(?:jpe?g|png|webp)/g, '$1https://picsum.photos/seed/$2/960/640');
 
 export async function buildTweenPreviews(list, outDir) {
   fs.rmSync(src, { recursive: true, force: true });
