@@ -75,4 +75,13 @@ for (let i = 0; i < changed.length; i += BATCH) {
 }
 if (plan.deleted.length) await call('/ingest/delete', { ids: plan.deleted });
 console.log('관계', await call('/ingest/edges', { hash: edgesHash, edges }));
+// 글에서 관계 뽑기(Claude): 아직 안 읽었거나 내용이 바뀐 자료만. 실패하면 다음 배포 때 다시 시도돼요
+const todo = await call('/ingest/extract-plan', {});
+let aiEdges = 0;
+for (let i = 0; i < todo.ids.length; i += todo.batch) {
+  const r = await call('/ingest/extract', { ids: todo.ids.slice(i, i + todo.batch) });
+  aiEdges += r.edges;
+  console.log(`관계 추출 ${Math.min(i + todo.batch, todo.ids.length)} / ${todo.ids.length}`);
+}
+console.log({ 관계추출: todo.ids.length, 새관계: aiEdges });
 console.log({ added: plan.added, updated: plan.updated, deleted: plan.deleted.length, unchanged: docs.length - changed.length });

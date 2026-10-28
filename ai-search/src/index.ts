@@ -7,7 +7,18 @@ const RETRIEVE = 20; // 벡터 검색으로 먼저 고르는 조각 수
 const TOP = 10; // 재정렬 후 Claude에 보내는 자료 수
 const HOP_PER_SEED = 3, HOP_MAX = 12; // 그래프에서 찾은 자료의 이웃을 이만큼 더 후보에 넣어요
 // 관계 이름 (edges.rel) → 사람이 읽는 말
-const REL_KO: Record<string, string> = { compare: "비교 대상", mentions: "관련", code: "코드 버전", uses: "함께 씀" };
+const REL_KO: Record<string, string> = { compare: "비교 대상", mentions: "관련", code: "코드 버전", uses: "함께 씀", kind_of: "상위 개념" };
+// 글에서 관계를 뽑을 때 쓰는 모델과 한 번에 읽는 자료 수. 자료가 바뀐 것만 다시 읽어요
+const EXTRACT_MODEL = "claude-sonnet-5-5";
+const EXTRACT_SOURCES = ["ui-glossary", "tween"];
+const EXTRACT_BATCH = 10;
+const EXTRACT_SYSTEM = `당신은 UI 자료 사이의 관계를 찾아요. 각 <자료>를 읽고, <목록>에 있는 다른 자료와의 관계를 적어요.
+관계 종류:
+- compare: 헷갈리기 쉬워서 차이를 설명하는 상대 (Popover ↔ Tooltip, Switch ↔ Checkbox)
+- kind_of: 이 자료가 저 자료의 한 종류 (Alert dialog → Dialog)
+- uses: 이 자료 안에 저 부품이 들어가거나 함께 쓰임 (Dialog → Button)
+- code: 코드 컴포넌트가 어떤 용어의 움직이는 버전인지 (Sliding Tabs → Tabs)
+규칙: 자료 본문에 근거가 있는 것만, 자료당 최대 6개, 자기 자신은 빼요. dst는 반드시 <목록>의 id예요. why는 한 문장이에요.`;
 const MAX_QUESTION = 200;
 const EMBED_BATCH = 50;
 
@@ -45,10 +56,15 @@ const placeholders = (n: number) => Array(n).fill("?").join(",");
 
 // ───── 그래프 ─────
 // 마이그레이션 없이도 동작하게 Worker가 표를 만들어요 (migrations/0002_graph.sql과 같은 모양)
-const ensureEdges = (env: Env) => env.DB.batch([
-  env.DB.prepare("CREATE TABLE IF NOT EXISTS edges (src TEXT NOT NULL, rel TEXT NOT NULL, dst TEXT NOT NULL, weight REAL NOT NULL DEFAULT 1, PRIMARY KEY (src, rel, dst))"),
-  env.DB.prepare("CREATE INDEX IF NOT EXISTS edges_dst ON edges (dst)"),
-]);
+// origin: data(데이터에 적힌 관계) / ai(글에서 Claude가 뽑은 관계). extracted는 자료별로 어떤 내용을 읽었는지(해시) 기억해요
+async function ensureEdges(env: Env) {
+  await env.DB.batch([
+    env.DB.prepare("CREATE TABLE IF NOT EXISTS edges (src TEXT NOT NULL, rel TEXT NOT NULL, dst TEXT NOT NULL, weight REAL NOT NULL DEFAULT 1, PRIMARY KEY (src, rel, dst))"),
+    env.DB.prepare("CREATE INDEX IF NOT EXISTS edges_dst ON edges (dst)"),
+    env.DB.prepare("CREATE TABLE IF NOT EXISTS extracted (doc_id TEXT PRIMARY KEY, hash TEXT NOT NULL, extracted_at TEXT NOT NULL)"),
+  ]);
+  await env.DB.prepare("ALTER TABLE edges ADD COLUMN origin TEXT NOT NULL DEFAULT 'data'").run().catch(() => {}); // 이미 있으면 넘어가요
+}
 
 // 주어진 자료들에 닿아 있는 관계를 모두 가져와요 (양방향)
 async function edgesAround(env: Env, ids: string[]) {
@@ -316,19 +332,95 @@ async function remove(env: Env, ids: string[]) {
 async function putEdges(env: Env, body: { hash: string; edges: Edge[] }) {
   await ensureEdges(env);
   if ((await getMeta(env, "edges_hash")) === body.hash) return { edges: body.edges.length, unchanged: true };
-  await env.DB.batch([env.DB.prepare("DELETE FROM edges")]);
+  await env.DB.batch([env.DB.prepare("DELETE FROM edges WHERE origin = 'data'")]);
   for (let i = 0; i < body.edges.length; i += 100) {
     await env.DB.batch(body.edges.slice(i, i + 100).map(e =>
-      env.DB.prepare("INSERT OR REPLACE INTO edges (src, rel, dst, weight) VALUES (?, ?, ?, ?)").bind(e.src, e.rel, e.dst, e.weight ?? 1)));
+      env.DB.prepare("INSERT OR REPLACE INTO edges (src, rel, dst, weight, origin) VALUES (?, ?, ?, ?, 'data')").bind(e.src, e.rel, e.dst, e.weight ?? 1)));
   }
   await env.DB.batch([setMeta(env, "edges_hash", body.hash)]);
   return { edges: body.edges.length, unchanged: false };
 }
 
+// 글에서 관계 뽑기: 아직 안 읽었거나 내용이 바뀐 자료 목록
+async function extractPlan(env: Env) {
+  await ensureEdges(env);
+  const { results } = await env.DB.prepare(
+    `SELECT d.id FROM docs d LEFT JOIN extracted x ON x.doc_id = d.id WHERE d.source IN (${placeholders(EXTRACT_SOURCES.length)}) AND (x.hash IS NULL OR x.hash != d.hash) ORDER BY d.id`,
+  ).bind(...EXTRACT_SOURCES).all<{ id: string }>();
+  return { ids: results.map(r => r.id), batch: EXTRACT_BATCH };
+}
+
+// 자료 묶음(최대 EXTRACT_BATCH개)을 Claude에게 읽혀 관계를 뽑고, 그 자료의 이전 ai 관계를 바꿔 넣어요
+async function extract(env: Env, ids: string[]) {
+  await ensureEdges(env);
+  ids = [...new Set(ids)].slice(0, EXTRACT_BATCH);
+  if (!ids.length) return { extracted: 0, edges: 0 };
+  const { results: catalog } = await env.DB.prepare(`SELECT id, title FROM docs WHERE source IN (${placeholders(EXTRACT_SOURCES.length)}) ORDER BY id`).bind(...EXTRACT_SOURCES).all<{ id: string; title: string }>();
+  const { results: docs } = await env.DB.prepare(
+    `SELECT d.id, d.title, d.hash, c.text FROM docs d JOIN chunks c ON c.doc_id = d.id AND c.n = 0 WHERE d.id IN (${placeholders(ids.length)})`,
+  ).bind(...ids).all<{ id: string; title: string; hash: string; text: string }>();
+  if (!docs.length) return { extracted: 0, edges: 0 };
+  const catalogIds = catalog.map(c => c.id);
+
+  const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
+  const msg = await client.beta.messages.create({
+    model: EXTRACT_MODEL,
+    max_tokens: 4000,
+    betas: ["server-side-fallback-2026-07-01"],
+    fallbacks: "default",
+    output_config: {
+      effort: "low",
+      format: {
+        type: "json_schema",
+        schema: {
+          type: "object",
+          properties: {
+            relations: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  src: { type: "string", enum: docs.map(d => d.id) },
+                  rel: { type: "string", enum: ["compare", "kind_of", "uses", "code"] },
+                  dst: { type: "string", enum: catalogIds },
+                  why: { type: "string" },
+                },
+                required: ["src", "rel", "dst", "why"],
+                additionalProperties: false,
+              },
+            },
+          },
+          required: ["relations"],
+          additionalProperties: false,
+        },
+      },
+    },
+    system: EXTRACT_SYSTEM,
+    messages: [{
+      role: "user",
+      content: `<목록>\n${catalog.map(c => `${c.id} | ${c.title}`).join("\n")}\n</목록>\n\n${docs.map(d => `<자료 id="${d.id}">\n${d.text}\n</자료>`).join("\n")}`,
+    }],
+  });
+  const block = msg.content.find(b => b.type === "text");
+  if (msg.stop_reason === "refusal" || !block || block.type !== "text") throw new Error("관계를 뽑지 못했어요");
+  const { relations } = JSON.parse(block.text) as { relations: { src: string; rel: string; dst: string; why: string }[] };
+  const WEIGHT: Record<string, number> = { compare: 1, kind_of: 1, code: 1, uses: 0.7 };
+  const good = relations.filter(r => r.src !== r.dst && docs.some(d => d.id === r.src) && catalogIds.includes(r.dst)).slice(0, docs.length * 6);
+
+  const now = new Date().toISOString();
+  await env.DB.batch([
+    ...docs.map(d => env.DB.prepare("DELETE FROM edges WHERE origin = 'ai' AND src = ?").bind(d.id)),
+    // 데이터에 이미 있는 같은 관계는 그대로 두고(IGNORE), 새 것만 넣어요
+    ...good.map(r => env.DB.prepare("INSERT OR IGNORE INTO edges (src, rel, dst, weight, origin) VALUES (?, ?, ?, ?, 'ai')").bind(r.src, r.rel, r.dst, WEIGHT[r.rel] ?? 0.7)),
+    ...docs.map(d => env.DB.prepare("INSERT OR REPLACE INTO extracted (doc_id, hash, extracted_at) VALUES (?, ?, ?)").bind(d.id, d.hash, now)),
+  ]);
+  return { extracted: docs.length, edges: good.length };
+}
+
 async function stats(env: Env) {
   const { results } = await env.DB.prepare("SELECT source, COUNT(*) AS docs FROM docs GROUP BY source").all();
-  const edges = await env.DB.prepare("SELECT COUNT(*) AS n FROM edges").first<{ n: number }>().catch(() => null);
-  return { sources: results, edges: edges?.n ?? 0, embedModel: await getMeta(env, "embed_model"), indexedAt: await getMeta(env, "indexed_at") };
+  const { results: edges } = await env.DB.prepare("SELECT origin, COUNT(*) AS n FROM edges GROUP BY origin").all<{ origin: string; n: number }>().catch(() => ({ results: [] }));
+  return { sources: results, edges, embedModel: await getMeta(env, "embed_model"), indexedAt: await getMeta(env, "indexed_at") };
 }
 
 // ───── HTTP ─────
@@ -405,6 +497,8 @@ export default {
         if (pathname === "/ingest/upsert") return reply(await upsert(env, body.docs));
         if (pathname === "/ingest/delete") return reply(await remove(env, body.ids));
         if (pathname === "/ingest/edges") return reply(await putEdges(env, body));
+        if (pathname === "/ingest/extract-plan") return reply(await extractPlan(env));
+        if (pathname === "/ingest/extract") return reply(await extract(env, body.ids ?? []));
       }
       return reply({ error: "없는 경로예요." }, 404);
     } catch (err) {
