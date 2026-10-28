@@ -47,7 +47,7 @@ const bySource = {};
 for (const d of docs) bySource[d.source] = (bySource[d.source] || 0) + 1;
 console.log(`추출: 문서 ${docs.length}개, 청크 ${docs.reduce((n, d) => n + d.chunks.length, 0)}개`, bySource);
 // 관계(그래프): 문서 사이의 연결. 전체를 한 번에 올리고, 내용이 같으면 Worker가 건너뛰어요
-const edges = buildEdges(docs, { glossaryHtml: path.join(configDir, '..', 'UI', 'ui-glossary.html'), tweenJson: path.join(configDir, 'data', 'tween.json') });
+const edges = buildEdges(docs, { termCodeJson: path.join(configDir, 'data', 'term-code.json'), tweenJson: path.join(configDir, 'data', 'tween.json') });
 const edgesHash = crypto.createHash('sha256').update(JSON.stringify(edges)).digest('hex');
 const byRel = {};
 for (const e of edges) byRel[e.rel] = (byRel[e.rel] || 0) + 1;

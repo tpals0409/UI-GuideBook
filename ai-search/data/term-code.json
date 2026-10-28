@@ -1,0 +1,143 @@
+{
+ "button": [
+  "shiny-button",
+  "glow-button",
+  "text-roll-button",
+  "dot-bloom-button",
+  "focus-frame-button"
+ ],
+ "icon-button": [
+  "icon-trail-button",
+  "spring-tooltip"
+ ],
+ "tabs": [
+  "sliding-tabs",
+  "tab-wipe"
+ ],
+ "tooltip": [
+  "spring-tooltip"
+ ],
+ "accordion": [
+  "faq-accordion"
+ ],
+ "dialog": [
+  "auth-modal"
+ ],
+ "carousel": [
+  "arc-carousel",
+  "image-fan-slider",
+  "shutter-slider",
+  "rating-carousel"
+ ],
+ "navigation-bar": [
+  "navbar-pill-glide",
+  "navbar-gooey-bloom"
+ ],
+ "top-app-bar": [
+  "navbar-pill-glide",
+  "navbar-corner-panel",
+  "navbar-push-menu"
+ ],
+ "hamburger": [
+  "navbar-push-menu",
+  "navbar-corner-panel"
+ ],
+ "mega-menu": [
+  "navbar-gooey-bloom"
+ ],
+ "loading-indicator": [
+  "loader-line-fold",
+  "loader-iris-ring"
+ ],
+ "linear-progress": [
+  "loader-line-fold"
+ ],
+ "avatar": [
+  "avatar-reveal"
+ ],
+ "stat-card": [
+  "number-counter"
+ ],
+ "card": [
+  "flip-card",
+  "card-hover-expand",
+  "card-spotlight-grid"
+ ],
+ "stepper": [
+  "process-card-reveal",
+  "process-sticky-steps"
+ ],
+ "timeline": [
+  "process-card-reveal"
+ ],
+ "hero": [
+  "cta-photo-headline",
+  "cta-starfall",
+  "infinite-rotating-cards"
+ ],
+ "marquee": [
+  "logo-wave",
+  "logo-cycle"
+ ],
+ "shimmer": [
+  "shiny-button"
+ ],
+ "tilt": [
+  "card-spotlight-grid"
+ ],
+ "hover-lift": [
+  "card-hover-expand",
+  "blog-hover-expand"
+ ],
+ "scroll-reveal": [
+  "wordmark-reveal",
+  "column-drift"
+ ],
+ "typewriter": [
+  "morphing-text"
+ ],
+ "gradient-border": [
+  "glow-button"
+ ],
+ "sticky": [
+  "process-sticky-steps"
+ ],
+ "segmented": [
+  "pricing-plan-switch"
+ ],
+ "slider": [
+  "pricing-usage-slider"
+ ],
+ "microinteraction": [
+  "magnetic-button",
+  "text-roll-button",
+  "icon-trail-button"
+ ],
+ "magnetic": [
+  "magnetic-button"
+ ],
+ "text-roll": [
+  "text-roll-button",
+  "slide-arrow-button"
+ ],
+ "sliding-highlight": [
+  "sliding-tabs",
+  "navbar-pill-glide"
+ ],
+ "count-up": [
+  "number-counter",
+  "pricing-plan-switch"
+ ],
+ "line-draw": [
+  "svg-draw",
+  "integration-hub"
+ ],
+ "card-flip": [
+  "flip-card"
+ ],
+ "stagger": [
+  "avatar-reveal",
+  "grid-cascade",
+  "auth-modal"
+ ]
+}

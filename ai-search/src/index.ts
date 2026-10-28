@@ -328,6 +328,20 @@ async function remove(env: Env, ids: string[]) {
   return { deleted: ids.length };
 }
 
+// 사이트가 모달에 '관련' 칩을 그릴 때 쓰는 그래프 전체 (관계 + 관계에 나오는 자료의 제목·주소)
+async function graphAll(env: Env) {
+  await ensureEdges(env);
+  const { results: edges } = await env.DB.prepare("SELECT src, rel, dst, origin FROM edges").all<{ src: string; rel: string; dst: string; origin: string }>();
+  const ids = [...new Set(edges.flatMap(e => [e.src, e.dst]))];
+  const nodes: Record<string, { title: string; url: string; source: string }> = {};
+  for (let i = 0; i < ids.length; i += 100) {
+    const part = ids.slice(i, i + 100);
+    const { results } = await env.DB.prepare(`SELECT id, title, url, source FROM docs WHERE id IN (${placeholders(part.length)})`).bind(...part).all<{ id: string; title: string; url: string; source: string }>();
+    for (const d of results) nodes[d.id] = { title: d.title, url: d.url, source: d.source };
+  }
+  return { nodes, edges };
+}
+
 // 관계 전체를 받아 바꿔 넣어요. 내용 해시가 같으면 건너뛰어요
 async function putEdges(env: Env, body: { hash: string; edges: Edge[] }) {
   await ensureEdges(env);
@@ -450,6 +464,9 @@ export default {
     // 페이지·검색은 Access로 잠긴 사이트 주소에서만 열어요. 다른 주소(workers.dev)는 관리용 경로만 받아요.
     if (hostname !== env.SITE_HOST && !isAdminPath) return new Response("Not found", { status: 404 });
     if (hostname === env.SITE_HOST && pathname === "/") return Response.redirect(new URL("/UI/ui-glossary.html", req.url).href, 302);
+    if (hostname === env.SITE_HOST && pathname === "/graph" && req.method === "GET") {
+      return Response.json(await graphAll(env), { headers: { "Cache-Control": "public, max-age=300" } }); // 5분 캐시
+    }
     if (hostname === env.SITE_HOST && pathname !== "/search" && pathname !== "/palette" && !isAdminPath) {
       const res = await env.ASSETS.fetch(req);
       if (!pathname.endsWith(".md") || !res.ok) return res;

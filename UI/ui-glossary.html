@@ -116,9 +116,12 @@ body[data-view]:not([data-view=terms]) :is(#app,#empty,#ai,#ai-panel){display:no
 .an-re{position:absolute;right:10px;bottom:10px;z-index:2;border:0;border-radius:999px;background:rgb(255 255 255/.92);color:#141414;font:inherit;font-size:12.5px;padding:6px 12px;cursor:pointer}
 .mo-acts{display:flex;flex-wrap:wrap;gap:8px}
 .mo-acts .mo-act.sub{background:var(--ui-surface);color:var(--ui-text);box-shadow:inset 0 0 0 1px var(--ui-line)}
-.dt-tween .tw-list{display:flex;flex-wrap:wrap;gap:6px}
-.dt-tween .tw-list button{border:1px solid var(--ui-line);background:var(--ui-surface);color:var(--ui-text);font:inherit;font-size:13px;border-radius:999px;padding:6px 12px;cursor:pointer}
-.dt-tween .tw-list button:hover{border-color:var(--ui-text)}
+.rel-groups{display:flex;flex-direction:column;gap:8px}
+.rel-g{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.rel-g>span{font-size:12px;color:var(--ui-muted);min-width:64px}
+.rel-g button{border:1px solid var(--ui-line);background:var(--ui-surface);color:var(--ui-text);font:inherit;font-size:13px;border-radius:999px;padding:5px 11px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.rel-g button:hover{border-color:var(--ui-text)}
+.rel-g button .pill{font-size:10px;padding:1px 5px}
 .docs a[aria-current=page]{background:var(--ui-surface);font-weight:600;box-shadow:inset 0 0 0 1px var(--ui-line)}
 .docs a[aria-current=page]::before{content:'';position:absolute;left:4px;top:9px;bottom:9px;width:3px;border-radius:2px;background:var(--ui-accent)}
 .mo{padding:4px 28px 64px;max-width:1480px;width:100%;margin:0 auto}
@@ -205,7 +208,7 @@ html:has(.dt[open]){overflow:hidden}
 .dt-body{flex:1;min-height:0;padding:16px 22px 22px;overflow:auto;display:flex;flex-direction:column;gap:14px}
 .dt-body .desc{font-size:15px}
 .dt .dt-demo{min-height:340px;padding:32px 24px}
-.dt-how h3,.dt-tween h3,.dt-demo-l{font-size:13px;margin:0 0 8px;color:var(--ui-muted);font-weight:600}
+.dt-how h3,.dt-rel h3,.dt-demo-l{font-size:13px;margin:0 0 8px;color:var(--ui-muted);font-weight:600}
 .dt-how ol{margin:0;padding:0;list-style:none;counter-reset:s;display:flex;flex-direction:column;gap:8px}
 .dt-how li{counter-increment:s;display:flex;gap:10px;font-size:14px;align-items:flex-start}
 .dt-how li::before{content:counter(s);flex:none;width:22px;height:22px;margin-top:1px;border-radius:50%;background:var(--ui-soft);color:var(--ui-accent);font-size:12px;font-weight:700;display:grid;place-items:center}
@@ -399,6 +402,7 @@ html:has(.dt[open]){overflow:hidden}
     <p class="desc"></p>
     <div><p class="dt-demo-l">직접 해 보기</p><div class="demo dt-demo an-stage"></div></div>
     <section class="an-src"><h3 class="dt-demo-l">코드</h3><dl></dl><div class="mo-acts"><button class="mo-act" data-copy="code">코드 복사</button><button class="mo-act sub" data-copy="install">설치 명령 복사</button></div><div class="an-files"></div><p class="tp-note an-credit"></p></section>
+    <section class="dt-rel" hidden><h3>관련</h3><div class="rel-groups"></div></section>
     <details class="dt-theme"><summary>예시 테마</summary><div class="dt-theme-row"><div><p class="tp-h">글꼴</p><div class="dd" data-kind="font" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><input class="font-q" type="search" autocomplete="off" spellcheck="false" aria-label="글꼴 검색" placeholder="글꼴 검색 (예: 명조, 손글씨, Pretendard)"><div class="dd-list" role="listbox" aria-label="글꼴"></div></div></div></div><div><p class="tp-h">색</p><div class="dd" data-kind="pal" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><input class="font-q" type="search" autocomplete="off" spellcheck="false" aria-label="색 검색" placeholder="색·회사 검색 (예: 토스, Kakao)"><div class="dd-list" role="listbox" aria-label="색 팔레트"></div></div></div></div><div><p class="tp-h">아이콘</p><div class="dd" data-kind="icon" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><div class="dd-list" role="listbox" aria-label="아이콘"></div></div></div></div></div><div class="tp-actions"><button type="button" class="tp-act" data-act="hex">Hex 코드 복사</button></div></details>
   </div>
   <div class="dt-foot"><button class="btn sm text an-prev-b">‹ 이전</button><span class="an-pos"></span><button class="btn sm text an-next-b">다음 ›</button></div>
@@ -410,7 +414,7 @@ html:has(.dt[open]){overflow:hidden}
     <p class="desc"></p>
     <div><p class="dt-demo-l">직접 해 보기</p><div class="demo dt-demo"></div></div>
     <section class="dt-how"><h3>동작 방식</h3><ol></ol></section>
-    <section class="dt-tween" hidden><h3>코드 갤러리</h3><div class="tw-list"></div></section>
+    <section class="dt-rel" hidden><h3>관련</h3><div class="rel-groups"></div></section>
     <p class="diff"></p>
     <details class="dt-theme"><summary>예시 테마</summary><div class="dt-theme-row"><div><p class="tp-h">글꼴</p><div class="dd" data-kind="font" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><input class="font-q" type="search" autocomplete="off" spellcheck="false" aria-label="글꼴 검색" placeholder="글꼴 검색 (예: 명조, 손글씨, Pretendard)"><div class="dd-list" role="listbox" aria-label="글꼴"></div></div></div></div><div><p class="tp-h">색</p><div class="dd" data-kind="pal" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><input class="font-q" type="search" autocomplete="off" spellcheck="false" aria-label="색 검색" placeholder="색·회사 검색 (예: 토스, Kakao)"><div class="dd-list" role="listbox" aria-label="색 팔레트"></div></div></div></div><div><p class="tp-h">아이콘</p><div class="dd" data-kind="icon" data-scope="global"><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"></button><div class="dd-pop" hidden><div class="dd-list" role="listbox" aria-label="아이콘"></div></div></div></div></div><div class="tp-actions"><button type="button" class="tp-act" data-act="hex">Hex 코드 복사</button></div></details>
   </div>
@@ -2134,7 +2138,7 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
     const v=anList.length?anList:an,i=v.findIndex(x=>x.name===name);
     $('.an-pos',anDlg).textContent=i<0?'':`${i+1} / ${v.length}`;
     $('.an-prev-b',anDlg).disabled=i<=0;$('.an-next-b',anDlg).disabled=i<0||i>=v.length-1;
-    $('.dt-body',anDlg).scrollTop=0;drawAll();
+    $('.dt-body',anDlg).scrollTop=0;drawAll();drawRel('tween:'+name,anDlg);
     if(!anDlg.open)anDlg.showModal();
     const box=$('.an-stage',anDlg);box.innerHTML='<button class="an-re" type="button">다시 재생</button>';box.style.height='';mount(box,e,false);$('iframe',box).tabIndex=0;$('iframe',box).removeAttribute('aria-hidden');$('iframe',box).title=`${e.title} 미리보기`;
     history.replaceState(null,'','#anim/'+name);
@@ -2155,25 +2159,41 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
   });
   $('#an-x').onclick=()=>anDlg.close();
   anDlg.addEventListener('close',()=>{$('.an-stage',anDlg).innerHTML='';history.replaceState(null,'','#anim')}); // 닫으면 미리보기도 멈춰요
-  // 용어 모달 → 비슷한 애니메이션 코드 (용어 id → Tween UI 이름)
-  const TWEEN_FOR={
-    button:['shiny-button','glow-button','text-roll-button','dot-bloom-button','focus-frame-button'],'icon-button':['icon-trail-button','spring-tooltip'],
-    tabs:['sliding-tabs','tab-wipe'],tooltip:['spring-tooltip'],accordion:['faq-accordion'],dialog:['auth-modal'],carousel:['arc-carousel','image-fan-slider','shutter-slider','rating-carousel'],
-    'navigation-bar':['navbar-pill-glide','navbar-gooey-bloom'],'top-app-bar':['navbar-pill-glide','navbar-corner-panel','navbar-push-menu'],hamburger:['navbar-push-menu','navbar-corner-panel'],'mega-menu':['navbar-gooey-bloom'],
-    'loading-indicator':['loader-line-fold','loader-iris-ring'],'linear-progress':['loader-line-fold'],avatar:['avatar-reveal'],'stat-card':['number-counter'],card:['flip-card','card-hover-expand','card-spotlight-grid'],
-    stepper:['process-card-reveal','process-sticky-steps'],timeline:['process-card-reveal'],hero:['cta-photo-headline','cta-starfall','infinite-rotating-cards'],marquee:['logo-wave','logo-cycle'],
-    shimmer:['shiny-button'],tilt:['card-spotlight-grid'],'hover-lift':['card-hover-expand','blog-hover-expand'],'scroll-reveal':['wordmark-reveal','column-drift'],typewriter:['morphing-text'],
-    'gradient-border':['glow-button'],sticky:['process-sticky-steps'],segmented:['pricing-plan-switch'],slider:['pricing-usage-slider'],microinteraction:['magnetic-button','text-roll-button','icon-trail-button'],
-    magnetic:['magnetic-button'],'text-roll':['text-roll-button','slide-arrow-button'],'sliding-highlight':['sliding-tabs','navbar-pill-glide'],'count-up':['number-counter','pricing-plan-switch'],
-    'line-draw':['svg-draw','integration-hub'],'card-flip':['flip-card'],stagger:['avatar-reveal','grid-cascade','auth-modal'],
-  };
-  const drawTween=id=>{
-    const sec=$('#detail .dt-tween'),names=TWEEN_FOR[id]||[];sec.hidden=!names.length;if(!names.length)return;
-    anLoad().then(()=>{const items=names.map(n=>an.find(x=>x.name===n)).filter(Boolean);sec.hidden=!items.length;$('.tw-list',sec).innerHTML=items.map(e=>`<button type="button" data-n="${esc(e.name)}">${esc(e.ko||e.title)}</button>`).join('')});
-  };
-  $('#detail .dt-tween').addEventListener('click',e=>{const b=e.target.closest('[data-n]');if(!b)return;const d=$('#detail');d.addEventListener('close',()=>{$('#q').value='';setView('anim');anOpen(b.dataset.n)},{once:true});d.close()}); // 용어 모달이 닫힌 뒤에 열어요(주소가 지워지지 않게)
   addEventListener('keydown',e=>{if(e.key==='/'&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)){e.preventDefault();$('#q').focus()}});
   filter();
+
+  // ───── 관련 항목: Worker의 /graph(자료 사이의 관계)를 받아 모달에 칩으로 보여줘요 ─────
+  // 관계는 배포 때 데이터에서 뽑은 것과 Claude가 글에서 뽑은 것이에요. 사이트에서 열었을 때만 있어요
+  let graph=null;
+  const graphLoad=()=>graph?Promise.resolve(graph):!location.protocol.startsWith('http')?Promise.resolve(null):fetch('/graph').then(r=>r.ok?r.json():null).catch(()=>null).then(g=>graph=g);
+  // 관계 이름과 방향에 따른 표시 (src → dst 를 어느 쪽에서 보느냐)
+  const REL_LABEL={compare:['비교 대상','비교 대상'],kind_of:['상위 개념','하위 종류'],uses:['함께 씀','쓰이는 곳'],code:['코드 버전','용어'],mentions:['관련','관련']};
+  const REL_ORDER=['compare','kind_of','code','uses','mentions'];
+  const SRC_PILL={'ui-glossary':'용어',tween:'코드',motion:'영상',docs:'문서'};
+  const drawRel=(docId,box)=>{
+    const sec=$('.dt-rel',box);sec.hidden=true;
+    graphLoad().then(g=>{
+      if(!g||!g.nodes[docId])return;
+      const groups={};
+      for(const e of g.edges){
+        if(e.src!==docId&&e.dst!==docId)continue;
+        const out=e.src===docId,other=out?e.dst:e.src,n=g.nodes[other];if(!n)continue;
+        const label=(REL_LABEL[e.rel]||[e.rel,e.rel])[out?0:1];
+        (groups[label]||=new Map()).set(other,n);
+      }
+      const order=l=>{const i=REL_ORDER.findIndex(r=>REL_LABEL[r].includes(l));return i<0?99:i};
+      const html=Object.entries(groups).sort((a,b)=>order(a[0])-order(b[0])).map(([label,m])=>`<div class="rel-g"><span>${esc(label)}</span>${[...m.values()].slice(0,8).map(n=>`<button type="button" data-url="${esc(n.url)}"><span class="pill">${SRC_PILL[n.source]||n.source}</span>${esc(n.title.replace(/ \(.*\)$/,''))}</button>`).join('')}</div>`).join('');
+      if(!html)return;$('.rel-groups',sec).innerHTML=html;sec.hidden=false;
+    });
+  };
+  // 칩을 누르면 그 항목을 열어요 (지금 열린 모달은 닫고 주소로 이동)
+  document.addEventListener('click',e=>{
+    const b=e.target.closest('.rel-g button');if(!b)return;
+    const url=b.dataset.url;if(!url.startsWith('UI/ui-glossary.html#'))return window.open('../'+url,'_blank','noopener');
+    const h=url.slice('UI/ui-glossary.html#'.length),d=b.closest('dialog');
+    const go=()=>{if(location.hash==='#'+h)route();else location.hash=h};
+    if(d?.open){d.addEventListener('close',go,{once:true});d.close()}else go();
+  });
 
   // 상세 모달: 카드를 누르면 같은 데모를 크게 다시 그리고 동작 방식을 보여줘요
   const dlg=$('#detail'),dDemo=$('.dt-demo',dlg);let cur=null;
@@ -2188,7 +2208,7 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
     $('.desc',dlg).innerHTML=t.desc;
     $('.diff',dlg).innerHTML=t.diff?`<b>차이</b>${t.diff}`:'';$('.diff',dlg).hidden=!t.diff;
     $('.dt-how ol',dlg).innerHTML=(HOW[id]||[]).map(s=>`<li>${s}</li>`).join('');
-    drawTween(id);
+    drawRel('ui-glossary:'+id,dlg);
     dDemo.innerHTML=uniq(t.demo);drawTerm();
     try{t.init?.(dDemo)}catch(err){console.error(id,err)}
     const v=visible(),i=v.indexOf(id);
