@@ -101,7 +101,6 @@ body[data-view]:not([data-view=terms]) :is(#app,#empty,#ai,#ai-panel){display:no
 .demo.an-stage{position:relative;overflow:hidden;padding:0;display:block}
 .an-stage iframe{position:absolute;left:0;top:0;border:0;transform-origin:0 0;opacity:0;transition:opacity .25s;background:transparent}
 .an-stage iframe.on{opacity:1}
-.an-tile .an-stage iframe{pointer-events:none}
 .dt .an-stage{height:min(56vh,520px);min-height:300px}
 .an-src{display:flex;flex-direction:column;gap:10px}
 .an-src dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0;font-size:13px}
@@ -2075,14 +2074,18 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
     let f=$('iframe',box);
     if(!f){f=document.createElement('iframe');f.className='tp';f.tabIndex=-1;f.title='';f.setAttribute('aria-hidden','true');box.append(f)}
     // 컴포넌트가 무대보다 넓으면 그려진 뒤 폭에 맞게 줄여요
-    f.onload=()=>{themeFrame(f);setTimeout(()=>{try{const el=f.contentDocument.querySelector('#root>div'),sw=Math.max(el.scrollWidth,...[...el.querySelectorAll(':scope>*,:scope>*>*')].map(c=>c.getBoundingClientRect().width)),w=box.clientWidth;if(e.kind!=='block'&&sw>w){const k=w/(sw+24);Object.assign(f.style,{width:w/k+'px',height:box.clientHeight/k+'px',transform:`scale(${k})`})}}catch{}f.classList.add('on')},250)};
+    f.onload=()=>{themeFrame(f);
+      // 타일 무대 안도 마우스로 직접 만져 볼 수 있어요(올리기·누르기로 움직이는 컴포넌트가 많아서). 누르면 상세가 열려요
+      if(box.closest('.an-tile'))try{f.contentDocument.addEventListener('click',()=>anOpen(e.name))}catch{}
+      setTimeout(()=>{try{const el=f.contentDocument.querySelector('#root>div'),sw=Math.max(el.scrollWidth,...[...el.querySelectorAll(':scope>*,:scope>*>*')].map(c=>c.getBoundingClientRect().width)),w=box.clientWidth;if(e.kind!=='block'&&sw>w){const k=w/(sw+24);Object.assign(f.style,{width:w/k+'px',height:box.clientHeight/k+'px',transform:`scale(${k})`})}}catch{}f.classList.add('on')},250)};
     fit(f,box,e.kind);f.classList.remove('on');f.src=PREVIEW(e.name,still);
   };
   const tileIO=new IntersectionObserver(es=>es.forEach(x=>{if(!x.isIntersecting)return;tileIO.unobserve(x.target);const t=x.target;mount($('.an-stage',t),anOf(t.dataset.n),true)}),{rootMargin:'300px'});
   const anTile=e=>e.target.closest?.('.an-tile');
   const tilePlay=(t,on)=>{if(reduced()&&on)return;const box=$('.an-stage',t);if(!$('iframe',box))return;t.dataset.live=on?'1':'';mount(box,anOf(t.dataset.n),!on)};
   $('#an-grid').addEventListener('mouseover',e=>{const t=anTile(e);if(t&&!t.contains(e.relatedTarget)&&!t.dataset.live)tilePlay(t,true)});
-  $('#an-grid').addEventListener('mouseout',e=>{const t=anTile(e);if(t&&!t.contains(e.relatedTarget)&&t.dataset.live)tilePlay(t,false)});
+  // 무대 iframe 안으로 들어갈 때도 mouseout이 와요. 정말 타일을 벗어났는지(:hover) 확인하고 멈춰요
+  $('#an-grid').addEventListener('mouseout',e=>{const t=anTile(e);if(t&&t.dataset.live)setTimeout(()=>{if(!t.matches(':hover'))tilePlay(t,false)},60)});
   $('#an-grid').addEventListener('focusin',e=>{const t=anTile(e);if(t&&!t.dataset.live)tilePlay(t,true)});
   $('#an-grid').addEventListener('focusout',e=>{const t=anTile(e);if(t&&t.dataset.live)tilePlay(t,false)});
   // 상세: 용어 모달과 같은 모양 (직접 해 보기 → 예시 테마 → 코드)

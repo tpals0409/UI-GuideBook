@@ -38,7 +38,9 @@ export async function buildTweenPreviews(list, outDir) {
     }
     if (e.demo) {
       fs.mkdirSync(path.join(src, 'examples'), { recursive: true });
-      fs.writeFileSync(path.join(src, 'examples', `${e.name}-demo.tsx`), theme(e.demo));
+      // 몇몇 예시는 레이아웃 파일(<html><body>…)이라 그대로 그리면 아무것도 안 보여요. 겉 태그만 빼요
+      const demo = e.demo.replace(/<html[^>]*>|<body[^>]*>/g, '<>').replace(/<\/html>|<\/body>/g, '</>');
+      fs.writeFileSync(path.join(src, 'examples', `${e.name}-demo.tsx`), theme(demo));
     }
   }
   fs.mkdirSync(path.join(src, 'lib'), { recursive: true });
