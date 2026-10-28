@@ -9,6 +9,7 @@ import { buildFontList } from './fonts.mjs';
 import { buildCompanyList } from './companies.mjs';
 import { buildMotionList } from './motion.mjs';
 import { build as bundle } from 'rolldown';
+import { buildTweenList, savedTweenList } from './tween.mjs';
 
 const configDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const root = path.join(configDir, '..'); // 개발 체크리스트 폴더
@@ -44,6 +45,9 @@ fs.writeFileSync(path.join(out, 'companies.json'), JSON.stringify(companies));
 // 모션 예시 (prompt-motion). 받아오지 못하면 저장해 둔 목록을 써요
 const motion = await buildMotionList().catch(err => { console.warn(`모션 예시를 새로 받지 못했어요: ${err.message}`); return JSON.parse(fs.readFileSync(path.join(configDir, 'data', 'motion.json'), 'utf8')); });
 fs.writeFileSync(path.join(out, 'motion.json'), JSON.stringify(motion));
+// 애니메이션 코드 모음 (Tween UI). 받아오지 못하면 저장해 둔 목록을 써요
+const tween = await buildTweenList().catch(err => { console.warn(`애니메이션 코드를 새로 받지 못했어요: ${err.message}`); return savedTweenList(); });
+fs.writeFileSync(path.join(out, 'tween.json'), JSON.stringify(tween));
 // 움직이는 아이콘: 쓰는 아이콘만 묶은 작은 스크립트
 await bundle({ input: path.join(configDir, 'scripts', 'icons-entry.mjs'), output: { file: path.join(out, 'UI', 'icons.js'), format: 'iife', minify: true }, logLevel: 'warn' });
-console.log(`public/에 ${files.length}개 파일, 문서 목록(${docs.length}개), 글꼴 목록(${fonts.length}개), 회사 팔레트(${companies.length}개), 모션 예시(${motion.length}개)를 만들었어요`);
+console.log(`public/에 ${files.length}개 파일, 문서 목록(${docs.length}개), 글꼴 목록(${fonts.length}개), 회사 팔레트(${companies.length}개), 모션 예시(${motion.length}개), 애니메이션 코드(${tween.length}개)를 만들었어요`);
