@@ -390,7 +390,7 @@ const P={
   inbox:'M4 13l3-8h10l3 8v6H4zM4 13h5l1 2h4l1-2h5',folder:'M3 6h6l2 2h10v11H3z',file:'M6 3h8l4 4v14H6zM14 3v4h4',
   share:'M12 3v12M7 8l5-5 5 5M5 14v6h14v-6','arrow-up':'M12 19V5M5 12l7-7 7 7',grid:'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z',
 };
-const ic=(n,s=20)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${n==='more'?3:2}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${P[n]}"/></svg>`;
+const ic=(n,s=20)=>`<svg data-ic="${n}" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${n==='more'?3:2}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${P[n]}"/></svg>`;
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const TERMS=[];
 const add=(cat,list)=>list.forEach(t=>TERMS.push({...t,cat}));
@@ -1931,6 +1931,27 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
   $('.dt-prev',dlg).onclick=()=>step(-1);$('.dt-next',dlg).onclick=()=>step(1);
   dlg.addEventListener('keydown',e=>{if(e.target.closest('.dt-demo'))return;if(e.key==='ArrowLeft')step(-1);if(e.key==='ArrowRight')step(1)});
   dlg.addEventListener('close',()=>{if(dlg.open)return;dDemo.innerHTML='';history.replaceState(null,'',location.pathname);$('#'+cur)?.focus({preventScroll:true})});
+
+  // ───── 움직이는 아이콘: ic()로 그린 아이콘을 @animateicons(Lucide 모양) 아이콘으로 바꿔요 ─────
+  // 배포 때 만든 icons.js가 있을 때만(사이트에서 열었을 때). 없으면 지금 아이콘 그대로예요.
+  // 버튼·링크에 마우스를 올리면 그 안의 아이콘이, 타일에 올리면 타일 안의 아이콘이 한 번 움직여요.
+  const upIcons=root=>{
+    const A=window.AnimIcons;if(!A||!root.querySelectorAll)return;
+    for(const old of [...(root.matches?.('svg[data-ic]')?[root]:[]),...root.querySelectorAll('svg[data-ic]')]){
+      const d=A.icons[old.dataset.ic];if(!d||!old.isConnected)continue;
+      const svg=A.renderIcon(d,+old.getAttribute('width')||20);
+      svg.setAttribute('aria-hidden','true');svg.setAttribute('data-up',old.dataset.ic);
+      old.replaceWith(svg);svg._p=A.play(svg,d);
+    }
+  };
+  const iconHost=t=>t.closest?.('.card,.mo-card,button,a,label,summary,[role=button],[role=tab],[role=menuitem]');
+  document.addEventListener('mouseover',e=>{const h=iconHost(e.target);if(h&&!h.contains(e.relatedTarget))h.querySelectorAll('svg[data-up]').forEach(s=>s._p?.start())});
+  document.addEventListener('focusin',e=>{const h=iconHost(e.target);if(h)h.querySelectorAll('svg[data-up]').forEach(s=>s._p?.start())});
+  if(location.protocol.startsWith('http')){
+    const sc=document.createElement('script');sc.src='icons.js';
+    sc.onload=()=>{upIcons(document.body);new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(upIcons))).observe(document.body,{childList:true,subtree:true})};
+    document.head.append(sc);
+  }
 
   // 주소에 #용어가 있으면, 아래 초기화(테마 등)가 끝난 뒤 그 용어를 열어요
   queueMicrotask(()=>{
