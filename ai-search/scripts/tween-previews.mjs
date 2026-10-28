@@ -28,6 +28,10 @@ const theme = code => code
   .replace(/(["'`])\/logos\/([a-z0-9]+?)(?:-dark)?\.svg/g, '$1https://api.iconify.design/simple-icons/$2.svg')
   .replace(/(["'`])\/(?:photos|avatars|services|images)\/([\w-]+)\.(?:jpe?g|png|webp)/g, '$1https://picsum.photos/seed/$2/960/640');
 
+// 스크롤해야 움직이는 예시 (타일 안에는 스크롤할 공간이 없어서 자동 스크롤로 보여줘요)
+const SCROLLY = ['wordmark-reveal', 'column-drift', 'testimonial-reel-focus', 'process-sticky-steps', 'footer-wordmark-rise', 'footer-pulse-links',
+  'gyro-gallery', 'testimonial-ring', 'kinetic-type-ring', 'navbar-pill-glide', 'navbar-push-menu', 'navbar-gooey-bloom', 'navbar-corner-panel'];
+
 export async function buildTweenPreviews(list, outDir) {
   fs.rmSync(src, { recursive: true, force: true });
   for (const e of list) {
@@ -62,6 +66,8 @@ body{font-family:var(--demo-font,"Gmarket Sans",-apple-system,BlinkMacSystemFont
 #root{min-height:100vh;display:flex;align-items:center;justify-content:center}
 #root>div{width:100%;display:flex;justify-content:center;align-items:center} /* w-full 컴포넌트가 0 폭이 되지 않게 */
 #root>.block{display:block;align-self:stretch}
+/* 스크롤로 움직이는 예시: 위아래에 여백을 두고 자동으로 스크롤해요 */
+.scrolly #root{display:block;min-height:0;padding:50vh 0 50vh}
 `);
   fs.writeFileSync(path.join(src, 'preview.html'), `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>미리보기</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/GmarketSans/GmarketSans.css"></head>
@@ -72,17 +78,35 @@ import { createRoot } from 'react-dom/client';
 // 사용 예시 파일마다 따로 쪼개 불러와요 (하나 열 때 그 코드만 받아요)
 const demos = import.meta.glob('./examples/*-demo.tsx');
 const BLOCKS = new Set(${JSON.stringify(blocks)});
+// 페이지 스크롤에 맞춰 움직이는 것들 (ScrollTrigger·스크롤 위치를 씀)
+const SCROLLY = new Set(${JSON.stringify(SCROLLY)});
+const still = new URLSearchParams(location.search).has('still');
 const n = new URLSearchParams(location.search).get('n') || '';
 const load = demos['./examples/' + n + '-demo.tsx'];
 const root = createRoot(document.getElementById('root')!);
 if (!load) root.render(<p>미리보기가 없어요: {n}</p>);
 else load().then((m: any) => { const Demo = m.default; root.render(<div className={BLOCKS.has(n) ? 'block' : ''}><Demo /></div>); });
 // ?still=1: 목록 썸네일용. 등장 애니메이션이 끝날 즈음(1.8초) 멈춰서 정지 화면처럼 보여요
-if (new URLSearchParams(location.search).has('still')) setTimeout(async () => {
+if (still) setTimeout(async () => {
   const { gsap } = await import('gsap');
   gsap.globalTimeline.pause();
   document.documentElement.classList.add('still');
 }, 1800);
+// 움직이는 미리보기에서는 스크롤 예시를 위→아래로 천천히 자동 스크롤하고 반복해요. 직접 휠·터치로 스크롤하면 멈춰요
+if (!still && SCROLLY.has(n) && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  document.documentElement.classList.add('scrolly');
+  let y = 0, on = true;
+  const stop = () => { on = false; };
+  addEventListener('wheel', stop, { passive: true }); addEventListener('touchstart', stop, { passive: true });
+  const max = () => document.documentElement.scrollHeight - innerHeight;
+  const step = () => {
+    if (!on) return;
+    y += Math.max(2, max() / 420);
+    if (y >= max()) { scrollTo(0, max()); setTimeout(() => { y = 0; scrollTo(0, 0); requestAnimationFrame(step); }, 1500); return; }
+    scrollTo(0, y); requestAnimationFrame(step);
+  };
+  setTimeout(() => requestAnimationFrame(step), 700);
+}
 `);
   fs.writeFileSync(path.join(src, 'tsconfig.json'), JSON.stringify({ compilerOptions: { jsx: 'react-jsx', baseUrl: '.', paths: { '@/*': ['./*'] } } }));
   await build({
