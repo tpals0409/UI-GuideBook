@@ -33,9 +33,9 @@ jobs:
           cache-dependency-path: ai-search/package-lock.json
       - run: npm ci
       - run: npm run typecheck
-      - run: npm test
-      # html과 .md 문서를 public/에 모은 뒤 Worker를 빌드해요
+      # html과 .md 문서를 public/에 모은 뒤 Worker를 빌드해요 (스모크 테스트가 public/의 회사·글꼴 자료를 읽어서 빌드가 먼저예요)
       - run: npm run build
+      - run: npm test
       - run: npx cf deploy --prebuilt --mode production --dry-run
 
       - name: 배포
