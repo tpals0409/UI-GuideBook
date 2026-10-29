@@ -67,17 +67,22 @@ export async function edgesAround(env: Env, ids: string[]) {
 
 // ───── 검색 ─────
 // 같은 질문은 Claude를 다시 부르지 않아요 (answers 표). 색인·관계가 바뀌면 clearAnswers로 표를 비워요.
-// ponytail: TTL 없음, 표가 커지면 created_at 오래된 것부터 지우기
+// 키는 소문자·공백 하나·문장 부호 제거 뒤의 해시예요 ("툴팁 차이?"와 "툴팁 차이"가 같은 답). 표는 최근 MAX_ANSWERS개만 남겨요 (TTL 없음).
+const MAX_ANSWERS = 1000;
+const logErr = (where: string) => (e: unknown) => { console.error(where, e); return null; }; // D1 문제는 Workers Logs에서 보고, 요청은 계속 처리해요
 export async function search(env: Env, q: string, source?: string, model?: string) {
   if (model) return answer(env, q, source, model); // 모델 비교 실험(관리자 전용): 캐시를 거치지 않아요
-  const key = await sha(`${q.toLowerCase().replace(/\s+/g, " ")}|${source ?? ""}`);
-  const hit = await env.DB.prepare("SELECT body FROM answers WHERE key = ?").bind(key).first<{ body: string }>().catch(() => null); // 표가 아직 없으면 캐시 없이 동작
+  const key = await sha(`${q.toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, "").replace(/\s+/g, " ").trim()}|${source ?? ""}`);
+  const hit = await env.DB.prepare("SELECT body FROM answers WHERE key = ?").bind(key).first<{ body: string }>().catch(logErr("answers read"));
   if (hit) return JSON.parse(hit.body) as Awaited<ReturnType<typeof answer>>;
   const r = await answer(env, q, source);
-  await env.DB.prepare("INSERT OR REPLACE INTO answers (key, body, created_at) VALUES (?, ?, ?)").bind(key, JSON.stringify(r), new Date().toISOString()).run().catch(() => {});
+  await env.DB.batch([
+    env.DB.prepare("INSERT OR REPLACE INTO answers (key, body, created_at) VALUES (?, ?, ?)").bind(key, JSON.stringify(r), new Date().toISOString()),
+    env.DB.prepare("DELETE FROM answers WHERE key NOT IN (SELECT key FROM answers ORDER BY created_at DESC LIMIT ?)").bind(MAX_ANSWERS),
+  ]).catch(logErr("answers write"));
   return r;
 }
-const clearAnswers = (env: Env) => env.DB.prepare("DELETE FROM answers").run().catch(() => {});
+const clearAnswers = (env: Env) => env.DB.prepare("DELETE FROM answers").run().catch(logErr("answers clear"));
 
 async function answer(env: Env, q: string, source?: string, model?: string) {
   const experiment = model !== undefined; // 모델을 명시한 실험 요청이면 usage를 붙여요 (기본 모델과 같아도)
@@ -442,7 +447,7 @@ async function extract(env: Env, ids: string[]) {
 async function stats(env: Env) {
   const { results } = await env.DB.prepare("SELECT source, COUNT(*) AS docs FROM docs GROUP BY source").all();
   const { results: edges } = await env.DB.prepare("SELECT origin, COUNT(*) AS n FROM edges GROUP BY origin").all<{ origin: string; n: number }>().catch(() => ({ results: [] }));
-  const cached = (await env.DB.prepare("SELECT COUNT(*) AS n FROM answers").first<{ n: number }>().catch(() => null))?.n ?? 0;
+  const cached = (await env.DB.prepare("SELECT COUNT(*) AS n FROM answers").first<{ n: number }>().catch(logErr("answers count")))?.n ?? 0;
   return { sources: results, edges, cachedAnswers: cached, embedModel: await getMeta(env, "embed_model"), indexedAt: await getMeta(env, "indexed_at") };
 }
 

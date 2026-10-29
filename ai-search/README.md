@@ -84,10 +84,16 @@ AI 버튼은 사이트(`https://` 주소)에서 열 때 자동으로 나타나�
 
 추출기는 `{ id, source, title, text, url, tags }` 모양의 배열만 돌려주면 돼요. `url`은 `개발 체크리스트` 폴더 기준 경로예요.
 
+## 테스트
+
+- `npm test` — 네트워크·비용 없이 다 돌아요. 추출기·그래프·조각 단위 테스트와, 가짜 AI·메모리 D1로 Worker 전체를 돌리는 스모크 테스트(ingest → 검색·캐시 → 그래프 → MCP → 주소별 라우팅)예요. CI가 배포 전에 실행해요.
+- `node test/harness.mjs` — 같은 가짜 Worker를 :8812에 띄워 두고 손으로 눌러 봐요. 자료 넣기는 `AI_SEARCH_URL=http://localhost:8812 ADMIN_TOKEN=secret-token npm run ingest`.
+
 ## 설정
 
 - 허용할 페이지 출처: `cloudflare.config.ts`의 `ALLOWED_ORIGINS` (기본값 `https://ui.leo0409.work`). 다른 주소에서도 검색을 쓰려면 쉼표로 추가해요.
 - 요청 제한: IP당 1분에 10회 (`RATE_LIMITER`)
+- 외부 자료(회사 팔레트·모션·Tween)는 푸시할 때와 매주 월요일 아침 배포 때 새로 받아요. 의존성 업데이트 PR은 Dependabot이 매주 보내요.
 - 임베딩 모델을 바꾸면 Vectorize 인덱스를 새 차원으로 다시 만들고 `npm run ingest -- --full`을 실행해요.
 - 로그: Workers Logs가 켜져 있어요(`observability`). 대시보드 Workers → dev-reference-ai-search → Logs에서 요청·오류를 봐요. 실시간은 `npx wrangler tail dev-reference-ai-search`.
 - 답 생성 모델 바꾸기: `src/index.ts`의 `CLAUDE_MODEL`. 바꾸기 전에 Actions 탭의 "Compare models"를 수동 실행하면 두 모델의 답·자료·토큰·시간을 나란히 비교한 `compare.md`가 artifact로 나와요.

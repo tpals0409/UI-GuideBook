@@ -1,0 +1,14 @@
+# 의존성 업데이트 PR을 매주 받아요. PR에서는 빌드·테스트·배포 dry run만 돌아서 안전해요.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /ai-search
+    schedule:
+      interval: weekly
+    groups:
+      all: # 한 PR로 묶어요
+        patterns: ["*"]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

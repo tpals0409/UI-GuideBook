@@ -1,5 +1,6 @@
 # main에 푸시하면 사이트(ui.leo0409.work)를 배포하고 AI 검색 색인을 갱신해요.
 # PR에서는 빌드와 배포 점검(dry run)만 해요.
+# 매주 월요일 아침(KST)에도 한 번 돌아서 외부 자료(회사 팔레트·모션 예시·Tween 코드)를 새로 받아요. 푸시가 없어도 오래되지 않게요.
 name: Deploy
 
 on:
@@ -7,6 +8,8 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+  schedule:
+    - cron: '0 21 * * 0' # 일요일 21:00 UTC = 월요일 06:00 KST
 
 # 배포가 겹치지 않게 하나씩 실행해요
 concurrency:

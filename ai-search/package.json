@@ -9,7 +9,7 @@
     "typecheck": "cf workers types && tsc",
     "ingest": "node scripts/ingest.mjs",
     "build": "node scripts/build-site.mjs && cf build",
-    "test": "node --test"
+    "test": "node --test 'test/*.test.mjs'"
   },
   "devDependencies": {
     "@animateicons/vanilla": "0.2.0",
