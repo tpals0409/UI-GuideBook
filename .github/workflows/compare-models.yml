@@ -1,0 +1,26 @@
+# 검색 모델 비교 실험. Actions 탭에서 수동으로 실행하면 compare.md를 artifact로 올려요.
+# ADMIN_TOKEN은 Actions secret에만 있어서 로컬에 토큰이 없어도 돌아가요. (Claude 호출 20회)
+name: Compare models
+
+on:
+  workflow_dispatch:
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ai-search
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - run: node scripts/compare-models.mjs > compare.md
+        env:
+          AI_SEARCH_URL: https://dev-reference-ai-search.tpals0409dev.workers.dev
+          ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: compare
+          path: ai-search/compare.md
