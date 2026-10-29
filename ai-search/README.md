@@ -89,6 +89,8 @@ AI 버튼은 사이트(`https://` 주소)에서 열 때 자동으로 나타나�
 - 허용할 페이지 출처: `cloudflare.config.ts`의 `ALLOWED_ORIGINS` (기본값 `https://ui.leo0409.work`). 다른 주소에서도 검색을 쓰려면 쉼표로 추가해요.
 - 요청 제한: IP당 1분에 10회 (`RATE_LIMITER`)
 - 임베딩 모델을 바꾸면 Vectorize 인덱스를 새 차원으로 다시 만들고 `npm run ingest -- --full`을 실행해요.
+- 로그: Workers Logs가 켜져 있어요(`observability`). 대시보드 Workers → dev-reference-ai-search → Logs에서 요청·오류를 봐요. 실시간은 `npx wrangler tail dev-reference-ai-search`.
+- 답 생성 모델 바꾸기: `src/index.ts`의 `CLAUDE_MODEL`. 바꾸기 전에 Actions 탭의 "Compare models"를 수동 실행하면 두 모델의 답·자료·토큰·시간을 나란히 비교한 `compare.md`가 artifact로 나와요.
 
 ## 관리용 API (`Authorization: Bearer <ADMIN_TOKEN>` 필요)
 

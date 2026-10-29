@@ -15,6 +15,8 @@ export default defineConfig({
     previewUrls: false,
     // 모든 요청을 Worker가 먼저 받아서, 주소에 따라 페이지를 보여줄지 정해요
     assets: { runWorkerFirst: true },
+    // Workers Logs: 대시보드(Workers → Logs)에서 요청·오류 로그를 봐요. 보관은 Cloudflare 기본값(일부 무료)이에요
+    observability: { logs: { enabled: true } },
     env: {
       ASSETS: bindings.assets(),
       AI: bindings.ai({ dev: { remote: true } }),

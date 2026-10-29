@@ -54,16 +54,8 @@ async function embed(env: Env, texts: string[]) {
 const placeholders = (n: number) => Array(n).fill("?").join(",");
 
 // ───── 그래프 ─────
-// 마이그레이션 없이도 동작하게 Worker가 표를 만들어요 (migrations/0002_graph.sql과 같은 모양)
+// 표는 migrations/0002_graph.sql이 만들어요 (새 DB는 migrations apply 필요)
 // origin: data(데이터에 적힌 관계) / ai(글에서 Claude가 뽑은 관계). extracted는 자료별로 어떤 내용을 읽었는지(해시) 기억해요
-async function ensureEdges(env: Env) {
-  await env.DB.batch([
-    env.DB.prepare("CREATE TABLE IF NOT EXISTS edges (src TEXT NOT NULL, rel TEXT NOT NULL, dst TEXT NOT NULL, weight REAL NOT NULL DEFAULT 1, PRIMARY KEY (src, rel, dst))"),
-    env.DB.prepare("CREATE INDEX IF NOT EXISTS edges_dst ON edges (dst)"),
-    env.DB.prepare("CREATE TABLE IF NOT EXISTS extracted (doc_id TEXT PRIMARY KEY, hash TEXT NOT NULL, extracted_at TEXT NOT NULL)"),
-  ]);
-  await env.DB.prepare("ALTER TABLE edges ADD COLUMN origin TEXT NOT NULL DEFAULT 'data'").run().catch(() => {}); // 이미 있으면 넘어가요
-}
 
 // 주어진 자료들에 닿아 있는 관계를 모두 가져와요 (양방향)
 export async function edgesAround(env: Env, ids: string[]) {
@@ -348,7 +340,6 @@ async function remove(env: Env, ids: string[]) {
 
 // 사이트가 모달에 '관련' 칩을 그릴 때 쓰는 그래프 전체 (관계 + 관계에 나오는 자료의 제목·주소)
 async function graphAll(env: Env) {
-  await ensureEdges(env);
   const { results: edges } = await env.DB.prepare("SELECT src, rel, dst, origin FROM edges").all<{ src: string; rel: string; dst: string; origin: string }>();
   const ids = [...new Set(edges.flatMap(e => [e.src, e.dst]))];
   const nodes: Record<string, { title: string; url: string; source: string }> = {};
@@ -362,7 +353,6 @@ async function graphAll(env: Env) {
 
 // 관계 전체를 받아 바꿔 넣어요. 내용 해시가 같으면 건너뛰어요
 async function putEdges(env: Env, body: { hash: string; edges: Edge[] }) {
-  await ensureEdges(env);
   if ((await getMeta(env, "edges_hash")) === body.hash) return { edges: body.edges.length, unchanged: true };
   await env.DB.batch([env.DB.prepare("DELETE FROM edges WHERE origin = 'data'")]);
   for (let i = 0; i < body.edges.length; i += 100) {
@@ -376,7 +366,6 @@ async function putEdges(env: Env, body: { hash: string; edges: Edge[] }) {
 
 // 글에서 관계 뽑기: 아직 안 읽었거나 내용이 바뀐 자료 목록
 async function extractPlan(env: Env) {
-  await ensureEdges(env);
   const { results } = await env.DB.prepare(
     `SELECT d.id FROM docs d LEFT JOIN extracted x ON x.doc_id = d.id WHERE d.source IN (${placeholders(EXTRACT_SOURCES.length)}) AND (x.hash IS NULL OR x.hash != d.hash) ORDER BY d.id`,
   ).bind(...EXTRACT_SOURCES).all<{ id: string }>();
@@ -385,7 +374,6 @@ async function extractPlan(env: Env) {
 
 // 자료 묶음(최대 EXTRACT_BATCH개)을 Claude에게 읽혀 관계를 뽑고, 그 자료의 이전 ai 관계를 바꿔 넣어요
 async function extract(env: Env, ids: string[]) {
-  await ensureEdges(env);
   ids = [...new Set(ids)].slice(0, EXTRACT_BATCH);
   if (!ids.length) return { extracted: 0, edges: 0 };
   const { results: catalog } = await env.DB.prepare(`SELECT id, title FROM docs WHERE source IN (${placeholders(EXTRACT_SOURCES.length)}) ORDER BY id`).bind(...EXTRACT_SOURCES).all<{ id: string; title: string }>();
