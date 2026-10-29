@@ -12,6 +12,7 @@
   },
   "devDependencies": {
     "@animateicons/vanilla": "0.2.0",
+    "@cloudflare/vite-plugin": "^2.0.0-beta.v.7",
     "@gsap/react": "2.1.2",
     "@number-flow/react": "0.6.2",
     "@tailwindcss/vite": "4.3.3",
