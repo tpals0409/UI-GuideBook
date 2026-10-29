@@ -17,7 +17,7 @@ GitHub Actions의 `CLOUDFLARE_API_TOKEN` 권한: Account — Workers Scripts Edi
 질문을 받으면 관련 자료를 찾아(RAG) Claude가 짧게 답하고, 근거가 된 자료 목록을 돌려줘요.
 
 ```
-질문 → 임베딩(Workers AI bge-m3) → Vectorize 상위 20개 (+ 관계 그래프 이웃) → 재정렬 → 상위 10개 → Claude Opus 5.5 → 답변 + 자료 목록
+질문 → 임베딩(Workers AI bge-m3) → Vectorize 상위 20개 (+ 관계 그래프 이웃) → 재정렬 → 상위 10개 → Claude Sonnet 5.5 → 답변 + 자료 목록
 ```
 
 - API 키는 Worker의 secret에만 있어요. html에는 Worker 주소만 들어가요.

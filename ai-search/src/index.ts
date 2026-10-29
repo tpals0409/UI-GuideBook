@@ -3,7 +3,7 @@ import { mcpFetch } from "./mcp.ts";
 
 // 임베딩 모델을 바꾸면 Vectorize 인덱스 차원도 맞춰야 하고, `npm run ingest -- --full`로 전체를 다시 색인해야 해요.
 const EMBED_MODEL = "@cf/baai/bge-m3"; // 한국어를 포함한 다국어 임베딩, 1024차원. 질문-자료 점수 매기기(재정렬)에도 써요.
-const CLAUDE_MODEL = "claude-opus-5-5";
+const CLAUDE_MODEL = "claude-sonnet-5-5"; // 2026-10-29 비교: Opus 5.5와 답·자료 거의 같고 더 빨라서 바꿨어요 (scripts/compare-models.mjs)
 const RETRIEVE = 20; // 벡터 검색으로 먼저 고르는 조각 수
 const TOP = 10; // 재정렬 후 Claude에 보내는 자료 수
 const HOP_PER_SEED = 3, HOP_MAX = 12; // 그래프에서 찾은 자료의 이웃을 이만큼 더 후보에 넣어요
