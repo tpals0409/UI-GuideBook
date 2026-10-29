@@ -87,7 +87,9 @@ export async function search(env: Env, q: string, source?: string, model?: strin
 }
 const clearAnswers = (env: Env) => env.DB.prepare("DELETE FROM answers").run().catch(() => {});
 
-async function answer(env: Env, q: string, source?: string, model = CLAUDE_MODEL) {
+async function answer(env: Env, q: string, source?: string, model?: string) {
+  const experiment = model !== undefined; // 모델을 명시한 실험 요청이면 usage를 붙여요 (기본 모델과 같아도)
+  model ??= CLAUDE_MODEL;
   const empty = { answer: "관련 자료를 찾지 못했어요. 다른 말로 다시 물어봐 주세요.", results: [] };
   const [vec] = await embed(env, [q]);
   const found = await env.VECTORIZE.query(vec, { topK: RETRIEVE, ...(source ? { filter: { source } } : {}) });
@@ -194,7 +196,7 @@ async function answer(env: Env, q: string, source?: string, model = CLAUDE_MODEL
     .map(x => { const d = byId.get(x.other)!; return { id: x.other, title: d.title, url: d.url, source: d.source, rel: REL_KO[x.rel] ?? x.rel }; });
   return {
     answer: parsed.answer,
-    ...(model !== CLAUDE_MODEL && { usage }), // 실험 때만 붙여요
+    ...(experiment && { usage }), // 실험 때만 붙여요
     results: parsed.results.filter(r => byId.has(r.id)).map(r => {
       const t = byId.get(r.id)!;
       return { id: r.id, title: t.title, source: t.source, url: t.url, reason: r.reason, related: relatedOf(r.id) };

@@ -4,3 +4,4 @@ node_modules/
 .env*
 public/
 .tween-build/
+compare.md
