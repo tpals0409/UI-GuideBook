@@ -47,3 +47,12 @@
 ## 비밀값
 
 API 키와 관리용 토큰은 Cloudflare Worker의 secret에만 저장돼 있고, 이 저장소에는 없어요. `.env*` 파일은 `.gitignore`로 제외돼요.
+
+## Claude Code 플러그인
+
+ui-ref MCP와 디자인 스킬(`/designer`, `/grill-me`, `/show-me`)을 한 번에 설치해요. 자세한 건 [plugin/README.md](plugin/README.md).
+
+```bash
+claude plugin marketplace add tpals0409/UI-GuideBook
+claude plugin install ui-guidebook@ui-guidebook
+```

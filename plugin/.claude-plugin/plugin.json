@@ -1,0 +1,8 @@
+{
+  "name": "ui-guidebook",
+  "description": "UI 용어·회사 디자인 시스템·애니메이션 코드·모션 프롬프트 참고 자료(ui-ref MCP)와 디자인 스킬 3개(designer, grill-me, show-me)",
+  "version": "1.0.0",
+  "author": { "name": "SeMin Kim" },
+  "homepage": "https://github.com/tpals0409/UI-GuideBook",
+  "keywords": ["design", "ui", "design-system", "palette", "mcp"]
+}

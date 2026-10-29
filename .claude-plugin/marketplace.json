@@ -1,0 +1,15 @@
+{
+  "$schema": "https://code.claude.com/schemas/marketplace.json",
+  "name": "ui-guidebook",
+  "description": "UI GuideBook: 디자인 참고 자료 MCP와 디자인 스킬",
+  "owner": { "name": "SeMin Kim" },
+  "plugins": [
+    {
+      "name": "ui-guidebook",
+      "source": "./plugin",
+      "description": "ui-ref MCP(용어·회사 디자인 시스템·코드·모션 프롬프트) + 스킬: designer(토큰·디자인 시스템 만들기), grill-me(브리프 확정 질문), show-me(A/B 시안)",
+      "repository": "https://github.com/tpals0409/UI-GuideBook",
+      "keywords": ["design", "ui", "design-system", "palette", "mcp"]
+    }
+  ]
+}
