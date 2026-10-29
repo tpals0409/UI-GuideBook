@@ -30,6 +30,7 @@ jobs:
           cache-dependency-path: ai-search/package-lock.json
       - run: npm ci
       - run: npm run typecheck
+      - run: npm test
       # html과 .md 문서를 public/에 모은 뒤 Worker를 빌드해요
       - run: npm run build
       - run: npx cf deploy --prebuilt --mode production --dry-run

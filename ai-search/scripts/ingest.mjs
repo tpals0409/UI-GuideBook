@@ -11,28 +11,14 @@ import markdown from '../extractors/markdown.mjs';
 import tween from '../extractors/tween.mjs';
 import motion from '../extractors/motion.mjs';
 import buildEdges from './graph.mjs';
+import { chunk } from './chunk.mjs';
 
 const EXTRACTORS = { glossary, markdown, tween, motion };
-const CHUNK = 800, OVERLAP = 100, BATCH = 25;
+const BATCH = 25;
 const here = path.dirname(fileURLToPath(import.meta.url));
 const configDir = path.join(here, '..');
 const root = path.join(configDir, '..'); // 개발 체크리스트 폴더 (url의 기준)
 const args = new Set(process.argv.slice(2));
-
-// 긴 글은 문단 경계를 우선해서 자르고, 앞뒤를 조금 겹쳐요
-function chunk(text) {
-  if (text.length <= CHUNK) return [text];
-  const out = [];
-  for (let i = 0; i < text.length;) {
-    let end = Math.min(i + CHUNK, text.length);
-    const para = text.lastIndexOf('\n', end);
-    if (end < text.length && para > i + CHUNK / 2) end = para;
-    out.push(text.slice(i, end).trim());
-    if (end >= text.length) break;
-    i = end - OVERLAP;
-  }
-  return out;
-}
 
 const docs = sources.flatMap(s => EXTRACTORS[s.extractor]({ ...s, file: path.join(configDir, s.path), root }));
 const ids = new Set();

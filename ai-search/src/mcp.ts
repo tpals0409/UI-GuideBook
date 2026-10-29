@@ -17,7 +17,7 @@ const asset = async (env: Env, base: string, path: string) => {
 };
 
 // 본문은 조각(앞뒤 100자 겹침)으로 저장돼 있어요. 겹치는 부분을 빼고 이어 붙여요
-const joinChunks = ([first = "", ...rest]: string[]) => rest.reduce((acc, p) => {
+export const joinChunks = ([first = "", ...rest]: string[]) => rest.reduce((acc, p) => {
   for (let k = Math.min(140, acc.length, p.length); k > 0; k--) if (acc.endsWith(p.slice(0, k))) return acc + p.slice(k);
   return acc + "\n" + p;
 }, first);
