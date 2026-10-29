@@ -479,7 +479,8 @@ function isAdmin(req: Request, env: Env) {
 export default {
   async fetch(req, env) {
     const { pathname, hostname } = new URL(req.url);
-    const isAdminPath = pathname.startsWith("/ingest/") || pathname === "/stats";
+    // 관리자 토큰이 있는 /search는 workers.dev에서도 받아요 (모델 비교 실험을 Actions에서 돌리기 위해)
+    const isAdminPath = pathname.startsWith("/ingest/") || pathname === "/stats" || (pathname === "/search" && isAdmin(req, env));
     // 페이지·검색은 Access로 잠긴 사이트 주소에서만 열어요. 다른 주소(workers.dev)는 관리용 경로만 받아요.
     if (hostname !== env.SITE_HOST && !isAdminPath) return new Response("Not found", { status: 404 });
     if (hostname === env.SITE_HOST && pathname === "/") return Response.redirect(new URL("/UI/ui-glossary.html", req.url).href, 302);
