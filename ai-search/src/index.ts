@@ -504,7 +504,7 @@ export default {
     try {
       if (pathname === "/search" && req.method === "POST") {
         const ip = req.headers.get("CF-Connecting-IP") ?? "unknown";
-        if (!(await env.RATE_LIMITER.limit({ key: ip })).success) return reply({ error: "잠시 후 다시 시도해 주세요. (1분에 10회까지)" }, 429);
+        if (!isAdmin(req, env) && !(await env.RATE_LIMITER.limit({ key: ip })).success) return reply({ error: "잠시 후 다시 시도해 주세요. (1분에 10회까지)" }, 429);
         const body = await req.json<{ q?: unknown; source?: unknown; model?: unknown }>().catch(() => ({} as { q?: unknown; source?: unknown; model?: unknown }));
         const q = typeof body.q === "string" ? body.q.trim() : "";
         if (!q || q.length > MAX_QUESTION) return reply({ error: `질문은 1~${MAX_QUESTION}자로 입력해 주세요.` }, 400);
