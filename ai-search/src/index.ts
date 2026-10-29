@@ -76,7 +76,8 @@ export async function edgesAround(env: Env, ids: string[]) {
 // ───── 검색 ─────
 // 같은 질문은 Claude를 다시 부르지 않아요 (answers 표). 색인·관계가 바뀌면 clearAnswers로 표를 비워요.
 // ponytail: TTL 없음, 표가 커지면 created_at 오래된 것부터 지우기
-export async function search(env: Env, q: string, source?: string) {
+export async function search(env: Env, q: string, source?: string, model?: string) {
+  if (model) return answer(env, q, source, model); // 모델 비교 실험(관리자 전용): 캐시를 거치지 않아요
   const key = await sha(`${q.toLowerCase().replace(/\s+/g, " ")}|${source ?? ""}`);
   const hit = await env.DB.prepare("SELECT body FROM answers WHERE key = ?").bind(key).first<{ body: string }>().catch(() => null); // 표가 아직 없으면 캐시 없이 동작
   if (hit) return JSON.parse(hit.body) as Awaited<ReturnType<typeof answer>>;
@@ -86,7 +87,7 @@ export async function search(env: Env, q: string, source?: string) {
 }
 const clearAnswers = (env: Env) => env.DB.prepare("DELETE FROM answers").run().catch(() => {});
 
-async function answer(env: Env, q: string, source?: string) {
+async function answer(env: Env, q: string, source?: string, model = CLAUDE_MODEL) {
   const empty = { answer: "관련 자료를 찾지 못했어요. 다른 말로 다시 물어봐 주세요.", results: [] };
   const [vec] = await embed(env, [q]);
   const found = await env.VECTORIZE.query(vec, { topK: RETRIEVE, ...(source ? { filter: { source } } : {}) });
@@ -136,7 +137,7 @@ async function answer(env: Env, q: string, source?: string) {
 
   const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
   const msg = await client.beta.messages.create({
-    model: CLAUDE_MODEL,
+    model,
     max_tokens: 2000,
     betas: ["server-side-fallback-2026-07-01"],
     fallbacks: "default",
@@ -175,6 +176,7 @@ async function answer(env: Env, q: string, source?: string) {
   const block = msg.content.find(b => b.type === "text");
   if (!block || block.type !== "text") throw new Error("응답에 텍스트가 없어요");
   const parsed = JSON.parse(block.text) as { answer: string; results: { id: string; reason: string }[] };
+  const usage = { model: msg.model, input: msg.usage.input_tokens, output: msg.usage.output_tokens };
   const byId = new Map<string, { title: string; url: string; source: string }>(rows.map(r => [r.doc_id, r]));
   // 결과마다 이어지는 자료를 칩으로 붙여요. 후보에 없던 이웃은 제목만 따로 가져와요
   const picked = parsed.results.map(r => r.id).filter(id => byId.has(id));
@@ -192,6 +194,7 @@ async function answer(env: Env, q: string, source?: string) {
     .map(x => { const d = byId.get(x.other)!; return { id: x.other, title: d.title, url: d.url, source: d.source, rel: REL_KO[x.rel] ?? x.rel }; });
   return {
     answer: parsed.answer,
+    ...(model !== CLAUDE_MODEL && { usage }), // 실험 때만 붙여요
     results: parsed.results.filter(r => byId.has(r.id)).map(r => {
       const t = byId.get(r.id)!;
       return { id: r.id, title: t.title, source: t.source, url: t.url, reason: r.reason, related: relatedOf(r.id) };
@@ -502,11 +505,13 @@ export default {
       if (pathname === "/search" && req.method === "POST") {
         const ip = req.headers.get("CF-Connecting-IP") ?? "unknown";
         if (!(await env.RATE_LIMITER.limit({ key: ip })).success) return reply({ error: "잠시 후 다시 시도해 주세요. (1분에 10회까지)" }, 429);
-        const body = await req.json<{ q?: unknown; source?: unknown }>().catch(() => ({} as { q?: unknown; source?: unknown }));
+        const body = await req.json<{ q?: unknown; source?: unknown; model?: unknown }>().catch(() => ({} as { q?: unknown; source?: unknown; model?: unknown }));
         const q = typeof body.q === "string" ? body.q.trim() : "";
         if (!q || q.length > MAX_QUESTION) return reply({ error: `질문은 1~${MAX_QUESTION}자로 입력해 주세요.` }, 400);
         const source = typeof body.source === "string" && body.source.length <= 64 ? body.source : undefined;
-        return reply(await search(env, q, source));
+        // 관리자만: 다른 Claude 모델로 같은 질문을 돌려 보는 실험용 (ADMIN_TOKEN 헤더 + body.model)
+        const model = typeof body.model === "string" && /^claude-[a-z0-9-]+$/.test(body.model) && isAdmin(req, env) ? body.model : undefined;
+        return reply(await search(env, q, source, model));
       }
 
       if (pathname === "/palette" && req.method === "POST") {
