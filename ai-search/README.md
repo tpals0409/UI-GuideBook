@@ -96,6 +96,7 @@ AI 버튼은 사이트(`https://` 주소)에서 열 때 자동으로 나타나�
 - 외부 자료(회사 팔레트·모션·Tween)는 푸시할 때와 매주 월요일 아침 배포 때 새로 받아요. 의존성 업데이트 PR은 Dependabot이 매주 보내요.
 - 임베딩 모델을 바꾸면 Vectorize 인덱스를 새 차원으로 다시 만들고 `npm run ingest -- --full`을 실행해요.
 - 로그: Workers Logs가 켜져 있어요(`observability`). 대시보드 Workers → dev-reference-ai-search → Logs에서 요청·오류를 봐요. 실시간은 `npx wrangler tail dev-reference-ai-search`.
+- 회사 자료(`data/companies.json`)에는 색 8개 외에 상태 색(danger·success·warning), 타이포 스케일, 간격, 분야·느낌 키워드(74곳, oh-my-design의 reference-tags)가 들어 있어요. MCP `company`는 이름이나 영문 키워드(fintech, playful …)로 찾고 글꼴 주소·WCAG 대비·CSS 변수를 같이 줘요.
 - 답 생성 모델 바꾸기: `src/index.ts`의 `CLAUDE_MODEL`. 바꾸기 전에 Actions 탭의 "Compare models"를 수동 실행하면 두 모델의 답·자료·토큰·시간을 나란히 비교한 `compare.md`가 artifact로 나와요.
 
 ## 관리용 API (`Authorization: Bearer <ADMIN_TOKEN>` 필요)

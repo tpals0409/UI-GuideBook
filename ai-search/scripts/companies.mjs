@@ -42,11 +42,19 @@ export function styleOf(md, fonts) {
   const b = block(fm, 'components').match(/type: button\n(?: {4}.+\n)*? {4}rounded:\s*(.+)/);
   if (b) radius.btn = /full|pill|999/.test(b[1]) || parseFloat(b[1]) >= 100 ? '999px' : px(b[1]);
   for (const k in radius) if (!radius[k]) delete radius[k];
+  // 타이포 스케일(h1~h4, body): "크기/굵기/행간"으로 짧게. 간격(xs~xxl)은 px 숫자
+  const type = {};
+  for (const m of block(fm, 'typography').matchAll(/^ {2}(h[1-4]|body):\n((?: {4}.+\n?)+)/gm)) {
+    const g = k => m[2].match(new RegExp(`${k}:\\s*(\\S+)`))?.[1];
+    if (g('fontSize')) type[m[1]] = [g('fontSize'), g('fontWeight') || '400', g('lineHeight') || '-'].join('/');
+  }
+  const spacing = {};
+  for (const m of block(fm, 'spacing').matchAll(/^ {2}(\w+):\s*(\d+(?:\.\d+)?)(?:px)?\s*$/gm)) spacing[m[1]] = +m[2];
   // 글꼴: fonts.roles와 typography의 fontFamily를 순서대로 보고, 목록에 있는 첫 글꼴
   const fams = [...block(fm, 'fonts').matchAll(/^ {4}\w+:\s*(.+)$/gm), ...fm.matchAll(/fontFamily:\s*(.+)/g)]
     .flatMap(m => m[1].split(',')).map(x => x.replace(/['"]/g, '').replace(/ Variable$/, '').trim());
   const font = fams.map(f => fonts.find(x => x.family === f || x.name === f)).find(Boolean);
-  return { ...(Object.keys(radius).length && { radius }), ...(font && { font: font.id }) };
+  return { ...(Object.keys(radius).length && { radius }), ...(font && { font: font.id }), ...(Object.keys(type).length && { type }), ...(Object.keys(spacing).length && { spacing }) };
 }
 
 // 회사마다 이름이 달라서, 흔한 이름부터 차례로 찾아 우리 역할 8개에 맞춰요. 없는 값은 있는 값으로 섞어 만들어요.
@@ -77,6 +85,8 @@ export function toPalette(id, name, c) {
     muted: pick(c, 'muted', 'text-secondary', 'text-muted', 'body', 'secondary', 'slate', 'subtle-text') || mix(text, surface, 0.6),
     border: pick(c, 'hairline', 'border', 'divider', 'outline', 'line') || mix(text, surface, dark ? 0.2 : 0.12),
     ...(dark && { dark: true }),
+    // 상태 색은 회사가 적어 둔 것만 (없으면 빠져요)
+    ...Object.fromEntries([['danger', pick(c, 'danger', 'error', 'negative')], ['success', pick(c, 'success', 'positive')], ['warning', pick(c, 'warning', 'caution')]].filter(e => e[1])),
   };
 }
 
@@ -93,8 +103,11 @@ export async function buildCompanyList(fonts = []) {
   try {
     const tgz = path.join(dir, 'p.tgz');
     fs.writeFileSync(tgz, Buffer.from(await (await fetch(meta.dist.tarball)).arrayBuffer()));
-    execFileSync('tar', ['xzf', tgz, '-C', dir, 'package/data/reference-quality.json', 'package/web/references']);
+    execFileSync('tar', ['xzf', tgz, '-C', dir, 'package/data/reference-quality.json', 'package/data/reference-tags.md', 'package/web/references']);
     const pkg = path.join(dir, 'package');
+    // 분야·느낌 키워드 표 (일부 회사만 있어요). "| id | 색 | 분야 | 키워드, ... |"
+    const tagFile = path.join(pkg, 'data/reference-tags.md');
+    const tags = new Map(fs.existsSync(tagFile) ? [...fs.readFileSync(tagFile, 'utf8').matchAll(/^\| ([a-z0-9-]+) \| #[0-9a-fA-F]+ \| ([^|]+) \| ([^|]+) \|/gm)].map(m => [m[1], { category: m[2].trim(), tags: m[3].split(',').map(t => t.trim()).filter(Boolean) }]) : []);
     const items = JSON.parse(fs.readFileSync(path.join(pkg, 'data/reference-quality.json'), 'utf8')).items;
     const ok = items.map(i => i.id), status = Object.fromEntries(items.map(i => [i.id, i.status]));
     const list = [];
@@ -102,7 +115,7 @@ export async function buildCompanyList(fonts = []) {
       const f = path.join(pkg, 'web/references', id, 'DESIGN.md');
       if (!fs.existsSync(f)) continue;
       const md = fs.readFileSync(f, 'utf8'), r = colorsOf(md);
-      const p = r && { ...toPalette(id, r.name || id, r.c), ...styleOf(md, fonts), ...(status[id] !== 'verified_v2' && { unverified: true }) };
+      const p = r && { ...toPalette(id, r.name || id, r.c), ...styleOf(md, fonts), ...tags.get(id), ...(status[id] !== 'verified_v2' && { unverified: true }) };
       if (!p?.primary) continue;
       // "Classum (클라썸)"처럼 괄호 안에 한글 이름이 있으면 한글만 보여줘요
       const k = ko.get(id) || p.name, m = k.match(/^(.+?) \(([^)]*[가-힣][^)]*)\)$/);

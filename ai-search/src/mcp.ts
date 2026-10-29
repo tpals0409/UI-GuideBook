@@ -22,17 +22,39 @@ export const joinChunks = ([first = "", ...rest]: string[]) => rest.reduce((acc,
   return acc + "\n" + p;
 }, first);
 
-// 회사 팔레트를 바로 붙여 넣을 CSS 변수로
-const css = (c: Company) => {
-  const roles = ["primary", "onPrimary", "primarySoft", "surface", "surface2", "text", "muted", "border"];
-  const r = c.radius || {};
-  return `:root{\n${roles.map(k => `  --${k}: ${c[k]};`).join("\n")}${Object.keys(r).length ? "\n" + Object.entries(r).map(([k, v]) => `  --r-${k}: ${v};`).join("") : ""}\n}`;
+// 회사 팔레트를 바로 붙여 넣을 CSS 변수로 (색 8개 + 상태 색 + 둥글기 + 간격 + 글꼴)
+type Font = { id: string; name: string; family: string; css?: string; license?: string };
+const stack = (f?: Font) => f ? `"${f.family}", system-ui, sans-serif` : "system-ui, sans-serif";
+const css = (c: Company, f?: Font) => {
+  const roles = ["primary", "onPrimary", "primarySoft", "surface", "surface2", "text", "muted", "border", "danger", "success", "warning"].filter(k => c[k]);
+  const lines = [
+    ...roles.map(k => `  --${k}: ${c[k]};`),
+    ...Object.entries(c.radius || {}).map(([k, v]) => `  --r-${k}: ${v};`),
+    ...Object.entries(c.spacing || {}).map(([k, v]) => `  --sp-${k}: ${v}px;`),
+    `  --font-sans: ${stack(f)};`,
+  ];
+  return `:root{\n${lines.join("\n")}\n}`;
 };
+// WCAG 대비: 자주 쓰는 네 쌍이 AA(4.5:1)를 넘는지
+const lum = (h: string) => { const c = [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255).map(v => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; };
+const ratio = (a: string, b: string) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+const contrast = (c: Company) => [["본문/표면", "text", "surface"], ["보조 글자/표면", "muted", "surface"], ["강조색 위 글자/강조색", "onPrimary", "primary"], ["강조색/연한 강조색", "primary", "primarySoft"]]
+  .map(([n, a, b]) => { const v = ratio(c[a], c[b]); return `${n} ${v.toFixed(2)}:1 ${v >= 4.5 ? "AA 통과" : v >= 3 ? "큰 글자만" : "미달"}`; }).join(" · ");
+// 회사 하나를 Claude가 읽기 좋은 글로
+const companyText = (c: Company, f?: Font) => [
+  `# ${c.name}${c.en ? ` (${c.en})` : ""}${c.dark ? " · 어두운 테마" : ""}${c.unverified ? " · 미검증(출처 검증을 아직 마치지 않은 값이라 공식 값과 다를 수 있어요)" : ""}`,
+  `출처: ${c.src} (oh-my-design이 정리한 공개 값, 회사 공식 파일 아님)`,
+  c.category && `분야: ${c.category}${c.tags?.length ? ` · 느낌: ${c.tags.join(", ")}` : ""}`,
+  f && `글꼴: ${f.name} (${f.license || "-"}) ${f.css ? `<link rel="stylesheet" href="${f.css}">` : ""}`,
+  c.type && `타이포(크기/굵기/행간): ${Object.entries(c.type).map(([k, v]) => `${k} ${v}`).join(", ")}`,
+  `대비: ${contrast(c)}`,
+  css(c, f),
+].filter(Boolean).join("\n");
 
 export function makeServer(env: Env, base: string) {
   const server = new McpServer(
     { name: "ui-ref", version: "1.0.0" },
-    { instructions: "UI 용어 126개, 회사 디자인 시스템 514개(oh-my-design), React 애니메이션 컴포넌트 코드 61개(Tween UI), 모션 영상 프롬프트 234개를 담은 참고 자료예요. 색·둥글기·글꼴을 회사 스타일로 맞추려면 company, 컴포넌트 이름·동작을 찾으려면 list→get, 말로 물으려면 search를 써요. id 형식: ui-glossary:<용어>, tween:<이름>, motion:<slug>." },
+    { instructions: "UI 용어 126개, 회사 디자인 시스템 514개(oh-my-design), React 애니메이션 컴포넌트 코드 61개(Tween UI), 모션 영상 프롬프트 234개를 담은 참고 자료예요. 색·둥글기·글꼴을 회사 스타일로 맞추려면 company, 컴포넌트 이름·동작을 찾으려면 list→get, 말로 물으려면 search를 써요. id 형식: ui-glossary:<용어>, tween:<이름>, motion:<slug>. 디자인 팔레트·디자인 시스템·화면 시안을 만들 때는 색·글꼴을 새로 정하기 전에 company로 참고할 회사(이름 또는 fintech·playful 같은 분야·느낌)를 먼저 가져와 토큰의 출발점으로 쓰고, 결과에 출처(회사 이름)를 적어요." },
   );
 
   server.registerTool("search", {
@@ -70,17 +92,21 @@ export function makeServer(env: Env, base: string) {
   });
 
   server.registerTool("company", {
-    description: "실제 회사의 디자인 시스템(색 팔레트·모서리 둥글기·글꼴)을 가져와요. '토스 느낌으로', '당근처럼 둥글게' 같은 요청에 써요. q가 비면 회사 이름 목록만 줘요. 맞으면 CSS 변수 블록까지 같이 줘요.",
-    inputSchema: { q: z.string().max(60).optional().describe("회사 이름 일부 (한글·영문·id)") },
+    description: "실제 회사의 디자인 시스템(색 팔레트·상태 색·모서리 둥글기·간격·타이포 스케일·글꼴)을 CSS 변수와 WCAG 대비 결과까지 가져와요. 디자인 팔레트·디자인 시스템·시안을 만들 때 출발점으로 써요. q는 회사 이름(한글·영문·id)이나 분야·느낌 키워드(fintech, consumer, playful, minimal, korean …). 분야·느낌 키워드는 영문이고 74곳에만 있어요. q가 비면 회사 이름 목록만 줘요.",
+    inputSchema: { q: z.string().max(60).optional().describe("회사 이름 일부, 또는 분야·느낌 키워드(영문)") },
   }, async ({ q }) => {
-    const all = (await asset(env, base, "/companies.json")) as Company[] | null;
+    const [all, fonts] = await Promise.all([asset(env, base, "/companies.json") as Promise<Company[] | null>, asset(env, base, "/fonts.json") as Promise<Font[] | null>]);
     if (!all?.length) return fail("회사 자료가 아직 없어요.");
-    if (!q) return text(all.map(c => c.name + (c.en && c.en !== c.name ? ` (${c.en})` : "")).join(", "));
+    if (!q) return text(all.map(c => c.name + (c.en && c.en !== c.name ? ` (${c.en})` : "") + (c.category ? ` [${c.category}]` : "")).join(", "));
     const k = q.toLowerCase();
-    const hit = all.filter(c => [c.name, c.en, c.id].some(s => s?.toLowerCase().includes(k)));
-    if (!hit.length) return fail(`'${q}'에 맞는 회사가 없어요.`);
-    if (hit.length > 5) return text(`${hit.length}곳이 맞아요. 더 좁혀요: ` + hit.map(c => c.name).join(", "));
-    return text(hit.map(c => `# ${c.name}${c.en ? ` (${c.en})` : ""}${c.dark ? " · 어두운 테마" : ""}${c.unverified ? " · 미검증" : ""}\n출처: ${c.src}\n${JSON.stringify({ font: c.font, radius: c.radius })}\n${css(c)}`).join("\n\n"));
+    // 이름 일치가 먼저, 없으면 분야·느낌 키워드로
+    let hit = all.filter(c => [c.name, c.en, c.id].some(s => s?.toLowerCase().includes(k)));
+    if (!hit.length) hit = all.filter(c => [c.category, ...(c.tags ?? [])].some(s => s?.toLowerCase().includes(k)));
+    if (!hit.length) return fail(`'${q}'에 맞는 회사가 없어요. 이름이나 영문 분야·느낌 키워드(fintech, playful …)로 다시 찾아요.`);
+    // 6~20곳이면 고를 수 있게 한 줄씩 요약, 그보다 많으면 이름만
+    if (hit.length > 20) return text(`${hit.length}곳이 맞아요. 더 좁혀요: ` + hit.map(c => c.name).join(", "));
+    if (hit.length > 5) return text(`${hit.length}곳이 맞아요. 하나를 골라 이름으로 다시 불러요:\n` + hit.map(c => `- ${c.name}${c.en ? ` (${c.en})` : ""}${c.category ? ` [${c.category}]` : ""} 강조색 ${c.primary}${c.dark ? " 어두운 테마" : ""}${c.tags?.length ? ` · ${c.tags.slice(0, 4).join(", ")}` : ""}`).join("\n"));
+    return text(hit.map(c => companyText(c, fonts?.find(f => f.id === c.font))).join("\n\n"));
   });
 
   server.registerTool("graph", {

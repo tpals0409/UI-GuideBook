@@ -59,3 +59,20 @@ test('다른 주소: 관리용 경로와 관리자 /search만 열려요', async 
   assert.ok((await r.json()).usage, '모델을 명시하면 usage가 붙어요');
   assert.equal((await fetch(h.adminUrl + '/stats')).status, 401);
 });
+
+test('MCP company: 분야 키워드로 찾고 글꼴·타이포·대비·CSS 변수를 같이 줘요', async () => {
+  const call = async q => {
+    const r = await post(h.url, '/mcp', { jsonrpc: '2.0', id: 2, method: 'tools/call', params: { name: 'company', arguments: { q } } }, { accept: 'application/json, text/event-stream' });
+    const body = await r.text(); // SSE면 "data: {...}" 줄에 답이 있어요
+    return JSON.parse(body.match(/^data: (.+)$/m)?.[1] ?? body).result.content[0].text;
+  };
+  assert.match(await call('fintech'), /7곳이 맞아요[\s\S]*- 토스 \(Toss\) \[Fintech\] 강조색 #3182f6/); // 여럿이면 한 줄씩 요약
+  const t = await call('banking'); // 토스의 느낌 키워드
+  assert.match(t, /# 토스 \(Toss\)/);
+  assert.match(t, /분야: Fintech/);
+  assert.match(t, /글꼴: Pretendard .*<link rel="stylesheet"/);
+  assert.match(t, /타이포.*h1 36px\/700\/54px/);
+  assert.match(t, /본문\/표면 \d+\.\d\d:1 AA 통과/);
+  assert.match(t, /--danger: #e42939;[\s\S]*--sp-md: 8px;[\s\S]*--font-sans: "Pretendard"/);
+  assert.match(await call('없는회사zz'), /맞는 회사가 없어요/);
+});
