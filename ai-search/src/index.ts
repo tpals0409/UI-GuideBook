@@ -37,11 +37,9 @@ type Related = { id: string; title: string; url: string; source: string; rel: st
 
 const enc = new TextEncoder();
 
-async function vectorId(docId: string, n: number) {
-  // Vectorize id는 64바이트 제한이 있어서 문서 id를 해시로 줄여요
-  const h = new Uint8Array(await crypto.subtle.digest("SHA-256", enc.encode(docId)));
-  return `${[...h.slice(0, 16)].map(b => b.toString(16).padStart(2, "0")).join("")}#${n}`;
-}
+const sha = async (s: string) => [...new Uint8Array(await crypto.subtle.digest("SHA-256", enc.encode(s)))].map(b => b.toString(16).padStart(2, "0")).join("");
+// Vectorize id는 64바이트 제한이 있어서 문서 id를 해시로 줄여요
+const vectorId = async (docId: string, n: number) => `${(await sha(docId)).slice(0, 32)}#${n}`;
 
 async function embed(env: Env, texts: string[]) {
   const out: number[][] = [];
@@ -76,7 +74,19 @@ export async function edgesAround(env: Env, ids: string[]) {
 }
 
 // ───── 검색 ─────
+// 같은 질문은 Claude를 다시 부르지 않아요 (answers 표). 색인·관계가 바뀌면 clearAnswers로 표를 비워요.
+// ponytail: TTL 없음, 표가 커지면 created_at 오래된 것부터 지우기
 export async function search(env: Env, q: string, source?: string) {
+  const key = await sha(`${q.toLowerCase().replace(/\s+/g, " ")}|${source ?? ""}`);
+  const hit = await env.DB.prepare("SELECT body FROM answers WHERE key = ?").bind(key).first<{ body: string }>().catch(() => null); // 표가 아직 없으면 캐시 없이 동작
+  if (hit) return JSON.parse(hit.body) as Awaited<ReturnType<typeof answer>>;
+  const r = await answer(env, q, source);
+  await env.DB.prepare("INSERT OR REPLACE INTO answers (key, body, created_at) VALUES (?, ?, ?)").bind(key, JSON.stringify(r), new Date().toISOString()).run().catch(() => {});
+  return r;
+}
+const clearAnswers = (env: Env) => env.DB.prepare("DELETE FROM answers").run().catch(() => {});
+
+async function answer(env: Env, q: string, source?: string) {
   const empty = { answer: "관련 자료를 찾지 못했어요. 다른 말로 다시 물어봐 주세요.", results: [] };
   const [vec] = await embed(env, [q]);
   const found = await env.VECTORIZE.query(vec, { topK: RETRIEVE, ...(source ? { filter: { source } } : {}) });
@@ -312,6 +322,7 @@ async function upsert(env: Env, docs: DocIn[]) {
     setMeta(env, "embed_model", EMBED_MODEL),
     setMeta(env, "indexed_at", now),
   ]);
+  await clearAnswers(env);
   return { upserted: docs.length, chunks: items.length };
 }
 
@@ -326,6 +337,7 @@ async function remove(env: Env, ids: string[]) {
       env.DB.prepare(`DELETE FROM docs WHERE id IN (${placeholders(part.length)})`).bind(...part),
     ]);
   }
+  await clearAnswers(env);
   return { deleted: ids.length };
 }
 
@@ -353,6 +365,7 @@ async function putEdges(env: Env, body: { hash: string; edges: Edge[] }) {
       env.DB.prepare("INSERT OR REPLACE INTO edges (src, rel, dst, weight, origin) VALUES (?, ?, ?, ?, 'data')").bind(e.src, e.rel, e.dst, e.weight ?? 1)));
   }
   await env.DB.batch([setMeta(env, "edges_hash", body.hash)]);
+  await clearAnswers(env);
   return { edges: body.edges.length, unchanged: false };
 }
 
@@ -429,13 +442,15 @@ async function extract(env: Env, ids: string[]) {
     ...good.map(r => env.DB.prepare("INSERT OR IGNORE INTO edges (src, rel, dst, weight, origin) VALUES (?, ?, ?, ?, 'ai')").bind(r.src, r.rel, r.dst, WEIGHT[r.rel] ?? 0.7)),
     ...docs.map(d => env.DB.prepare("INSERT OR REPLACE INTO extracted (doc_id, hash, extracted_at) VALUES (?, ?, ?)").bind(d.id, d.hash, now)),
   ]);
+  if (good.length) await clearAnswers(env);
   return { extracted: docs.length, edges: good.length };
 }
 
 async function stats(env: Env) {
   const { results } = await env.DB.prepare("SELECT source, COUNT(*) AS docs FROM docs GROUP BY source").all();
   const { results: edges } = await env.DB.prepare("SELECT origin, COUNT(*) AS n FROM edges GROUP BY origin").all<{ origin: string; n: number }>().catch(() => ({ results: [] }));
-  return { sources: results, edges, embedModel: await getMeta(env, "embed_model"), indexedAt: await getMeta(env, "indexed_at") };
+  const cached = (await env.DB.prepare("SELECT COUNT(*) AS n FROM answers").first<{ n: number }>().catch(() => null))?.n ?? 0;
+  return { sources: results, edges, cachedAnswers: cached, embedModel: await getMeta(env, "embed_model"), indexedAt: await getMeta(env, "indexed_at") };
 }
 
 // ───── HTTP ─────

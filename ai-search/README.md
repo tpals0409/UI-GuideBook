@@ -22,6 +22,7 @@ GitHub Actions의 `CLOUDFLARE_API_TOKEN` 권한: Account — Workers Scripts Edi
 
 - API 키는 Worker의 secret에만 있어요. html에는 Worker 주소만 들어가요.
 - 비용: 질문 1회에 약 1~2센트(Claude) + Workers AI 소량. 자료가 늘어도 Claude에는 상위 10개만 보내서 거의 그대로예요.
+- 같은 질문(대소문자·공백 차이 무시)은 D1의 `answers` 표에서 바로 답해요 (Claude 호출 0). 색인이나 관계가 바뀌면 표를 비워요.
 
 ## 처음 설치 (한 번만)
 
@@ -60,7 +61,7 @@ npx cf vectorize metadata-index create dev-reference --property-name source --in
    npx cf d1 migrations apply <uuid>
    ```
 
-이후 배포는 `npm run deploy`만 하면 돼요. 비밀값을 바꿀 때는 `npx wrangler secret put ANTHROPIC_API_KEY --name dev-reference-ai-search` (입력창에 값을 넣어요, 즉시 반영).
+이후 배포는 `npm run deploy`만 하면 돼요. `migrations/`에 새 파일이 생기면 위 `migrations apply`를 한 번 더 실행해요 (표가 없으면 그 기능만 조용히 건너뛰어요). 비밀값을 바꿀 때는 `npx wrangler secret put ANTHROPIC_API_KEY --name dev-reference-ai-search` (입력창에 값을 넣어요, 즉시 반영).
 
 ## 자료 올리기
 
@@ -91,7 +92,7 @@ AI 버튼은 사이트(`https://` 주소)에서 열 때 자동으로 나타나�
 
 ## 관리용 API (`Authorization: Bearer <ADMIN_TOKEN>` 필요)
 
-- `GET /stats` — 출처별 문서 수, 관계 수(data/ai), 임베딩 모델, 마지막 색인 시각
+- `GET /stats` — 출처별 문서 수, 관계 수(data/ai), 캐시된 답 수, 임베딩 모델, 마지막 색인 시각
 - `POST /ingest/plan`, `/ingest/upsert`, `/ingest/delete` — 문서 색인. `npm run ingest`가 사용
 - `POST /ingest/edges`, `/ingest/extract-plan`, `/ingest/extract` — 관계 그래프(데이터에서 뽑은 것, Claude가 글에서 뽑은 것)
 
