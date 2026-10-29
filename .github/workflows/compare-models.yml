@@ -20,7 +20,7 @@ jobs:
         env:
           AI_SEARCH_URL: https://dev-reference-ai-search.tpals0409dev.workers.dev
           ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: compare
           path: ai-search/compare.md
