@@ -14,7 +14,8 @@
   "model": "Opus 5.5",
   "post": "https://x.com/LexnLin/status/2112674349132194185",
   "install": "npx skills add https://github.com/Leonxlnx/taste-skill --skill \"design-taste-frontend\"",
-  "skill": "A design skill that gives coding agents an art direction, real images and in-browser checks so they build distinctive websites, dashboards and app screens."
+  "skill": "A design skill that gives coding agents an art direction, real images and in-browser checks so they build distinctive websites, dashboards and app screens.",
+  "fullPrompt": "Build a 20-second showcase film of an analytics dashboard, rendered from real UI code.\nOpen on a dark, quiet screen; the dashboard assembles itself piece by piece: sidebar slides in, KPI cards count up from zero, a line chart draws left to right, a bar chart grows in staggered order.\nCamera glides slowly across the layout with subtle depth (parallax between cards and background). Every element uses the product's own design tokens: one accent color, generous spacing, large numerals, no gradients.\nCut to three close-ups: a hover state on a chart point, a filter chip toggling, a table row expanding. End on the full dashboard with the product name set in a confident sans-serif.\nMotion: ease-out entrances, 300–600 ms, nothing bounces. Add a soft ambient soundtrack and a single click sound on each toggle."
  },
  {
   "slug": "twoclipping-d89be5",
@@ -164,7 +165,8 @@
   "model": "Opus 5.5",
   "post": "https://x.com/LexnLin/status/2106891315371737480",
   "install": "npx skills add Leonxlnx/cinetic",
-  "skill": "An agent skill that has your coding agent concept, brand, score and render a short cinematic launch film or motion piece from code."
+  "skill": "An agent skill that has your coding agent concept, brand, score and render a short cinematic launch film or motion piece from code.",
+  "fullPrompt": "Create a 15-second cinematic launch film for a developer tool, entirely from code.\nAct 1 (0–4 s): black frame, a blinking cursor types one command line; the text resolves into the product wordmark with a light sweep.\nAct 2 (4–11 s): three feature beats, each a full-frame kinetic headline (two to four words) backed by an abstract code-like texture: lines of monospace glyphs drifting, highlighted tokens pulsing in the brand color.\nAct 3 (11–15 s): everything collapses into the logo; the install command appears beneath it; hold for two seconds.\nScore it: a low synth pad that rises through Act 2 and hits on the logo reveal. Timing locked to the beat. Palette: near-black background, one saturated accent, white type. No stock footage, no 3D."
  },
  {
   "slug": "grace-sunnyy-29bc61",
@@ -945,7 +947,8 @@
   "model": "Opus 5.5",
   "post": "https://x.com/anthonyriera/status/2103784508860305566",
   "install": "/plugin marketplace add Rieranthony/product-film-skill\n/plugin install product-film@product-film-skill",
-  "skill": "A Claude Code skill that learns your product's design system, interviews you about the film, then builds and renders a launch or landing-page video in Remotion using your real components, logo and music."
+  "skill": "A Claude Code skill that learns your product's design system, interviews you about the film, then builds and renders a launch or landing-page video in Remotion using your real components, logo and music.",
+  "fullPrompt": "Make a 30-second launch video for a Reddit marketing tool, using the product's real components, logo and brand colors.\nStory: a founder character (simple flat illustration, two-tone) stares at an empty Reddit feed; the tool appears and the feed fills with relevant threads, highlighted and sorted; the character drafts a reply with the tool's suggestion panel; an upvote counter climbs.\nAlternate between the character scenes and clean UI close-ups (search field, thread list, reply composer) rendered from the actual React components, not screenshots.\nTypography: short sentence-case captions, one per beat, lower third. Motion: snappy 250 ms transitions, cards slide and settle, no spinning.\nEnd card: logo, one-line tagline, website URL. Upbeat but not loud music; a soft notification sound when results appear."
  },
  {
   "slug": "jacksonfall-54b2ac",
@@ -1159,7 +1162,8 @@
   ],
   "model": "Opus 5.5",
   "post": "https://x.com/ChatGptAstra/status/2103834787647807540",
-  "prompt": "以动态设计师的高级审美，制作一段动态的15秒动态图形视频"
+  "prompt": "以动态设计师的高级审美，制作一段动态的15秒动态图形视频",
+  "fullPrompt": "Make a 15-second motion graphics piece, directed with the taste of a senior motion designer, demonstrating five principles of motion: timing, spacing, anticipation, follow-through and secondary action.\nOne principle per three-second chapter. Each chapter: a bold kinetic title (the principle's name) plus a minimal diagram that proves it, such as a ball with easing curves drawn next to its path, a square that squashes before it jumps, particles trailing behind a moving line.\nVisual system: off-white background, black geometry, one red accent, thin hairline guides that appear and disappear with the motion. Type set in a wide grotesque, titles enter with a mask reveal.\nRhythm: every chapter cuts on the beat of a tight percussive track. No fades, no blur. End on all five words stacked, then a hard cut to black."
  },
  {
   "slug": "kloss-xyz-15182a",
@@ -1401,7 +1405,8 @@
   ],
   "model": "Opus 5.5",
   "post": "https://x.com/henkvaness/status/2103801351993975279",
-  "prompt": "make educational video out of article."
+  "prompt": "make educational video out of article.",
+  "fullPrompt": "Turn the attached article about common prompting mistakes into a 60-second educational explainer video.\nStructure: a 5-second title card with the article's headline; then one chapter per mistake (five to six), each 8–10 seconds: a short kinetic headline naming the mistake, a simple diagram showing the wrong way versus the right way (two side-by-side boxes, red cross and green check), and a one-sentence takeaway as a caption.\nKeep all text in sentence case, large and legible on a phone. Diagrams are flat, two colors plus a neutral background. Transitions: wipe left between chapters, elements fade and slide in within a chapter.\nClose with a summary slide listing all mistakes and the article's author. Calm voice-over pacing: leave each slide on screen long enough to read twice."
  },
  {
   "slug": "ndhabarde11-f155b4",
@@ -1632,7 +1637,8 @@
   ],
   "model": "Opus 5.5",
   "post": "https://x.com/gautam_mer1/status/2103703336780530003",
-  "prompt": "an Apple-style 30s video of my app"
+  "prompt": "an Apple-style 30s video of my app",
+  "fullPrompt": "Create an Apple-style 30-second promo for my caption app, Matra.\nOpening: a phone floats in on a soft gradient background, screen dark; a tap wakes it and the app opens.\nBeats, each 4–5 seconds, each one short headline in large sans-serif over a clean phone close-up: 1) record a video, 2) captions appear word by word in sync with speech, 3) pick a caption style, previews flip through, 4) export and share.\nThe phone rotates slightly in 3D between beats; the camera pushes in on the screen for details. Real app screens and photos, no mockup chrome around the phone except the device itself.\nPalette: white and light gray backgrounds, one accent color from the app. Motion: slow, weighted eases; nothing faster than 400 ms. Music: warm, minimal piano with a soft hit on each headline. End on the app icon and name."
  },
  {
   "slug": "levabashidze-2d713a",
@@ -2108,7 +2114,8 @@
   ],
   "model": "Opus 5.5",
   "post": "https://x.com/Majin_AppSheet/status/2103497319899693327",
-  "prompt": "シンまじん式のPV作って"
+  "prompt": "シンまじん式のPV作って",
+  "fullPrompt": "Make a 20-second promo video (PV) for \"Shin Majin-shiki\", a method for building apps with AppSheet and AI.\nKinetic typography driven: the method's name appears in bold Japanese type with a sharp mask reveal; key phrases (three to five) slam in one after another, each on a different diagonal, each held for about two seconds.\nBetween phrases, quick inserts of abstract spreadsheet grids turning into app screens: cells light up, then snap into cards and buttons.\nColors: deep navy background, electric yellow type, white details. Camera: constant slow push-in with a brief whip-pan at each phrase change. Sound: punchy electronic beat, a bass hit on every phrase.\nFinal frame: method name, a one-line subtitle and the account handle."
  },
  {
   "slug": "davidmarcus-a28a60",
@@ -2193,7 +2200,8 @@
   ],
   "model": "Opus 5.5",
   "post": "https://x.com/sudo_kiran/status/2103463886372696074",
-  "prompt": "Go all out."
+  "prompt": "Go all out.",
+  "fullPrompt": "Make a 20-second motion design showreel that shows what you can do, with no storyboard from me.\nMix at least four styles in sequence: kinetic typography with words that split and reassemble; geometric shapes that morph (circle to square to triangle) with overshoot; a particle field that gathers into a wordmark; a split-screen rhythm montage cut to a beat.\nKeep one unifying palette (black, white, one neon accent) and one typeface so the styles feel like a single piece. Every transition should be motivated: a shape becomes a mask, a particle becomes a letter, a line becomes a cut.\nAdd a driving electronic track and sync every major change to the beat. End on a single word, \"Motion.\", then cut to black."
  },
  {
   "slug": "gizakdag-cf4ae6",
@@ -2787,7 +2795,8 @@
   "model": "Opus 5.5",
   "effort": "Max",
   "post": "https://x.com/slvDev/status/2103569170075975986",
-  "prompt": "create 15+ sec self-promotion promo"
+  "prompt": "create 15+ sec self-promotion promo",
+  "fullPrompt": "Create a 15-to-20-second self-promotion spot for Claude as a motion design tool.\nOpen on a phone and a laptop screen side by side, both dark; a prompt is typed on the laptop; the phone screen fills with the resulting animation.\nThree kinetic headlines, one per beat, in large type: \"Describe it.\", \"Watch it move.\", \"Ship it.\" Behind each headline, product UI fragments animate in: a timeline scrubbing, layers stacking, an export dialog completing.\nThen a fast montage of six half-second clips showing different animation styles (type, shapes, charts, particles, characters, UI).\nVisual system: near-black background, white type, a single orange accent. Motion: confident, 200–400 ms, hard cuts on the beat. Music: modern, minimal, with an impact on the final logo."
  },
  {
   "slug": "sudo-kiran-4f8b59",
@@ -3391,7 +3400,8 @@
   "model": "Opus 5.5",
   "post": "https://x.com/jake11moran/status/2103247490237825416",
   "install": "npx skills add heygen-com/hyperframes-community-skills --skill session-story",
-  "skill": "Has your agent read your local Claude Code history and turn a typical session with you into a short scored animated film rendered in HyperFrames."
+  "skill": "Has your agent read your local Claude Code history and turn a typical session with you into a short scored animated film rendered in HyperFrames.",
+  "fullPrompt": "Read my local Claude Code session history and turn a typical session into a 45-second animated short film.\nCast two characters in flat illustration: me (at a desk) and the agent (an abstract glowing shape). Script the story from the real session: the request, a wrong turn, the fix, the passing test.\nShow the terminal as a stylized panel, not a screenshot: commands type in, output scrolls, a red error flashes, then turns green.\nScenes: 1) the ask, 2) the agent explores files (shapes flying between folders), 3) the first attempt fails, 4) the fix and green checkmark, 5) both characters relax; end card with the session date.\nScore it with a light, playful soundtrack and small sound effects for typing, error and success. Keep the tone warm and a little funny."
  },
  {
   "slug": "maxalexweber-67688b",
@@ -3407,7 +3417,8 @@
   ],
   "model": "Opus 5.5",
   "post": "https://x.com/maxalexweber/status/2103118009535459784",
-  "prompt": "Make a ODATANO edit that goes hard"
+  "prompt": "Make a ODATANO edit that goes hard",
+  "fullPrompt": "Make a 20-second hype edit for ODATANO, a Cardano project, that goes hard.\nKinetic type at the center: the project name hits the frame in heavy condensed capitals with a shake and chromatic split on every beat; supporting words (\"on-chain\", \"data\", \"Cardano\") flash in and out.\nBackgrounds: particle storms in the brand blue, hex grids pulsing, the Cardano logo built from dots that explode and re-form.\nEdit to a fast trap or phonk beat: hard cuts every half second in the chorus, slow-motion zoom on the drop. Add glitch transitions, light leaks and a film-grain overlay.\nEnd on the logo and handle, holding for two seconds with a slow pulse."
  },
  {
   "slug": "micheleharmonic-77628e",
@@ -3486,7 +3497,8 @@
   ],
   "model": "Opus 5.5",
   "post": "https://x.com/Rames_Jusso/status/2103200703598776559",
-  "prompt": "140 BPM rusko/skream style UK dubstep"
+  "prompt": "140 BPM rusko/skream style UK dubstep",
+  "fullPrompt": "Compose a 140 BPM UK dubstep track in the style of Rusko and Skream, about 30 seconds, and render a music video for it made of ASCII and terminal visuals.\nAudio: half-time drums, deep wobbling sub bass on the drop, sparse snare, a short vocal chop as a hook; 8-bar intro, 8-bar build, 16-bar drop.\nVisuals: a dark terminal frame; waveforms drawn with ASCII characters that react to the kick and bass; a wall of code that scrolls faster as the build rises; on the drop, the screen floods with large block-character glyphs that strobe in green and white.\nKeep everything monospaced and two-color except a single red flash on the drop. Sync every visual change to the audio grid."
  },
  {
   "slug": "0xevinho-3777d8",
@@ -3641,7 +3653,8 @@
   ],
   "model": "Opus 5.5",
   "post": "https://x.com/kantamk/status/2103148907228176511",
-  "prompt": "make a video that could go viral."
+  "prompt": "make a video that could go viral.",
+  "fullPrompt": "Make a short, satisfying video that could go viral: a small glowing ball trapped inside twelve concentric rings, each ring with a single gap, rotating at different speeds.\nThe ball bounces off the rings with realistic physics; every bounce plays a musical note, pitched higher for inner rings, so the bounces compose a melody. When the ball passes through a gap, that ring shatters into particles and disappears with a chime.\nCamera fixed, square frame, dark background, rings in a rainbow gradient from inside to outside, soft glow and motion trails on the ball.\nTension builds as rings vanish; the final escape triggers a burst of particles and a bass hit. Length 25–40 seconds, loopable ending."
  },
  {
   "slug": "parkerrex-1a54fe",

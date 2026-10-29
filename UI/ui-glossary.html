@@ -2003,10 +2003,11 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
   let mo=null,moSel='all';const qPh=$('#q').placeholder;
   const moLoad=()=>mo?Promise.resolve(mo):fetch('/motion.json').then(r=>r.ok?r.json():[]).catch(()=>[]).then(l=>mo=l);
   const moKind=e=>e.install?'스킬':'프롬프트';
+  const moPrompt=e=>[e.prompt,e.fullPrompt].filter(Boolean).join('\n\n'); // 원문이 한 줄뿐이면 그 아래 자세한 프롬프트를 이어 보여줘요
   const drawMo=()=>{
     if(!mo)return;
     const q=$('#q').value.trim().toLowerCase();
-    const list=mo.filter(e=>(moSel==='all'||(moSel==='skill'?e.install:e.tags.includes(moSel)))&&(!q||[e.title,e.author,e.handle,e.prompt,e.skill,...e.tags.map(moTag)].join(' ').toLowerCase().includes(q)));
+    const list=mo.filter(e=>(moSel==='all'||(moSel==='skill'?e.install:e.tags.includes(moSel)))&&(!q||[e.title,e.author,e.handle,e.prompt,e.fullPrompt,e.skill,...e.tags.map(moTag)].join(' ').toLowerCase().includes(q)));
     $('#mo-grid').innerHTML=list.map(e=>`<article class="mo-tile" data-s="${esc(e.slug)}" tabindex="0" role="button" aria-haspopup="dialog" aria-label="${esc(e.title)} 자세히 보기"><div class="demo mo-stage"><img src="${esc(e.poster)}" alt="" loading="lazy"></div><div class="cap"><h3>${esc(e.title)}<span class="ko">@${esc(e.handle||e.author)}</span></h3><p><span class="mo-tag">${moKind(e)}</span>${e.tags.map(moTag).join(' · ')}</p></div></article>`).join('');
     $('#mo-count').textContent=list.length;$('#mo-empty').hidden=list.length>0;
     const n={};mo.forEach(e=>e.tags.forEach(t=>n[t]=(n[t]||0)+1));
@@ -2047,7 +2048,7 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
     $('#mo-side').innerHTML=`<h2 id="mo-title">${esc(e.title)}</h2>
       <p class="mo-by">@${esc(e.handle||'')} ${esc(e.author||'')}${e.post?` · <a href="${esc(e.post)}" target="_blank" rel="noopener">원문 글</a>`:''}</p>
       <dl>${e.model?`<dt>모델</dt><dd>${esc(e.model)}</dd>`:''}${e.effort?`<dt>노력 수준</dt><dd>${esc(e.effort)}</dd>`:''}<dt>종류</dt><dd>${e.tags.map(moTag).join(', ')}</dd>${e.date?`<dt>올린 날</dt><dd>${esc(e.date)}</dd>`:''}</dl>
-      ${e.prompt?`<pre>${esc(e.prompt)}</pre><button class="mo-act" data-copy="prompt">프롬프트 복사</button>`:''}
+      ${e.prompt||e.fullPrompt?`<pre>${esc(moPrompt(e))}</pre><button class="mo-act" data-copy="prompt">프롬프트 복사</button>`:''}
       ${e.install?`<p class="mo-by">${esc(e.skill||'')}</p><pre>${esc(e.install)}</pre><button class="mo-act" data-copy="install">설치 명령 복사</button>`:''}
       <p class="mo-by">영상과 프롬프트의 권리는 작성자에게 있어요. 참고용으로만 써요.</p>`;
     moDlg.showModal();moV.play().catch(()=>{});
@@ -2058,7 +2059,7 @@ gestalt:['간격이 같으면 → 하나의 덩어리로 보여요','간격만 �
   $('#mo-side').addEventListener('click',async ev=>{
     const b=ev.target.closest('[data-copy]');if(!b)return;
     const e=mo.find(x=>x.slug===$('#mo-side').dataset.s),t=b.textContent;
-    try{await navigator.clipboard.writeText(e[b.dataset.copy]);b.textContent='복사했어요'}catch{b.textContent='복사하지 못했어요'}
+    try{await navigator.clipboard.writeText(b.dataset.copy==='prompt'?moPrompt(e):e[b.dataset.copy]);b.textContent='복사했어요'}catch{b.textContent='복사하지 못했어요'}
     setTimeout(()=>b.textContent=t,1400);
   });
   $('#mo-x').onclick=()=>moDlg.close();
