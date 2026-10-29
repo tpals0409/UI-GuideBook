@@ -7,7 +7,7 @@
 - `dev-reference-ai-search.tpals0409dev.workers.dev`: 자료 업로드(`/ingest`, `/stats`)만 받아요(`ADMIN_TOKEN` 필요). 페이지와 검색은 404예요.
 - 로컬 파일로 연 html에서는 AI 버튼이 숨겨져요.
 
-`main`에 푸시하면 GitHub Actions(`.github/workflows/deploy.yml`)가 배포와 검색 색인 갱신을 자동으로 해요. 로컬에서 직접 하려면 `npm run deploy`(사이트 반영)와 `npm run ingest`(검색 반영)를 실행해요. `npm run deploy`는 `scripts/build-site.mjs`로 html과 `.md` 문서를 `public/`에 모은 뒤 배포해요.
+`main`에 푸시하면 GitHub Actions(`.github/workflows/deploy.yml`)가 배포와 검색 색인 갱신을 자동으로 해요. 로컬에서 직접 하려면 `npm run deploy`(사이트 반영)와 `npm run ingest`(검색 반영)를 실행해요. `npm run deploy`는 `scripts/build-site.mjs`로 html과 `.md` 문서를 `public/`에 모은 뒤 배포해요. 외부 자료(회사 팔레트·모션 예시·애니메이션 코드)는 받아오면 `data/*.json`에 저장하고, 못 받으면 저장해 둔 것을 그대로 써요.
 
 GitHub Actions의 `CLOUDFLARE_API_TOKEN` 권한: Account — Workers Scripts Edit, Account Settings Read, D1 Read, Vectorize Read, Workers AI Read / Zone(leo0409.work) — Workers Routes Edit, Zone Read, DNS Read.
 
@@ -17,11 +17,11 @@ GitHub Actions의 `CLOUDFLARE_API_TOKEN` 권한: Account — Workers Scripts Edi
 질문을 받으면 관련 자료를 찾아(RAG) Claude가 짧게 답하고, 근거가 된 자료 목록을 돌려줘요.
 
 ```
-질문 → 임베딩(Workers AI bge-m3) → Vectorize 상위 20개 → 재정렬 → 상위 8개 → Claude Opus 5.5 → 답변 + 자료 목록
+질문 → 임베딩(Workers AI bge-m3) → Vectorize 상위 20개 (+ 관계 그래프 이웃) → 재정렬 → 상위 10개 → Claude Opus 5.5 → 답변 + 자료 목록
 ```
 
 - API 키는 Worker의 secret에만 있어요. html에는 Worker 주소만 들어가요.
-- 비용: 질문 1회에 약 1~2센트(Claude) + Workers AI 소량. 자료가 늘어도 Claude에는 상위 8개만 보내서 거의 그대로예요.
+- 비용: 질문 1회에 약 1~2센트(Claude) + Workers AI 소량. 자료가 늘어도 Claude에는 상위 10개만 보내서 거의 그대로예요.
 
 ## 처음 설치 (한 번만)
 
@@ -70,7 +70,7 @@ AI_SEARCH_URL=https://dev-reference-ai-search.<계정>.workers.dev ADMIN_TOKEN=<
 
 바뀐 문서만 다시 임베딩해요. 업로드 없이 추출 결과만 보려면 `npm run ingest -- --dry-run`.
 
-마지막으로 `UI/ui-glossary.html`의 `const AI_ENDPOINT=''`에 Worker 주소를 넣으면 AI 버튼이 나타나요.
+AI 버튼은 사이트(`https://` 주소)에서 열 때 자동으로 나타나요. 로컬 파일로 열면 숨겨져요.
 
 ## 자료 추가하기
 
@@ -85,14 +85,17 @@ AI_SEARCH_URL=https://dev-reference-ai-search.<계정>.workers.dev ADMIN_TOKEN=<
 
 ## 설정
 
-- 허용할 페이지 출처: `cloudflare.config.ts`의 `ALLOWED_ORIGINS` (기본값 `null` = 로컬에서 연 html 파일). 페이지를 호스팅하면 그 주소를 쉼표로 추가해요.
+- 허용할 페이지 출처: `cloudflare.config.ts`의 `ALLOWED_ORIGINS` (기본값 `https://ui.leo0409.work`). 다른 주소에서도 검색을 쓰려면 쉼표로 추가해요.
 - 요청 제한: IP당 1분에 10회 (`RATE_LIMITER`)
 - 임베딩 모델을 바꾸면 Vectorize 인덱스를 새 차원으로 다시 만들고 `npm run ingest -- --full`을 실행해요.
 
 ## 관리용 API (`Authorization: Bearer <ADMIN_TOKEN>` 필요)
 
-- `GET /stats` — 출처별 문서 수, 임베딩 모델, 마지막 색인 시각
-- `POST /ingest/plan`, `/ingest/upsert`, `/ingest/delete` — `npm run ingest`가 사용
+- `GET /stats` — 출처별 문서 수, 관계 수(data/ai), 임베딩 모델, 마지막 색인 시각
+- `POST /ingest/plan`, `/ingest/upsert`, `/ingest/delete` — 문서 색인. `npm run ingest`가 사용
+- `POST /ingest/edges`, `/ingest/extract-plan`, `/ingest/extract` — 관계 그래프(데이터에서 뽑은 것, Claude가 글에서 뽑은 것)
+
+사이트 전용(인증 없음, Access 뒤): `GET /graph` — 관계 전체(5분 캐시), 모달의 '관련' 칸이 써요.
 
 ## 다른 프로젝트에서 쓰기 (MCP)
 

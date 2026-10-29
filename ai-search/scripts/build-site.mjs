@@ -40,8 +40,10 @@ fs.writeFileSync(path.join(out, 'docs.json'), JSON.stringify(docs));
 // 예시 테마의 글꼴 목록 (무료·오픈소스 글꼴)
 const fonts = await buildFontList();
 fs.writeFileSync(path.join(out, 'fonts.json'), JSON.stringify(fonts));
-// 예시 테마의 회사 팔레트 (oh-my-design). 받아오지 못해도 배포는 계속해요
-const companies = await buildCompanyList(fonts).catch(err => { console.warn(`회사 팔레트를 받지 못했어요: ${err.message}`); return []; });
+// 예시 테마의 회사 팔레트 (oh-my-design). 받아오지 못하면 저장해 둔 목록을 써요 (빈 사이트가 배포되지 않게)
+const companiesFile = path.join(configDir, 'data', 'companies.json');
+const companies = await buildCompanyList(fonts).then(l => { fs.writeFileSync(companiesFile, JSON.stringify(l, null, 1) + '\n'); return l; })
+  .catch(err => { console.warn(`회사 팔레트를 새로 받지 못했어요: ${err.message}`); return fs.existsSync(companiesFile) ? JSON.parse(fs.readFileSync(companiesFile, 'utf8')) : []; });
 fs.writeFileSync(path.join(out, 'companies.json'), JSON.stringify(companies));
 // 모션 예시 (prompt-motion). 받아오지 못하면 저장해 둔 목록을 써요
 const motion = await buildMotionList().catch(err => { console.warn(`모션 예시를 새로 받지 못했어요: ${err.message}`); return JSON.parse(fs.readFileSync(path.join(configDir, 'data', 'motion.json'), 'utf8')); });
