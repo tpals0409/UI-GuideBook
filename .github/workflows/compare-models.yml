@@ -13,7 +13,7 @@ jobs:
         working-directory: ai-search
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
       - run: node scripts/compare-models.mjs > compare.md
