@@ -537,7 +537,8 @@ export default {
       }
       return reply({ error: "없는 경로예요." }, 404);
     } catch (err) {
-      console.error(err);
+      // Workers Logs에는 스택만 남아서, Anthropic 오류는 상태 코드와 메시지를 직접 적어요
+      console.error(err instanceof Anthropic.APIError ? `Anthropic ${err.status}: ${err.message}` : err);
       if (err instanceof Anthropic.RateLimitError) return reply({ error: "AI 사용량이 많아요. 잠시 후 다시 시도해 주세요." }, 503);
       if (err instanceof Anthropic.APIError) return reply({ error: "AI 응답을 받지 못했어요." }, 502);
       return reply({ error: "서버 오류가 났어요." }, 500);

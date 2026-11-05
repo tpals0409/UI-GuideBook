@@ -15,6 +15,9 @@ export default defineConfig({
     previewUrls: false,
     // 모든 요청을 Worker가 먼저 받아서, 주소에 따라 페이지를 보여줄지 정해요
     assets: { runWorkerFirst: true },
+    // 한국에서 접속해도 Anthropic 지원 지역에서 실행해요. 요청이 홍콩(HKG)으로 들어오면 Claude 호출이 거절돼요 (Anthropic 미지원 지역)
+    // ponytail: 페이지 파일도 Worker를 거쳐 미국을 다녀와요. 느려지면 AI 경로만 별도 Worker로 나눠요
+    placement: { region: "aws:us-east-1" },
     // Workers Logs: 대시보드(Workers → Logs)에서 요청·오류 로그를 봐요. 보관은 Cloudflare 기본값(일부 무료)이에요
     observability: { logs: { enabled: true } },
     env: {
