@@ -33,8 +33,19 @@ const theme = code => code
 const SCROLLY = ['wordmark-reveal', 'column-drift', 'testimonial-reel-focus', 'process-sticky-steps', 'footer-wordmark-rise', 'footer-pulse-links',
   'gyro-gallery', 'testimonial-ring', 'kinetic-type-ring', 'navbar-pill-glide', 'navbar-push-menu', 'navbar-gooey-bloom', 'navbar-corner-panel'];
 
+// 코드가 불러오는 패키지 중 우리에게 설치되지 않은 것. Tween UI가 새 패키지를 쓰는 예시를 올려도 빌드가 멈추지 않게 해요
+const missingPackages = code => [...code.matchAll(/(?:from|import)\s*['"]([^'"]+)['"]/g)].map(m => m[1])
+  .filter(s => !/^(\.|\/|@\/|node:)/.test(s))
+  .map(s => s.split('/').slice(0, s[0] === '@' ? 2 : 1).join('/'))
+  .filter(p => !fs.existsSync(path.join(dir, 'node_modules', p)));
+
 export async function buildTweenPreviews(list, outDir) {
   fs.rmSync(src, { recursive: true, force: true });
+  // 설치되지 않은 패키지를 쓰는 예시는 미리보기만 건너뛰어요 (목록과 코드에는 그대로 나와요). 그 컴포넌트를 가져다 쓰는 예시도 같이요
+  const skip = new Map();
+  for (const e of list) { const miss = [...new Set(missingPackages([e.demo || '', ...e.files.map(f => f.content)].join('\n')))]; if (miss.length) skip.set(e.name, miss); }
+  for (let grew = true; grew;) { grew = false; for (const e of list) if (!skip.has(e.name) && (e.needs || []).some(n => skip.has(n))) { skip.set(e.name, [`${e.needs.find(n => skip.has(n))}의 미리보기가 없어요`]); grew = true; } }
+  for (const [name, miss] of skip) console.warn(`미리보기를 건너뛰어요: ${name} (설치되지 않은 패키지: ${miss.join(', ')})`);
   for (const e of list) {
     for (const f of e.files) {
       const p = path.join(src, f.path);
@@ -43,7 +54,7 @@ export async function buildTweenPreviews(list, outDir) {
       const src2 = f.content.replace(/onMouseEnter=\{(?:pause|\(\) => (?:pauseRef\.current\(\)|swiperRef\.current\?\.autoplay\?\.pause\(\)))\}/g, 'onMouseEnter={undefined}');
       fs.writeFileSync(p, theme(src2));
     }
-    if (e.demo) {
+    if (e.demo && !skip.has(e.name)) {
       fs.mkdirSync(path.join(src, 'examples'), { recursive: true });
       // 몇몇 예시는 레이아웃 파일(<html><body>…)이라 그대로 그리면 아무것도 안 보여요. 겉 태그만 빼요
       let demo = e.demo.replace(/<html[^>]*>|<body[^>]*>/g, '<>').replace(/<\/html>|<\/body>/g, '</>');
