@@ -674,38 +674,6 @@
   "en": "Liner"
  },
  {
-  "id": "co-laftel",
-  "name": "라프텔",
-  "src": "https://oh-my-design.kr/design-systems/laftel",
-  "primary": "#816bff",
-  "onPrimary": "#ffffff",
-  "primarySoft": "#edeaff",
-  "surface": "#ffffff",
-  "surface2": "#242537",
-  "text": "#121212",
-  "muted": "#8a8a8a",
-  "border": "#eeeeee",
-  "danger": "#f16361",
-  "radius": {
-   "sm": "4px",
-   "md": "4px",
-   "lg": "8px",
-   "btn": "4px"
-  },
-  "font": "pretendard",
-  "spacing": {
-   "xs": 4,
-   "sm": 8,
-   "md": 12,
-   "base": 16,
-   "lg": 24,
-   "xl": 32,
-   "xxl": 48
-  },
-  "unverified": true,
-  "en": "Laftel"
- },
- {
   "id": "co-lablup",
   "name": "래블업",
   "src": "https://oh-my-design.kr/design-systems/lablup",
@@ -877,50 +845,6 @@
    "popover": 12
   },
   "en": "Wrtn"
- },
- {
-  "id": "co-ridi",
-  "name": "리디",
-  "src": "https://oh-my-design.kr/design-systems/ridi",
-  "primary": "#f4361e",
-  "onPrimary": "#111111",
-  "primarySoft": "#fde3df",
-  "surface": "#ffffff",
-  "surface2": "#f9f9f9",
-  "text": "#222222",
-  "muted": "#7a7a7a",
-  "border": "#e4e4e4",
-  "success": "#03aa5a",
-  "radius": {
-   "sm": "4px",
-   "md": "8px",
-   "lg": "12px",
-   "btn": "8px"
-  },
-  "type": {
-   "body": "16px/400/1.5"
-  },
-  "spacing": {
-   "xs": 4,
-   "sm": 8,
-   "md": 12,
-   "base": 16,
-   "lg": 24,
-   "xl": 32,
-   "xxl": 48,
-   "section": 64
-  },
-  "category": "Consumer",
-  "tags": [
-   "calm",
-   "literate",
-   "editorial",
-   "low-pressure",
-   "bookish",
-   "respectful"
-  ],
-  "unverified": true,
-  "en": "RIDI"
  },
  {
   "id": "co-remember",
@@ -2673,80 +2597,6 @@
   "en": "Wisetracker"
  },
  {
-  "id": "co-watcha",
-  "name": "왓챠",
-  "src": "https://oh-my-design.kr/design-systems/watcha",
-  "primary": "#f82f62",
-  "onPrimary": "#111111",
-  "primarySoft": "#3c0b18",
-  "surface": "#000000",
-  "surface2": "#141414",
-  "text": "#ffffff",
-  "muted": "#999ca1",
-  "border": "#333333",
-  "dark": true,
-  "danger": "#f25c5c",
-  "success": "#2bc149",
-  "radius": {
-   "sm": "4px",
-   "md": "8px",
-   "lg": "12px",
-   "btn": "4px"
-  },
-  "font": "pretendard",
-  "type": {
-   "body": "14px/400/1.5"
-  },
-  "spacing": {
-   "xs": 4,
-   "sm": 8,
-   "md": 12,
-   "base": 16,
-   "lg": 24,
-   "xl": 32
-  },
-  "unverified": true,
-  "en": "Watcha"
- },
- {
-  "id": "co-yogiyo",
-  "name": "요기요",
-  "src": "https://oh-my-design.kr/design-systems/yogiyo",
-  "primary": "#fa0050",
-  "onPrimary": "#ffffff",
-  "primarySoft": "#fedbe6",
-  "surface": "#ffffff",
-  "surface2": "#f5f5f7",
-  "text": "#1a1a1a",
-  "muted": "#999999",
-  "border": "#dddddd",
-  "danger": "#f5444c",
-  "success": "#21c17a",
-  "warning": "#ff8a00",
-  "radius": {
-   "sm": "6px",
-   "md": "12px",
-   "lg": "16px",
-   "btn": "12px"
-  },
-  "font": "pretendard",
-  "type": {
-   "body": "14px/400/1.5"
-  },
-  "spacing": {
-   "xs": 4,
-   "sm": 8,
-   "md": 12,
-   "base": 16,
-   "lg": 24,
-   "xl": 32,
-   "xxl": 48,
-   "section": 64
-  },
-  "unverified": true,
-  "en": "Yogiyo"
- },
- {
   "id": "co-wooribank",
   "name": "우리은행",
   "src": "https://oh-my-design.kr/design-systems/wooribank",
@@ -2811,42 +2661,6 @@
    "xl": 40
   },
   "en": "Wanted"
- },
- {
-  "id": "co-wavve",
-  "name": "웨이브",
-  "src": "https://oh-my-design.kr/design-systems/wavve",
-  "primary": "#1351f9",
-  "onPrimary": "#ffffff",
-  "primarySoft": "#0c1e50",
-  "surface": "#0a0e1a",
-  "surface2": "#1e212c",
-  "text": "#ffffff",
-  "muted": "#a7aec0",
-  "border": "#3b3e48",
-  "dark": true,
-  "danger": "#ff7a45",
-  "success": "#2bc56f",
-  "radius": {
-   "sm": "4px",
-   "md": "6px",
-   "lg": "12px",
-   "btn": "6px"
-  },
-  "font": "pretendard",
-  "type": {
-   "body": "14px/400/1.5"
-  },
-  "spacing": {
-   "xs": 4,
-   "sm": 8,
-   "md": 12,
-   "base": 16,
-   "lg": 24,
-   "xl": 32
-  },
-  "unverified": true,
-  "en": "Wavve"
  },
  {
   "id": "co-weverse",
@@ -3189,43 +3003,6 @@
    "super-app"
   ],
   "en": "Kakao"
- },
- {
-  "id": "co-kakaot",
-  "name": "카카오 T",
-  "src": "https://oh-my-design.kr/design-systems/kakaot",
-  "primary": "#fee500",
-  "onPrimary": "#191919",
-  "primarySoft": "#fffbdb",
-  "surface": "#ffffff",
-  "surface2": "#f5f6f7",
-  "text": "#191919",
-  "muted": "#76787a",
-  "border": "#e5e6e8",
-  "danger": "#f5444c",
-  "success": "#0fb882",
-  "warning": "#ff8a00",
-  "radius": {
-   "sm": "8px",
-   "md": "12px",
-   "lg": "16px",
-   "btn": "12px"
-  },
-  "font": "pretendard",
-  "type": {
-   "body": "14px/400/1.5"
-  },
-  "spacing": {
-   "xs": 4,
-   "sm": 8,
-   "md": 12,
-   "base": 16,
-   "lg": 20,
-   "xl": 24,
-   "xxl": 32
-  },
-  "unverified": true,
-  "en": "Kakao T"
  },
  {
   "id": "co-kakaogames",
@@ -5569,6 +5346,27 @@
   "unverified": true
  },
  {
+  "id": "co-bbva",
+  "name": "BBVA",
+  "src": "https://oh-my-design.kr/design-systems/bbva",
+  "primary": "#001391",
+  "onPrimary": "#ffffff",
+  "primarySoft": "#dbdef0",
+  "surface": "#ffffff",
+  "surface2": "#f7f8f8",
+  "text": "#070e46",
+  "muted": "#6a6e90",
+  "border": "#e1e2e9",
+  "success": "#0c6dff",
+  "radius": {
+   "md": "8px",
+   "btn": "8px"
+  },
+  "type": {
+   "body": "15.008px/350/24px"
+  }
+ },
+ {
   "id": "co-bilibili",
   "name": "Bilibili",
   "src": "https://oh-my-design.kr/design-systems/bilibili",
@@ -7362,6 +7160,24 @@
   ]
  },
  {
+  "id": "co-emag",
+  "name": "eMAG",
+  "src": "https://oh-my-design.kr/design-systems/emag",
+  "primary": "#0082e6",
+  "onPrimary": "#111111",
+  "primarySoft": "#69aff4",
+  "surface": "#f4f4f4",
+  "surface2": "#ffffff",
+  "text": "#222222",
+  "muted": "#666666",
+  "border": "#c4c4c4",
+  "success": "#009900",
+  "warning": "#f0a600",
+  "radius": {
+   "btn": "8px"
+  }
+ },
+ {
   "id": "co-epidemicsound",
   "name": "Epidemic Sound",
   "src": "https://oh-my-design.kr/design-systems/epidemicsound",
@@ -7554,6 +7370,24 @@
    "2xl": 64,
    "3xl": 80,
    "4xl": 96
+  }
+ },
+ {
+  "id": "co-finnair",
+  "name": "Finnair",
+  "src": "https://oh-my-design.kr/design-systems/finnair",
+  "primary": "#0c0243",
+  "onPrimary": "#ffffff",
+  "primarySoft": "#dddce5",
+  "surface": "#ffffff",
+  "surface2": "#f5f5f7",
+  "text": "#0c0243",
+  "muted": "#6d678e",
+  "border": "#e2e1e8",
+  "radius": {
+   "md": "40px",
+   "lg": "8px",
+   "btn": "40px"
   }
  },
  {
@@ -8932,6 +8766,43 @@
   }
  },
  {
+  "id": "co-kakaot",
+  "name": "카카오 T",
+  "src": "https://oh-my-design.kr/design-systems/kakaot",
+  "primary": "#fee500",
+  "onPrimary": "#191919",
+  "primarySoft": "#fffbdb",
+  "surface": "#ffffff",
+  "surface2": "#f5f6f7",
+  "text": "#191919",
+  "muted": "#76787a",
+  "border": "#e5e6e8",
+  "danger": "#f5444c",
+  "success": "#0fb882",
+  "warning": "#ff8a00",
+  "radius": {
+   "sm": "8px",
+   "md": "12px",
+   "lg": "16px",
+   "btn": "12px"
+  },
+  "font": "pretendard",
+  "type": {
+   "body": "14px/400/1.5"
+  },
+  "spacing": {
+   "xs": 4,
+   "sm": 8,
+   "md": 12,
+   "base": 16,
+   "lg": 20,
+   "xl": 24,
+   "xxl": 32
+  },
+  "unverified": true,
+  "en": "Kakao T"
+ },
+ {
   "id": "co-kdan",
   "name": "Kdan Mobile",
   "src": "https://oh-my-design.kr/design-systems/kdan",
@@ -8998,6 +8869,27 @@
    "section": 64
   },
   "unverified": true
+ },
+ {
+  "id": "co-kiwi",
+  "name": "Kiwi.com",
+  "src": "https://oh-my-design.kr/design-systems/kiwi",
+  "primary": "#008f7b",
+  "onPrimary": "#111111",
+  "primarySoft": "#dbefed",
+  "surface": "#ffffff",
+  "surface2": "#f6f6f7",
+  "text": "#252a31",
+  "muted": "#7c7f83",
+  "border": "#bac7d5",
+  "success": "#048724",
+  "warning": "#b36200",
+  "radius": {
+   "btn": "8px"
+  },
+  "type": {
+   "body": "15px/400/20px"
+  }
  },
  {
   "id": "co-kkbox",
@@ -9268,6 +9160,38 @@
    "lg": 12,
    "xl": 24
   }
+ },
+ {
+  "id": "co-laftel",
+  "name": "라프텔",
+  "src": "https://oh-my-design.kr/design-systems/laftel",
+  "primary": "#816bff",
+  "onPrimary": "#ffffff",
+  "primarySoft": "#edeaff",
+  "surface": "#ffffff",
+  "surface2": "#242537",
+  "text": "#121212",
+  "muted": "#8a8a8a",
+  "border": "#eeeeee",
+  "danger": "#f16361",
+  "radius": {
+   "sm": "4px",
+   "md": "4px",
+   "lg": "8px",
+   "btn": "4px"
+  },
+  "font": "pretendard",
+  "spacing": {
+   "xs": 4,
+   "sm": 8,
+   "md": 12,
+   "base": 16,
+   "lg": 24,
+   "xl": 32,
+   "xxl": 48
+  },
+  "unverified": true,
+  "en": "Laftel"
  },
  {
   "id": "co-lamborghini",
@@ -9622,6 +9546,27 @@
    "md": "12px",
    "lg": "24px",
    "btn": "30px"
+  }
+ },
+ {
+  "id": "co-mango",
+  "name": "Mango",
+  "src": "https://oh-my-design.kr/design-systems/mango",
+  "primary": "#131313",
+  "onPrimary": "#ffffff",
+  "primarySoft": "#dedede",
+  "surface": "#ffffff",
+  "surface2": "#f6f6f6",
+  "text": "#121212",
+  "muted": "#717171",
+  "border": "#e3e3e3",
+  "success": "#008905",
+  "warning": "#b25d2e",
+  "radius": {
+   "btn": "0px"
+  },
+  "type": {
+   "body": "13px/400/20px"
   }
  },
  {
@@ -10594,6 +10539,25 @@
    "section": 64
   },
   "unverified": true
+ },
+ {
+  "id": "co-odoo",
+  "name": "Odoo",
+  "src": "https://oh-my-design.kr/design-systems/odoo",
+  "primary": "#714b67",
+  "onPrimary": "#ffffff",
+  "primarySoft": "#ebe6ea",
+  "surface": "#ffffff",
+  "surface2": "#f3f4f6",
+  "text": "#111827",
+  "muted": "#017e84",
+  "border": "#e2e3e5",
+  "radius": {
+   "sm": "4.8px",
+   "md": "6.4px",
+   "lg": "8px",
+   "btn": "6.4px"
+  }
  },
  {
   "id": "co-ollama",
@@ -11936,6 +11900,50 @@
   "unverified": true
  },
  {
+  "id": "co-ridi",
+  "name": "리디",
+  "src": "https://oh-my-design.kr/design-systems/ridi",
+  "primary": "#f4361e",
+  "onPrimary": "#111111",
+  "primarySoft": "#fde3df",
+  "surface": "#ffffff",
+  "surface2": "#f9f9f9",
+  "text": "#222222",
+  "muted": "#7a7a7a",
+  "border": "#e4e4e4",
+  "success": "#03aa5a",
+  "radius": {
+   "sm": "4px",
+   "md": "8px",
+   "lg": "12px",
+   "btn": "8px"
+  },
+  "type": {
+   "body": "16px/400/1.5"
+  },
+  "spacing": {
+   "xs": 4,
+   "sm": 8,
+   "md": 12,
+   "base": 16,
+   "lg": 24,
+   "xl": 32,
+   "xxl": 48,
+   "section": 64
+  },
+  "category": "Consumer",
+  "tags": [
+   "calm",
+   "literate",
+   "editorial",
+   "low-pressure",
+   "bookish",
+   "respectful"
+  ],
+  "unverified": true,
+  "en": "RIDI"
+ },
+ {
   "id": "co-riiid",
   "name": "Riiid",
   "src": "https://oh-my-design.kr/design-systems/riiid",
@@ -12187,6 +12195,23 @@
    "md": "12px",
    "lg": "16px",
    "btn": "12px"
+  }
+ },
+ {
+  "id": "co-sbb",
+  "name": "SBB",
+  "src": "https://oh-my-design.kr/design-systems/sbb",
+  "primary": "#eb0000",
+  "onPrimary": "#ffffff",
+  "primarySoft": "#fcdbdb",
+  "surface": "#ffffff",
+  "surface2": "#f6f6f6",
+  "text": "#686868",
+  "muted": "#a4a4a4",
+  "border": "#e5e5e5",
+  "radius": {
+   "lg": "8px",
+   "btn": "0px"
   }
  },
  {
@@ -13887,6 +13912,78 @@
   "unverified": true
  },
  {
+  "id": "co-watcha",
+  "name": "왓챠",
+  "src": "https://oh-my-design.kr/design-systems/watcha",
+  "primary": "#f82f62",
+  "onPrimary": "#111111",
+  "primarySoft": "#3c0b18",
+  "surface": "#000000",
+  "surface2": "#141414",
+  "text": "#ffffff",
+  "muted": "#999ca1",
+  "border": "#333333",
+  "dark": true,
+  "danger": "#f25c5c",
+  "success": "#2bc149",
+  "radius": {
+   "sm": "4px",
+   "md": "8px",
+   "lg": "12px",
+   "btn": "4px"
+  },
+  "font": "pretendard",
+  "type": {
+   "body": "14px/400/1.5"
+  },
+  "spacing": {
+   "xs": 4,
+   "sm": 8,
+   "md": 12,
+   "base": 16,
+   "lg": 24,
+   "xl": 32
+  },
+  "unverified": true,
+  "en": "Watcha"
+ },
+ {
+  "id": "co-wavve",
+  "name": "웨이브",
+  "src": "https://oh-my-design.kr/design-systems/wavve",
+  "primary": "#1351f9",
+  "onPrimary": "#ffffff",
+  "primarySoft": "#0c1e50",
+  "surface": "#0a0e1a",
+  "surface2": "#1e212c",
+  "text": "#ffffff",
+  "muted": "#a7aec0",
+  "border": "#3b3e48",
+  "dark": true,
+  "danger": "#ff7a45",
+  "success": "#2bc56f",
+  "radius": {
+   "sm": "4px",
+   "md": "6px",
+   "lg": "12px",
+   "btn": "6px"
+  },
+  "font": "pretendard",
+  "type": {
+   "body": "14px/400/1.5"
+  },
+  "spacing": {
+   "xs": 4,
+   "sm": 8,
+   "md": 12,
+   "base": 16,
+   "lg": 24,
+   "xl": 32
+  },
+  "unverified": true,
+  "en": "Wavve"
+ },
+ {
   "id": "co-webflow",
   "name": "Webflow",
   "src": "https://oh-my-design.kr/design-systems/webflow",
@@ -14036,6 +14133,25 @@
    "lime",
    "green"
   ]
+ },
+ {
+  "id": "co-withings",
+  "name": "Withings",
+  "src": "https://oh-my-design.kr/design-systems/withings",
+  "primary": "#6784fe",
+  "onPrimary": "#111111",
+  "primarySoft": "#eaeeff",
+  "surface": "#ffffff",
+  "surface2": "#f5f5f5",
+  "text": "#0f0f0f",
+  "muted": "#6f6f6f",
+  "border": "#e2e2e2",
+  "danger": "#d93421",
+  "success": "#62e795",
+  "radius": {
+   "md": "16px",
+   "btn": "16px"
+  }
  },
  {
   "id": "co-wolt",
@@ -14214,6 +14330,44 @@
    "section": 81
   },
   "unverified": true
+ },
+ {
+  "id": "co-yogiyo",
+  "name": "요기요",
+  "src": "https://oh-my-design.kr/design-systems/yogiyo",
+  "primary": "#fa0050",
+  "onPrimary": "#ffffff",
+  "primarySoft": "#fedbe6",
+  "surface": "#ffffff",
+  "surface2": "#f5f5f7",
+  "text": "#1a1a1a",
+  "muted": "#999999",
+  "border": "#dddddd",
+  "danger": "#f5444c",
+  "success": "#21c17a",
+  "warning": "#ff8a00",
+  "radius": {
+   "sm": "6px",
+   "md": "12px",
+   "lg": "16px",
+   "btn": "12px"
+  },
+  "font": "pretendard",
+  "type": {
+   "body": "14px/400/1.5"
+  },
+  "spacing": {
+   "xs": 4,
+   "sm": 8,
+   "md": 12,
+   "base": 16,
+   "lg": 24,
+   "xl": 32,
+   "xxl": 48,
+   "section": 64
+  },
+  "unverified": true,
+  "en": "Yogiyo"
  },
  {
   "id": "co-yourator",
